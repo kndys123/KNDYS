@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey.svg)]()
 
-**📚 [Complete Module Guide](GUIA_COMPLETA_MODULOS.md) - Step-by-step guide for ALL modules in simple language**
+**📚 [Complete Module Guide](GUIA_COMPLETA_MODULOS.md) - Step-by-step guide for ALL modules**
 
 </div>
 
