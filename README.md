@@ -8,6 +8,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey.svg)]()
 
+**📚 [Complete Module Guide](GUIA_COMPLETA_MODULOS.md) - Step-by-step guide for ALL modules in simple language**
+
 </div>
 
 ---
@@ -192,6 +194,7 @@ See [DISCLAIMER.md](DISCLAIMER.md) for complete legal information.
 
 ## Documentation
 
+- **📚 [Complete Module Guide](GUIA_COMPLETA_MODULOS.md)** - **NEW!** Step-by-step guide for ALL 48 modules in simple language
 - **[Getting Started](GETTING_STARTED.md)** - Complete beginner's guide
 - **[Quick Start](QUICKSTART.md)** - Quick reference and examples
 - **[Installation Help](INSTALL.md)** - Detailed installation guide
