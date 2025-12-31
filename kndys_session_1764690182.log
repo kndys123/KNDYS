@@ -1,6 +1,0 @@
-[2025-12-02 15:44:04] [INFO] Running module: password/hash_cracker
-[2025-12-02 15:44:04] [SUCCESS] Hash cracked: 5f4dcc3b5aa765d61d8327deb882cf99 -> password
-[2025-12-02 15:45:34] [INFO] Running module: scan/ssl_scanner
-[2025-12-02 15:48:54] [INFO] Running module: password/credential_stuffing
-[2025-12-02 15:51:04] [INFO] Running module: scan/vuln_scanner
-[2025-12-02 15:53:38] [INFO] Running module: recon/port_scanner

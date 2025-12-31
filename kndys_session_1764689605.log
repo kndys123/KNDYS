@@ -1,9 +1,0 @@
-[2025-12-02 15:35:06] [INFO] Running module: password/brute_force
-[2025-12-02 15:35:22] [INFO] Running module: password/brute_force
-[2025-12-02 15:35:22] [ERROR] Module error: invalid literal for int() with base 10: '//192.168.45.12'
-[2025-12-02 15:35:57] [INFO] Running module: password/brute_force
-[2025-12-02 15:35:57] [ERROR] Module error: invalid literal for int() with base 10: '//192.168.52.4'
-[2025-12-02 15:37:32] [INFO] Running module: exploit/xss_exploit
-[2025-12-02 15:39:35] [INFO] Running module: password/spray_attack
-[2025-12-02 15:41:16] [INFO] Running module: post/privilege_escalation
-[2025-12-02 15:42:39] [INFO] Running module: wireless/wifi_scanner

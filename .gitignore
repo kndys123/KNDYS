@@ -83,3 +83,46 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+# Test files
+test_*.py
+
+# Session logs and results
+*.log
+kndys_session_*.json
+
+# Scan/exercise results
+*_report.txt
+*_report.json
+crawler_*.json
+portscan_*.json
+ssl_scan_*.json
+subdomains_*.json
+vuln_scan_*.txt
+network_map_*.json
+os_detect_*.json
+xss_scan_*.json
+csrf_scan_*.json
+dir_traversal_*.json
+pivot_plan_*.json
+credentials_*.txt
+
+# Temporary directories
+tmp/
+run/
+set/
+use/
+ui/
+tt/
+tests/
+docs/
+handler_sessions/
+phish_site/
+
+# Evidence and audit logs
+evidence.zip
+*_audit.log
+
+# Scripts
+test_modules.sh
+install.sh
