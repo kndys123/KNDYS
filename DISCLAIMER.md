@@ -9,20 +9,20 @@ KNDYS Framework is a penetration testing tool designed for **authorized security
 ## Authorized Use Only
 
 This tool is intended for:
-- ✅ Security professionals conducting authorized penetration tests
-- ✅ System administrators testing their own networks
-- ✅ Students learning in controlled lab environments
-- ✅ Bug bounty hunters operating within program rules
-- ✅ Security researchers with proper authorization
+- Security professionals conducting authorized penetration tests
+- System administrators testing their own networks
+- Students learning in controlled lab environments
+- Bug bounty hunters operating within program rules
+- Security researchers with proper authorization
 
 ## Prohibited Use
 
 This tool must NOT be used for:
-- ❌ Unauthorized access to computer systems
-- ❌ Testing systems without explicit written permission
-- ❌ Malicious or illegal activities
-- ❌ Causing damage to systems or data
-- ❌ Violating privacy or data protection laws
+- Unauthorized access to computer systems
+- Testing systems without explicit written permission
+- Malicious or illegal activities
+- Causing damage to systems or data
+- Violating privacy or data protection laws
 
 ## Legal Responsibility
 

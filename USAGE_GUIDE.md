@@ -11,7 +11,7 @@ Todos los 35 módulos han sido probados y funcionan correctamente:
 
 ## Ejemplos de Uso por Categoría
 
-### 🔍 Reconnaissance (recon/)
+### Reconnaissance (recon/)
 
 #### Port Scanner
 ```bash
@@ -44,7 +44,7 @@ kndys(recon/network_mapper)> set network 192.168.1.0/24
 kndys(recon/network_mapper)> run
 ```
 
-### 🔎 Vulnerability Scanning (scan/)
+### Vulnerability Scanning (scan/)
 
 #### Vulnerability Scanner
 ```bash
@@ -76,7 +76,7 @@ kndys(scan/csrf_scanner)> set url http://example.com
 kndys(scan/csrf_scanner)> run
 ```
 
-### ⚡ Exploitation (exploit/)
+### Exploitation (exploit/)
 
 #### Multi Handler (para reverse shells)
 ```bash
@@ -111,7 +111,7 @@ kndys(exploit/command_injection)> set os linux
 kndys(exploit/command_injection)> run
 ```
 
-### 🎯 Post-Exploitation (post/)
+### Post-Exploitation (post/)
 
 #### Shell Interactiva
 ```bash
@@ -164,7 +164,7 @@ kndys(post/pivot)> set target 192.168.2.0/24
 kndys(post/pivot)> run
 ```
 
-### 🔐 Password Attacks (password/)
+### Password Attacks (password/)
 
 #### Brute Force
 ```bash
@@ -203,7 +203,7 @@ kndys(password/credential_stuffing)> set threads 5
 kndys(password/credential_stuffing)> run
 ```
 
-### 📡 Wireless (wireless/)
+### Wireless (wireless/)
 
 #### WiFi Scanner
 ```bash
@@ -231,7 +231,7 @@ kndys(wireless/rogue_ap)> set channel 6
 kndys(wireless/rogue_ap)> run
 ```
 
-### 🎭 Social Engineering (social/)
+### Social Engineering (social/)
 
 #### Phishing Campaign
 ```bash
@@ -259,7 +259,7 @@ kndys(social/website_cloner)> set output phish_site
 kndys(social/website_cloner)> run
 ```
 
-### 📊 Reporting (report/)
+### Reporting (report/)
 
 #### Report Generator
 ```bash

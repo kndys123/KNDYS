@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey.svg)]()
 
-**📚 [Complete Module Guide](GUIA_COMPLETA_MODULOS.md) - Step-by-step guide for ALL modules**
+** [Complete Module Guide](GUIA_COMPLETA_MODULOS.md) - Step-by-step guide for ALL modules**
 
 </div>
 
@@ -20,26 +20,26 @@ KNDYS is a comprehensive penetration testing framework designed for security pro
 
 ## Key Features
 
-### 🔍 Reconnaissance & Intelligence
+### Reconnaissance & Intelligence
 - Advanced web crawling and content discovery
 - DNS enumeration and subdomain discovery
 - Port scanning and service detection
 - Network mapping and OS fingerprinting
 
-### 🛡️ Vulnerability Assessment
+### Vulnerability Assessment
 - SQL injection testing (error-based, blind, time-based)
 - XSS detection (reflected, stored, DOM-based)
 - CSRF vulnerability scanning
 - Directory traversal and LFI/RFI testing
 - Command injection and XXE detection
 
-### 🔓 Exploitation
+### Exploitation
 - Web application exploitation
 - Network-level attacks (ARP spoofing, DNS hijacking)
 - Wireless security testing
 - Social engineering campaigns
 
-### 📡 Post-Exploitation
+### Post-Exploitation
 - Credential harvesting and dumping
 - Persistence mechanisms
 - Privilege escalation techniques
@@ -47,7 +47,7 @@ KNDYS is a comprehensive penetration testing framework designed for security pro
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Simplest Method (Recommended)
 
@@ -79,7 +79,7 @@ chmod +x install.sh && ./install.sh
 
 ---
 
-## 📖 Basic Usage
+## Basic Usage
 
 ```bash
 # Start the framework
@@ -181,7 +181,7 @@ run
 
 ## Legal Disclaimer
 
-⚠️ **CRITICAL**: This tool is for **authorized security testing only**.
+ **CRITICAL**: This tool is for **authorized security testing only**.
 
 - Use only on systems you own or have explicit written permission to test
 - Unauthorized access to computer systems is illegal in most jurisdictions
@@ -194,7 +194,7 @@ See [DISCLAIMER.md](DISCLAIMER.md) for complete legal information.
 
 ## Documentation
 
-- **📚 [Complete Module Guide](GUIA_COMPLETA_MODULOS.md)** - **NEW!** Step-by-step guide for ALL 48 modules in simple language
+- ** [Complete Module Guide](GUIA_COMPLETA_MODULOS.md)** - **NEW!** Step-by-step guide for ALL 48 modules in simple language
 - **[Getting Started](GETTING_STARTED.md)** - Complete beginner's guide
 - **[Quick Start](QUICKSTART.md)** - Quick reference and examples
 - **[Installation Help](INSTALL.md)** - Detailed installation guide
@@ -226,15 +226,15 @@ Built for the security community. Thanks to all contributors and the open-source
 
 **Use Responsibly • Test Ethically • Secure The Future**
 
-Made with ❤️ for security professionals
+Made with ️ for security professionals
 
-</div>  
-✅ cryptography
-✅ paramiko
-✅ python-nmap
-✅ scapy
-✅ beautifulsoup4
-✅ sqlite3 (built-in)
+</div> 
+ cryptography
+ paramiko
+ python-nmap
+ scapy
+ beautifulsoup4
+ sqlite3 (built-in)
 
 ## Solución de Problemas
 

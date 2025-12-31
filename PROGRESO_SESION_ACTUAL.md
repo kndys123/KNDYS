@@ -1,49 +1,49 @@
-# 📊 Resumen de Progreso - Sesión Actual
+# Resumen de Progreso - Sesión Actual
 
-## ✅ Módulos Completados y Probados
+## Módulos Completados y Probados
 
-### 1. **port_scanner** ✅
+### 1. **port_scanner** 
 **Estado**: Completado y probado exitosamente
 **Líneas agregadas**: ~220
 **Mejoras implementadas**:
-- ✅ Base de datos extendida: 90+ servicios (antes: 24)
-- ✅ Banner grabbing avanzado con probes específicos por protocolo
-- ✅ Detección de vulnerabilidades en modo agresivo:
-  - FTP Anonymous login
-  - Redis sin autenticación
-  - MongoDB expuesto
-  - Elasticsearch abierto
-- ✅ Exportación dual: JSON + TXT
-- ✅ Formato profesional de salida
-- ✅ Categorización de servicios
+- Base de datos extendida: 90+ servicios (antes: 24)
+- Banner grabbing avanzado con probes específicos por protocolo
+- Detección de vulnerabilidades en modo agresivo:
+ - FTP Anonymous login
+ - Redis sin autenticación
+ - MongoDB expuesto
+ - Elasticsearch abierto
+- Exportación dual: JSON + TXT
+- Formato profesional de salida
+- Categorización de servicios
 
 **Prueba realizada**: Escaneado scanme.nmap.org
-**Resultado**: ✅ Detectó correctamente puertos 22 (SSH), 80 (HTTP), 9929
+**Resultado**: Detectó correctamente puertos 22 (SSH), 80 (HTTP), 9929
 
 ---
 
-### 2. **subdomain_scanner** ✅
+### 2. **subdomain_scanner** 
 **Estado**: Completado y probado exitosamente
 **Líneas agregadas**: ~262
 **Mejoras implementadas**:
-- ✅ 5 técnicas de enumeración:
-  1. DNS Zone Transfer (AXFR)
-  2. Certificate Transparency (crt.sh)
-  3. DNS Brute Force mejorado (246 términos)
-  4. Common Patterns
-  5. HTTP/HTTPS Verification
-- ✅ Detección de Wildcard DNS
-- ✅ Filtrado automático de falsos positivos
-- ✅ Resolución paralela con threading
-- ✅ Exportación dual: JSON + TXT
-- ✅ Rate limiting integrado
+- 5 técnicas de enumeración:
+ 1. DNS Zone Transfer (AXFR)
+ 2. Certificate Transparency (crt.sh)
+ 3. DNS Brute Force mejorado (246 términos)
+ 4. Common Patterns
+ 5. HTTP/HTTPS Verification
+- Detección de Wildcard DNS
+- Filtrado automático de falsos positivos
+- Resolución paralela con threading
+- Exportación dual: JSON + TXT
+- Rate limiting integrado
 
 **Prueba realizada**: Enumeración de example.com
-**Resultado**: ✅ Encontró www.example.com correctamente
+**Resultado**: Encontró www.example.com correctamente
 
 ---
 
-## ⏳ Módulos Pendientes
+## Módulos Pendientes
 
 ### 3. **web_crawler** 
 **Documentación**: WEB_CRAWLER_IMPROVEMENTS.md
@@ -83,17 +83,17 @@
 
 ---
 
-## 📈 Estadísticas
+## Estadísticas
 
 - **Archivo actual**: `tt` con 6,209 líneas
 - **Módulos completados**: 2/6 (33%)
 - **Módulos probados**: 2/2 (100% de los completados)
 - **Líneas agregadas**: ~482
-- **Commit realizado**: ✅ `a89082b`
+- **Commit realizado**: `a89082b`
 
 ---
 
-## 🎯 Próxima Sesión
+## Próxima Sesión
 
 **Orden sugerido de implementación**:
 1. **vuln_scanner** (PRIORIDAD ALTA - es el más complejo y útil)
@@ -103,7 +103,7 @@
 
 **Estimación de tiempo por módulo**:
 - vuln_scanner: ~300 líneas (45-60 min)
-- web_crawler: ~250 líneas (30-40 min)  
+- web_crawler: ~250 líneas (30-40 min) 
 - os_detection: ~200 líneas (25-35 min)
 - network_mapper: ~220 líneas (30-40 min)
 
@@ -111,31 +111,31 @@
 
 ---
 
-## 📝 Notas Importantes
+## Notas Importantes
 
 1. **Backups**: El archivo está en git, commit `a89082b`
 2. **Dependencias instaladas**: dnspython para subdomain_scanner
 3. **Archivos de prueba generados**:
-   - portscan_scanme.nmap.org_1764846990.json
-   - portscan_scanme.nmap.org_1764846990.txt
-   - subdomains_example.com_1764847257.json
-   - subdomains_example.com_1764847257.txt
+ - portscan_scanme.nmap.org_1764846990.json
+ - portscan_scanme.nmap.org_1764846990.txt
+ - subdomains_example.com_1764847257.json
+ - subdomains_example.com_1764847257.txt
 
 4. **Funciones auxiliares agregadas**:
-   - `get_service_name_extended()` - 90+ servicios
-   - `_export_port_scan_results()` - Exportación port scanner
-   - `_detect_wildcard_dns()` - Detección wildcard
-   - `_try_zone_transfer()` - AXFR
-   - `_search_crt_sh()` - Certificate Transparency
-   - `_get_subdomain_wordlist()` - Wordlist de 246 términos
-   - `_dns_brute_force()` - Brute force con threading
-   - `_test_common_patterns()` - Patrones comunes
-   - `_verify_http_access()` - Verificación HTTP
-   - `_export_subdomain_results()` - Exportación subdomain scanner
+ - `get_service_name_extended()` - 90+ servicios
+ - `_export_port_scan_results()` - Exportación port scanner
+ - `_detect_wildcard_dns()` - Detección wildcard
+ - `_try_zone_transfer()` - AXFR
+ - `_search_crt_sh()` - Certificate Transparency
+ - `_get_subdomain_wordlist()` - Wordlist de 246 términos
+ - `_dns_brute_force()` - Brute force con threading
+ - `_test_common_patterns()` - Patrones comunes
+ - `_verify_http_access()` - Verificación HTTP
+ - `_export_subdomain_results()` - Exportación subdomain scanner
 
 ---
 
-## 🚀 Para Continuar
+## Para Continuar
 
 ```bash
 # Verificar estado actual

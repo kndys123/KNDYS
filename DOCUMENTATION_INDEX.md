@@ -1,57 +1,57 @@
-# 📚 KNDYS Framework v3.1 - Índice de Documentación
+# KNDYS Framework v3.1 - Índice de Documentación
 
-## 🎯 Guía Rápida de Navegación
+## Guía Rápida de Navegación
 
 Este índice te ayudará a encontrar la documentación que necesitas según tu rol y necesidad.
 
 ---
 
-## 👤 PARA USUARIOS FINALES
+## PARA USUARIOS FINALES
 
-### 🚀 Primeros Pasos
+### Primeros Pasos
 1. **README_v3.1.md** ⭐ EMPEZAR AQUÍ
-   - Resumen ejecutivo de la expansión v3.1
-   - 19 nuevos módulos explicados
-   - Ejemplos de uso rápido
-   - Casos de uso corporativos
+ - Resumen ejecutivo de la expansión v3.1
+ - 19 nuevos módulos explicados
+ - Ejemplos de uso rápido
+ - Casos de uso corporativos
 
-### 📖 Uso Diario
+### Uso Diario
 2. **USAGE_GUIDE.md**
-   - Manual de uso del framework original
-   - Comandos básicos
-   - Flujo de trabajo estándar
+ - Manual de uso del framework original
+ - Comandos básicos
+ - Flujo de trabajo estándar
 
 3. **MODULES_GUIDE_v3.1.md** ⭐ GUÍA COMPLETA DE NUEVOS MÓDULOS
-   - Documentación detallada de 19 módulos nuevos
-   - Ejemplos paso a paso
-   - 3 escenarios corporativos completos
-   - Consideraciones legales
+ - Documentación detallada de 19 módulos nuevos
+ - Ejemplos paso a paso
+ - 3 escenarios corporativos completos
+ - Consideraciones legales
 
-### 📧 Reportes de Implementación de Módulos Mejorados
+### Reportes de Implementación de Módulos Mejorados
 4. **CREDENTIAL_HARVESTER_IMPLEMENTATION_REPORT.md** ⭐ MÓDULO CREDENTIAL_HARVESTER
-   - Transformación completa (42 → 900+ líneas)
-   - 15 templates profesionales
-   - 47 tests con 100% de cobertura
-   - Servidor Flask multi-threaded
-   - Exportación CSV/JSON/HTML
-   
-5. **PHISHING_MODULE_IMPLEMENTATION_REPORT.md** ⭐ MÓDULO PHISHING
-   - Transformación completa (32 → 675+ líneas)
-   - 20 templates profesionales (Office365, Google, PayPal, etc.)
-   - Sistema multi-threaded SMTP
-   - Base de datos SQLite con 3 tablas
-   - Email tracking (opens/clicks)
-   - 25 tests con 100% de cobertura
+ - Transformación completa (42 → 900+ líneas)
+ - 15 templates profesionales
+ - 47 tests con 100% de cobertura
+ - Servidor Flask multi-threaded
+ - Exportación CSV/JSON/HTML
 
-### 🔍 Consulta Rápida
+5. **PHISHING_MODULE_IMPLEMENTATION_REPORT.md** ⭐ MÓDULO PHISHING
+ - Transformación completa (32 → 675+ líneas)
+ - 20 templates profesionales (Office365, Google, PayPal, etc.)
+ - Sistema multi-threaded SMTP
+ - Base de datos SQLite con 3 tablas
+ - Email tracking (opens/clicks)
+ - 25 tests con 100% de cobertura
+
+### Consulta Rápida
 ```bash
 # Ver todos los módulos
 show modules
 
 # Ver categoría específica
-show modules social    # 9 módulos
-show modules network   # 5 módulos
-show modules webapp    # 5 módulos
+show modules social # 9 módulos
+show modules network # 5 módulos
+show modules webapp # 5 módulos
 
 # Ayuda general
 help
@@ -59,137 +59,137 @@ help
 
 ---
 
-## 👨‍💻 PARA ADMINISTRADORES Y RESPONSABLES
+## ‍ PARA ADMINISTRADORES Y RESPONSABLES
 
-### 📋 Decisiones de Implementación
+### Decisiones de Implementación
 1. **README_v3.1.md**
-   - Resumen ejecutivo
-   - Estadísticas de expansión
-   - Capacidades añadidas
+ - Resumen ejecutivo
+ - Estadísticas de expansión
+ - Capacidades añadidas
 
 2. **RESUMEN_MEJORAS.md**
-   - Historial completo v3.0 → v3.1
-   - Mejoras de interfaz
-   - Estadísticas comparativas
+ - Historial completo v3.0 → v3.1
+ - Mejoras de interfaz
+ - Estadísticas comparativas
 
-### 🎯 Casos de Uso Empresariales
+### Casos de Uso Empresariales
 3. **MODULES_GUIDE_v3.1.md** - Sección "Escenarios Prácticos"
-   - Scenario 1: Security Awareness Campaign
-   - Scenario 2: Network Security Assessment
-   - Scenario 3: Web Application Pentest
+ - Scenario 1: Security Awareness Campaign
+ - Scenario 2: Network Security Assessment
+ - Scenario 3: Web Application Pentest
 
-### ⚖️ Compliance y Legal
+### ️ Compliance y Legal
 4. **MODULES_GUIDE_v3.1.md** - Sección "Consideraciones Legales"
-   - Uso autorizado exclusivamente
-   - Advertencias por módulo
-   - Responsabilidad legal
+ - Uso autorizado exclusivamente
+ - Advertencias por módulo
+ - Responsabilidad legal
 
 ---
 
-## 🔧 PARA DESARROLLADORES
+## PARA DESARROLLADORES
 
-### 📝 Cambios Técnicos
+### Cambios Técnicos
 1. **CHANGELOG.md** ⭐ HISTORIAL TÉCNICO COMPLETO
-   - v3.1: Expansión de módulos (último)
-   - v3.0: Rediseño completo de interfaz
-   - Cambios línea por línea
+ - v3.1: Expansión de módulos (último)
+ - v3.0: Rediseño completo de interfaz
+ - Cambios línea por línea
 
 2. **IMPLEMENTATION_SUMMARY_v3.1.md** ⭐ DETALLES DE IMPLEMENTACIÓN
-   - Estructura del código
-   - Métricas de calidad
-   - Detalles de testing
-   - Roadmap futuro
+ - Estructura del código
+ - Métricas de calidad
+ - Detalles de testing
+ - Roadmap futuro
 
-### 🧪 Testing y Validación
+### Testing y Validación
 3. **IMPLEMENTATION_SUMMARY_v3.1.md** - Sección "Pruebas Realizadas"
-   - Tests exitosos
-   - Módulos verificados
-   - Resultados de testing
+ - Tests exitosos
+ - Módulos verificados
+ - Resultados de testing
 
-### 🏗️ Arquitectura
+### ️ Arquitectura
 ```python
 # Estructura del código en tt (5038 líneas)
-Lines    630-850:  Module definitions (social, network, webapp)
-Lines  1300-1450:  Module handlers dictionary
-Lines  3930-4830:  Module implementations (19 nuevas funciones)
-Lines  3211-3310:  Help menu (actualizado con nuevas categorías)
+Lines 630-850: Module definitions (social, network, webapp)
+Lines 1300-1450: Module handlers dictionary
+Lines 3930-4830: Module implementations (19 nuevas funciones)
+Lines 3211-3310: Help menu (actualizado con nuevas categorías)
 ```
 
 ---
 
-## 📑 TABLA DE CONTENIDOS POR DOCUMENTO
+## TABLA DE CONTENIDOS POR DOCUMENTO
 
 ### README_v3.1.md (340 líneas)
 ```
-✓ Resumen de cambios
-✓ 19 módulos implementados (lista completa)
-✓ Mejoras de interfaz
-✓ Documentación nueva
-✓ Pruebas realizadas
-✓ Casos de uso corporativos
-✓ Cómo usar los nuevos módulos (3 ejemplos)
-✓ Consideraciones legales
-✓ Estadísticas finales
+ Resumen de cambios
+ 19 módulos implementados (lista completa)
+ Mejoras de interfaz
+ Documentación nueva
+ Pruebas realizadas
+ Casos de uso corporativos
+ Cómo usar los nuevos módulos (3 ejemplos)
+ Consideraciones legales
+ Estadísticas finales
 ```
 
 ### MODULES_GUIDE_v3.1.md (580 líneas)
 ```
-✓ Social Engineering (6 módulos detallados)
-  - mass_mailer, qr_generator, usb_payload
-  - fake_update, sms_spoofing, pretexting
+ Social Engineering (6 módulos detallados)
+ - mass_mailer, qr_generator, usb_payload
+ - fake_update, sms_spoofing, pretexting
 
-✓ Network Attacks (5 módulos detallados)
-  - arp_spoof, dns_spoof, dhcp_starvation
-  - ssl_strip, packet_sniffer
+ Network Attacks (5 módulos detallados)
+ - arp_spoof, dns_spoof, dhcp_starvation
+ - ssl_strip, packet_sniffer
 
-✓ Web Application Testing (5 módulos detallados)
-  - jwt_cracker, api_fuzzer, cors_scanner
-  - nosql_injection, graphql_introspection
+ Web Application Testing (5 módulos detallados)
+ - jwt_cracker, api_fuzzer, cors_scanner
+ - nosql_injection, graphql_introspection
 
-✓ 3 Escenarios Prácticos Corporativos
-✓ Consideraciones Legales y Éticas
-✓ Referencias y Recursos
+ 3 Escenarios Prácticos Corporativos
+ Consideraciones Legales y Éticas
+ Referencias y Recursos
 ```
 
 ### IMPLEMENTATION_SUMMARY_v3.1.md (500 líneas)
 ```
-✓ Estadísticas de expansión
-✓ 19 módulos con detalles técnicos
-✓ Mejoras de interfaz
-✓ Documentación nueva
-✓ Pruebas realizadas y resultados
-✓ Casos de uso corporativos
-✓ Detalles técnicos de implementación
-✓ Métricas de calidad
-✓ Próximos pasos recomendados
+ Estadísticas de expansión
+ 19 módulos con detalles técnicos
+ Mejoras de interfaz
+ Documentación nueva
+ Pruebas realizadas y resultados
+ Casos de uso corporativos
+ Detalles técnicos de implementación
+ Métricas de calidad
+ Próximos pasos recomendados
 ```
 
 ### CHANGELOG.md (380 líneas)
 ```
-✓ v3.1 - Expansión de módulos (último)
-  - 6 módulos social engineering
-  - 5 módulos network attacks
-  - 5 módulos web application testing
-  - Estadísticas y mejoras de interfaz
+ v3.1 - Expansión de módulos (último)
+ - 6 módulos social engineering
+ - 5 módulos network attacks
+ - 5 módulos web application testing
+ - Estadísticas y mejoras de interfaz
 
-✓ v3.0 - Rediseño completo
-  - Interfaz minimalista
-  - 35 módulos originales mejorados
-  - Sistema de mensajes con Unicode
+ v3.0 - Rediseño completo
+ - Interfaz minimalista
+ - 35 módulos originales mejorados
+ - Sistema de mensajes con Unicode
 ```
 
 ### RESUMEN_MEJORAS.md (410 líneas)
 ```
-✓ v3.0 - Mejoras completas documentadas
-✓ v3.1 - Expansión documentada
-✓ Casos de uso corporativos
-✓ Estadísticas comparativas
-✓ Notas legales actualizadas
+ v3.0 - Mejoras completas documentadas
+ v3.1 - Expansión documentada
+ Casos de uso corporativos
+ Estadísticas comparativas
+ Notas legales actualizadas
 ```
 
 ---
 
-## 🎯 NAVEGACIÓN POR NECESIDAD
+## NAVEGACIÓN POR NECESIDAD
 
 ### "Quiero empezar a usar KNDYS v3.1"
 → **README_v3.1.md** (Sección: "CÓMO USAR LOS NUEVOS MÓDULOS")
@@ -214,7 +214,7 @@ Lines  3211-3310:  Help menu (actualizado con nuevas categorías)
 
 ---
 
-## 📊 ESTADÍSTICAS DE DOCUMENTACIÓN
+## ESTADÍSTICAS DE DOCUMENTACIÓN
 
 | Archivo | Líneas | Tamaño | Propósito |
 |---------|--------|--------|-----------|
@@ -229,41 +229,41 @@ Lines  3211-3310:  Help menu (actualizado con nuevas categorías)
 
 ---
 
-## 🗂️ ESTRUCTURA DE ARCHIVOS
+## ️ ESTRUCTURA DE ARCHIVOS
 
 ```
 KNDYS/
 │
-├── 📄 tt (5038 líneas)                      # Framework principal
+├── tt (5038 líneas) # Framework principal
 │
-├── 📚 DOCUMENTACIÓN PRINCIPAL
-│   ├── README_v3.1.md ⭐                     # EMPEZAR AQUÍ
-│   ├── MODULES_GUIDE_v3.1.md ⭐             # Guía completa de módulos
-│   ├── IMPLEMENTATION_SUMMARY_v3.1.md      # Detalles técnicos
-│   └── CHANGELOG.md                         # Historial de cambios
+├── DOCUMENTACIÓN PRINCIPAL
+│ ├── README_v3.1.md ⭐ # EMPEZAR AQUÍ
+│ ├── MODULES_GUIDE_v3.1.md ⭐ # Guía completa de módulos
+│ ├── IMPLEMENTATION_SUMMARY_v3.1.md # Detalles técnicos
+│ └── CHANGELOG.md # Historial de cambios
 │
-├── 📖 DOCUMENTACIÓN COMPLEMENTARIA
-│   ├── RESUMEN_MEJORAS.md                   # Resumen v3.0 + v3.1
-│   ├── USAGE_GUIDE.md                       # Manual de uso
-│   └── README.md                            # Readme original
+├── DOCUMENTACIÓN COMPLEMENTARIA
+│ ├── RESUMEN_MEJORAS.md # Resumen v3.0 + v3.1
+│ ├── USAGE_GUIDE.md # Manual de uso
+│ └── README.md # Readme original
 │
-├── 🗂️ WORDLISTS
-│   ├── rockyou.txt
-│   ├── password.lst
-│   └── xato-net-10-million-passwords-1000000.txt
+├── ️ WORDLISTS
+│ ├── rockyou.txt
+│ ├── password.lst
+│ └── xato-net-10-million-passwords-1000000.txt
 │
-├── 🌐 PHISHING SITE
-│   └── phish_site/
-│       └── index.html
+├── PHISHING SITE
+│ └── phish_site/
+│ └── index.html
 │
-└── 📋 OTROS
-    ├── requirements.txt
-    └── test_modules.sh
+└── OTROS
+ ├── requirements.txt
+ └── test_modules.sh
 ```
 
 ---
 
-## 🔍 BÚSQUEDA RÁPIDA POR PALABRA CLAVE
+## BÚSQUEDA RÁPIDA POR PALABRA CLAVE
 
 ### Módulos Sociales
 ```bash
@@ -287,7 +287,7 @@ grep -n "legal\|autorizado\|illegal\|ethical" MODULES_GUIDE_v3.1.md
 
 ---
 
-## 💡 TIPS DE USO
+## TIPS DE USO
 
 ### Para nuevos usuarios
 1. Leer **README_v3.1.md** primero (10 min)
@@ -340,7 +340,7 @@ show modules
 
 ---
 
-## 📌 ENLACES RÁPIDOS
+## ENLACES RÁPIDOS
 
 ### Documentos principales
 - [README v3.1](README_v3.1.md) - Guía de inicio
@@ -357,7 +357,7 @@ show modules
 
 ---
 
-## ✅ CHECKLIST DE LECTURA RECOMENDADA
+## CHECKLIST DE LECTURA RECOMENDADA
 
 ### Usuario Básico
 - [ ] README_v3.1.md (completo)
@@ -381,7 +381,7 @@ show modules
 
 ---
 
-## 🎓 RECURSOS DE APRENDIZAJE
+## RECURSOS DE APRENDIZAJE
 
 ### Documentación oficial
 1. README_v3.1.md - Overview
@@ -402,7 +402,7 @@ show modules
 
 ---
 
-## 🚀 EMPEZAR AHORA
+## EMPEZAR AHORA
 
 ```bash
 # 1. Leer resumen ejecutivo
@@ -425,16 +425,16 @@ cat MODULES_GUIDE_v3.1.md | less
 
 ---
 
-**KNDYS Framework v3.1**  
-*Professional Penetration Testing*  
+**KNDYS Framework v3.1** 
+*Professional Penetration Testing* 
 *54+ Modules | 10 Categories | 2610 Lines of Documentation*
 
-**Documentación Completa**: 74.4 KB  
+**Documentación Completa**: 74.4 KB 
 **Última Actualización**: Diciembre 2025
 
 ---
 
-*Todo lo que necesitas saber sobre KNDYS v3.1 en un solo lugar.*  
+*Todo lo que necesitas saber sobre KNDYS v3.1 en un solo lugar.* 
 *Usa este índice como punto de partida para navegar la documentación.*
 
-📖 **¡Feliz pentesting responsable!** 🔒
+ **¡Feliz pentesting responsable!** 

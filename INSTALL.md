@@ -1,6 +1,6 @@
 # KNDYS Installation Guide
 
-## 🎯 Simplest Method (Recommended)
+## Simplest Method (Recommended)
 
 Just clone and run! All dependencies install automatically:
 
@@ -15,7 +15,7 @@ chmod +x kndys.py
 
 ---
 
-## ⚙️ Alternative Installation Methods
+## Alternative Installation Methods
 
 ### Method 1: Manual pip install
 
@@ -43,7 +43,7 @@ pip3 install --break-system-packages -r requirements.txt
 git clone https://github.com/kndys123/KNDYS.git
 cd KNDYS
 python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ./kndys.py
 ```
@@ -59,7 +59,7 @@ chmod +x install.sh
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Issue: "pip3 not found"
 
@@ -99,7 +99,7 @@ sudo ./kndys.py
 
 ---
 
-## 📋 Requirements
+## Requirements
 
 - **Python:** 3.8 or higher
 - **OS:** Linux, macOS, or WSL2
@@ -109,7 +109,7 @@ sudo ./kndys.py
 
 ---
 
-## ✅ Verification
+## Verification
 
 After installation, verify everything works:
 
@@ -126,36 +126,36 @@ If you see the module list and info, you're all set!
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 Once installed, see [QUICKSTART.md](QUICKSTART.md) for usage examples.
 
 ---
 
-## 💡 Pro Tips
+## Pro Tips
 
 1. **Add to PATH** for system-wide access:
-   ```bash
-   sudo ln -s $(pwd)/kndys.py /usr/local/bin/kndys
-   # Now run from anywhere:
-   kndys
-   ```
+ ```bash
+ sudo ln -s $(pwd)/kndys.py /usr/local/bin/kndys
+ # Now run from anywhere:
+ kndys
+ ```
 
 2. **Create alias** for quick access:
-   ```bash
-   echo "alias kndys='cd ~/KNDYS && ./kndys.py'" >> ~/.bashrc
-   source ~/.bashrc
-   ```
+ ```bash
+ echo "alias kndys='cd ~/KNDYS && ./kndys.py'" >> ~/.bashrc
+ source ~/.bashrc
+ ```
 
 3. **Update framework:**
-   ```bash
-   cd KNDYS
-   git pull
-   ```
+ ```bash
+ cd KNDYS
+ git pull
+ ```
 
 ---
 
-## 📞 Support
+## Support
 
 - **Issues:** [GitHub Issues](https://github.com/kndys123/KNDYS/issues)
 - **Documentation:** See [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)

@@ -78,7 +78,7 @@ When you're in a module, you can:
 
 ## 5️⃣ Essential Modules to Try
 
-### 🔍 Reconnaissance
+### Reconnaissance
 
 **Port Scanner** - Find open ports and services
 ```bash
@@ -103,7 +103,7 @@ set max_pages 50
 run
 ```
 
-### 🛡️ Vulnerability Scanning
+### Vulnerability Scanning
 
 **SQL Injection** - Test for SQL injection
 ```bash
@@ -128,7 +128,7 @@ set url http://example.com
 run
 ```
 
-### 🔐 Password Attacks
+### Password Attacks
 
 **Hash Cracker** - Crack password hashes
 ```bash
@@ -154,9 +154,9 @@ run
 ### Set Global Options
 
 ```bash
-kndys> set lhost 192.168.1.100    # Your IP
-kndys> set lport 4444              # Your listening port
-kndys> set threads 10              # Concurrent threads
+kndys> set lhost 192.168.1.100 # Your IP
+kndys> set lport 4444 # Your listening port
+kndys> set threads 10 # Concurrent threads
 ```
 
 ### View Current Config
@@ -173,7 +173,7 @@ All scan results are automatically saved to JSON files in the current directory 
 
 ## 7️⃣ Legal & Ethical Use
 
-⚠️ **IMPORTANT:**
+ **IMPORTANT:**
 
 - Only test systems you own or have written permission to test
 - Unauthorized penetration testing is illegal
@@ -211,37 +211,37 @@ See [DISCLAIMER.md](DISCLAIMER.md) for full legal information.
 2. **Command History:** Use ↑/↓ arrows to scroll through previous commands
 
 3. **Quick Module Access:** You can load and run in one session:
-   ```bash
-   ./kndys.py
-   use scanner/sql_injection
-   set target http://example.com?id=1
-   run
-   exit
-   ```
+ ```bash
+ ./kndys.py
+ use scanner/sql_injection
+ set target http://example.com?id=1
+ run
+ exit
+ ```
 
 4. **Multiple Targets:** Create a targets file and loop through them
 
 5. **Results Location:** All scan results save to the current directory with timestamps
 
 6. **Update KNDYS:**
-   ```bash
-   cd KNDYS
-   git pull
-   ```
+ ```bash
+ cd KNDYS
+ git pull
+ ```
 
 ---
 
-## 🎯 Next Steps
+## Next Steps
 
-1. ✅ Install KNDYS
-2. ✅ Run your first scan
-3. 📚 Read [QUICKSTART.md](QUICKSTART.md) for more examples
-4. 🔍 Explore all modules with `show modules`
-5. 🎓 Learn about specific modules in [MODULES_GUIDE_v3.1.md](MODULES_GUIDE_v3.1.md)
-6. 🚀 Start your security testing journey!
+1. Install KNDYS
+2. Run your first scan
+3. Read [QUICKSTART.md](QUICKSTART.md) for more examples
+4. Explore all modules with `show modules`
+5. Learn about specific modules in [MODULES_GUIDE_v3.1.md](MODULES_GUIDE_v3.1.md)
+6. Start your security testing journey!
 
 ---
 
-**Happy Hacking! 🎩🔓**
+**Happy Hacking! **
 
 Remember: With great power comes great responsibility. Use KNDYS ethically and legally.

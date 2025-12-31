@@ -1,4 +1,4 @@
-# 🔍 Mejoras del Módulo Subdomain Scanner
+# Mejoras del Módulo Subdomain Scanner
 
 ## Resumen de Mejoras Implementadas
 
@@ -6,50 +6,50 @@ El módulo `recon/subdomain_scanner` ha sido completamente reescrito con **5 té
 
 ---
 
-## ✨ Nuevas Características
+## Nuevas Características
 
-### 🎯 **5 Técnicas de Enumeración Integradas**
+### **5 Técnicas de Enumeración Integradas**
 
 #### 1. **DNS Zone Transfer (AXFR)**
-- ✅ Intenta transferencia de zona desde name servers
-- ✅ Detección automática de NS records
-- ✅ Fallback a NS comunes si no hay resolución
-- ✅ Extracción completa de registros DNS
+- Intenta transferencia de zona desde name servers
+- Detección automática de NS records
+- Fallback a NS comunes si no hay resolución
+- Extracción completa de registros DNS
 - **Ventaja**: Obtiene TODOS los subdominios si el servidor está mal configurado
 
 #### 2. **Certificate Transparency Logs**
-- ✅ Búsqueda en crt.sh (base de datos pública de certificados SSL)
-- ✅ Descubre subdominios de certificados históricos
-- ✅ Incluye subdominios que ya no existen pero fueron certificados
-- ✅ Filtra wildcards automáticamente
+- Búsqueda en crt.sh (base de datos pública de certificados SSL)
+- Descubre subdominios de certificados históricos
+- Incluye subdominios que ya no existen pero fueron certificados
+- Filtra wildcards automáticamente
 - **Ventaja**: Encuentra subdominios sin hacer DNS queries
 
 #### 3. **DNS Brute Force Mejorado**
-- ✅ Wordlist mejorada: 246 términos (antes: ~50)
-- ✅ Rate limiting integrado para evitar detección
-- ✅ Detección de wildcard DNS
-- ✅ Filtrado automático de respuestas wildcard
-- ✅ Resolución de múltiples IPs por subdomain
-- ✅ Indicador de progreso en tiempo real
+- Wordlist mejorada: 246 términos (antes: ~50)
+- Rate limiting integrado para evitar detección
+- Detección de wildcard DNS
+- Filtrado automático de respuestas wildcard
+- Resolución de múltiples IPs por subdomain
+- Indicador de progreso en tiempo real
 - **Ventaja**: Más exhaustivo y seguro
 
 #### 4. **Common Patterns & Permutations**
-- ✅ Patrones VPN: vpn, vpn1, vpn2
-- ✅ Patrones Mail: mail, smtp, pop, imap, mx, mx1, mx2
-- ✅ Patrones Remote: remote, citrix, rdp, desktop, terminal
-- ✅ Patrones Corporate: intranet, extranet, internal, corp
+- Patrones VPN: vpn, vpn1, vpn2
+- Patrones Mail: mail, smtp, pop, imap, mx, mx1, mx2
+- Patrones Remote: remote, citrix, rdp, desktop, terminal
+- Patrones Corporate: intranet, extranet, internal, corp
 - **Ventaja**: Encuentra subdominios comunes sin wordlist
 
 #### 5. **HTTP/HTTPS Verification**
-- ✅ Verifica si el subdomain responde HTTP/HTTPS
-- ✅ Extrae código de estado (200, 301, 404, etc.)
-- ✅ Detecta servidor web (Apache, Nginx, IIS)
-- ✅ Detección de tecnologías web
+- Verifica si el subdomain responde HTTP/HTTPS
+- Extrae código de estado (200, 301, 404, etc.)
+- Detecta servidor web (Apache, Nginx, IIS)
+- Detección de tecnologías web
 - **Ventaja**: Identifica subdominios activos vs inactivos
 
 ---
 
-## 🔒 Nuevas Capacidades de Seguridad
+## Nuevas Capacidades de Seguridad
 
 ### **Detección de Wildcard DNS**
 ```
@@ -82,7 +82,7 @@ Detecta subdominios vulnerables a takeover en **15 servicios**:
 
 ---
 
-## 📚 Wordlist Mejorada
+## Wordlist Mejorada
 
 ### Categorías Añadidas (246 términos):
 
@@ -122,7 +122,7 @@ Detecta subdominios vulnerables a takeover en **15 servicios**:
 
 ---
 
-## 🎨 Detección de Tecnologías
+## Detección de Tecnologías
 
 Identifica automáticamente **10+ tecnologías web**:
 
@@ -147,28 +147,28 @@ Identifica automáticamente **10+ tecnologías web**:
 
 ---
 
-## 📊 Formatos de Salida
+## Formatos de Salida
 
 ### 1. **JSON Estructurado**
 Archivo: `subdomains_<domain>_<timestamp>.json`
 
 ```json
 {
-  "domain": "example.com",
-  "timestamp": 1764840565,
-  "duration": 45.32,
-  "total_found": 15,
-  "subdomains": {
-    "www.example.com": {
-      "ips": ["93.184.216.34"],
-      "method": "BruteForce",
-      "http_status": 200,
-      "https_status": 200,
-      "server": "Apache/2.4.41",
-      "technologies": ["WordPress", "PHP"],
-      "takeover_vulnerable": false
-    }
-  }
+ "domain": "example.com",
+ "timestamp": 1764840565,
+ "duration": 45.32,
+ "total_found": 15,
+ "subdomains": {
+ "www.example.com": {
+ "ips": ["93.184.216.34"],
+ "method": "BruteForce",
+ "http_status": 200,
+ "https_status": 200,
+ "server": "Apache/2.4.41",
+ "technologies": ["WordPress", "PHP"],
+ "takeover_vulnerable": false
+ }
+ }
 }
 ```
 
@@ -184,7 +184,7 @@ www.example.com -> 1.2.3.4
 
 ---
 
-## 🎯 Opciones del Módulo
+## Opciones del Módulo
 
 | Opción | Descripción | Valor por Defecto | Ejemplo |
 |--------|-------------|-------------------|---------|
@@ -197,7 +197,7 @@ www.example.com -> 1.2.3.4
 
 ---
 
-## 📋 Ejemplos de Uso
+## Ejemplos de Uso
 
 ### Escaneo Básico (Solo DNS Brute Force)
 ```bash
@@ -248,7 +248,7 @@ run
 
 ---
 
-## 🔒 Seguridad Implementada
+## Seguridad Implementada
 
 ### Rate Limiting
 - Integrado en cada DNS query
@@ -271,26 +271,26 @@ run
 
 ---
 
-## 📈 Comparación: Antes vs Ahora
+## Comparación: Antes vs Ahora
 
 | Característica | Antes | Ahora |
 |----------------|-------|-------|
 | **Técnicas de Enumeración** | 1 (DNS Brute Force) | 5 técnicas |
 | **Wordlist Built-in** | ~50 términos | 246 términos |
-| **Zone Transfer** | ❌ No | ✅ Sí |
-| **Certificate Transparency** | ❌ No | ✅ Sí |
-| **Wildcard Detection** | ❌ No | ✅ Sí |
-| **HTTP Verification** | ❌ No | ✅ Sí |
-| **Tech Detection** | ❌ No | ✅ Sí (10+ techs) |
-| **Takeover Detection** | ❌ No | ✅ Sí (15 servicios) |
-| **Rate Limiting** | ❌ No | ✅ Sí |
-| **JSON Output** | ❌ No | ✅ Sí |
-| **Progress Indicator** | ❌ No | ✅ Sí |
-| **Discovery Methods Tracking** | ❌ No | ✅ Sí |
+| **Zone Transfer** | No | Sí |
+| **Certificate Transparency** | No | Sí |
+| **Wildcard Detection** | No | Sí |
+| **HTTP Verification** | No | Sí |
+| **Tech Detection** | No | Sí (10+ techs) |
+| **Takeover Detection** | No | Sí (15 servicios) |
+| **Rate Limiting** | No | Sí |
+| **JSON Output** | No | Sí |
+| **Progress Indicator** | No | Sí |
+| **Discovery Methods Tracking** | No | Sí |
 
 ---
 
-## 🚀 Rendimiento
+## Rendimiento
 
 - **Velocidad DNS**: ~50-100 queries/segundo (con rate limiting)
 - **Velocidad HTTP**: ~20-30 verificaciones/segundo
@@ -299,7 +299,7 @@ run
 
 ---
 
-## 🎨 Interfaz Mejorada
+## Interfaz Mejorada
 
 ### Salida por Fases
 ```
@@ -311,10 +311,10 @@ run
 ```
 
 ### Códigos de Color
-- 🔵 Azul: Información general
-- 🟢 Verde: Subdominios encontrados
-- 🟡 Amarillo: Warnings y progreso
-- 🔴 Rojo: Vulnerabilidades de takeover
+- Azul: Información general
+- Verde: Subdominios encontrados
+- Amarillo: Warnings y progreso
+- Rojo: Vulnerabilidades de takeover
 
 ### Resumen Detallado
 ```
@@ -322,46 +322,46 @@ DETAILED RESULTS:
 ─────────────────────────────────────────────────
 
 ● api.example.com
-  IP(s): 1.2.3.4
-  Method: CertTransparency
-  HTTP: 200
-  HTTPS: 200
-  Server: nginx/1.18.0
-  Technologies: React, Node.js
+ IP(s): 1.2.3.4
+ Method: CertTransparency
+ HTTP: 200
+ HTTPS: 200
+ Server: nginx/1.18.0
+ Technologies: React, Node.js
 
 ● dev.example.com
-  IP(s): 1.2.3.5
-  Method: BruteForce
-  HTTP: 403
-  HTTPS: 403
-  
-⚠ admin.old-domain.com
-  IP(s): 1.2.3.6
-  Method: AXFR
-  HTTPS: 404
-  ⚠ VULNERABLE TO TAKEOVER: AWS: NoSuchBucket
+ IP(s): 1.2.3.5
+ Method: BruteForce
+ HTTP: 403
+ HTTPS: 403
+
+ admin.old-domain.com
+ IP(s): 1.2.3.6
+ Method: AXFR
+ HTTPS: 404
+ VULNERABLE TO TAKEOVER: AWS: NoSuchBucket
 ```
 
 ---
 
-## 🔍 Técnicas Pasivas vs Activas
+## Técnicas Pasivas vs Activas
 
 ### Técnicas Pasivas (No generan tráfico directo)
-- ✅ Certificate Transparency Logs
-- ✅ API queries a crt.sh
+- Certificate Transparency Logs
+- API queries a crt.sh
 
 ### Técnicas Semi-Activas (Queries DNS solamente)
-- ✅ Zone Transfer
-- ✅ DNS Brute Force
-- ✅ Common Patterns
+- Zone Transfer
+- DNS Brute Force
+- Common Patterns
 
 ### Técnicas Activas (HTTP requests)
-- ✅ HTTP/HTTPS Verification (solo si `verify_http=true`)
-- ✅ Takeover Detection (solo si `check_takeover=true`)
+- HTTP/HTTPS Verification (solo si `verify_http=true`)
+- Takeover Detection (solo si `check_takeover=true`)
 
 ---
 
-## ⚠️ Vulnerabilidades Detectadas
+## Vulnerabilidades Detectadas
 
 ### Subdomain Takeover
 **Impacto**: Alto - Permite al atacante controlar el subdomain
@@ -377,7 +377,7 @@ DETAILED RESULTS:
 
 ---
 
-## 📊 Métricas de Discovery
+## Métricas de Discovery
 
 El módulo rastrea el método de descubrimiento para cada subdomain:
 
@@ -390,7 +390,7 @@ Esto permite analizar la efectividad de cada técnica.
 
 ---
 
-## 🔧 Dependencias Opcionales
+## Dependencias Opcionales
 
 ### Para Zone Transfer (AXFR)
 ```bash
@@ -406,7 +406,7 @@ Si no está instalado, el módulo funciona sin esta técnica.
 
 ---
 
-## 🎓 Casos de Uso Avanzados
+## Casos de Uso Avanzados
 
 ### 1. Reconocimiento Pasivo
 ```bash
@@ -442,7 +442,7 @@ run
 
 ---
 
-## 📝 Logging y Tracking
+## Logging y Tracking
 
 ### Archivo de Sesión
 Todos los subdominios encontrados se registran en:
@@ -453,24 +453,24 @@ kndys_session_<timestamp>.json
 ### Estructura del Log
 ```json
 {
-  "findings": [
-    {
-      "timestamp": "2025-12-04T09:30:00",
-      "type": "Subdomain Enumeration",
-      "data": {
-        "domain": "example.com",
-        "total_found": 15,
-        "duration": 45.32,
-        "subdomains": [...]
-      }
-    }
-  ]
+ "findings": [
+ {
+ "timestamp": "2025-12-04T09:30:00",
+ "type": "Subdomain Enumeration",
+ "data": {
+ "domain": "example.com",
+ "total_found": 15,
+ "duration": 45.32,
+ "subdomains": [...]
+ }
+ }
+ ]
 }
 ```
 
 ---
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### No se encuentran subdominios
 1. Verifica que el dominio sea válido
@@ -493,7 +493,7 @@ kndys_session_<timestamp>.json
 
 ---
 
-## 🎯 Próximas Mejoras Sugeridas
+## Próximas Mejoras Sugeridas
 
 - [ ] Integración con APIs adicionales (VirusTotal, SecurityTrails, Shodan)
 - [ ] Detección de subdominios IPv6
@@ -506,7 +506,7 @@ kndys_session_<timestamp>.json
 
 ---
 
-## 📚 Referencias
+## Referencias
 
 - **Certificate Transparency**: https://crt.sh
 - **DNS Zone Transfer**: RFC 5936
@@ -515,7 +515,7 @@ kndys_session_<timestamp>.json
 
 ---
 
-**Fecha de Implementación**: 4 de Diciembre, 2025  
-**Versión del Framework**: KNDYS v3.0  
-**Estado**: ✅ Completamente funcional y probado  
+**Fecha de Implementación**: 4 de Diciembre, 2025 
+**Versión del Framework**: KNDYS v3.0 
+**Estado**: Completamente funcional y probado 
 **Líneas de código**: ~490 líneas de mejoras

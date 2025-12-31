@@ -1,6 +1,6 @@
 # KNDYS Quick Start Guide
 
-## 🚀 Installation (2 Commands!)
+## Installation (2 Commands!)
 
 ```bash
 # Clone and run
@@ -80,9 +80,9 @@ kndys(reconnaissance/port_scanner)> run
 ### Global Settings
 
 ```bash
-kndys> set lhost 192.168.1.100    # Your IP address
-kndys> set lport 4444              # Listening port
-kndys> set threads 10              # Concurrent threads
+kndys> set lhost 192.168.1.100 # Your IP address
+kndys> set lport 4444 # Listening port
+kndys> set threads 10 # Concurrent threads
 ```
 
 ### View Current Configuration

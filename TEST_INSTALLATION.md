@@ -17,19 +17,19 @@ cd KNDYS
 [!] First run detected - installing X dependencies...
 [*] This is a one-time setup and will take a few minutes.
 
-[✓] All dependencies installed successfully!
+[] All dependencies installed successfully!
 
 ╔══════════════════════════════════════════════════╗
-║               KNDYS FRAMEWORK                    ║
-║     Penetration Testing Framework v3.1           ║
+║ KNDYS FRAMEWORK ║
+║ Penetration Testing Framework v3.1 ║
 ╚══════════════════════════════════════════════════╝
 ```
 
 #### Subsequent Runs:
 ```
 ╔══════════════════════════════════════════════════╗
-║               KNDYS FRAMEWORK                    ║
-║     Penetration Testing Framework v3.1           ║
+║ KNDYS FRAMEWORK ║
+║ Penetration Testing Framework v3.1 ║
 ╚══════════════════════════════════════════════════╝
 
 kndys>
@@ -119,11 +119,11 @@ Expected: Port scan results showing open/closed ports
 
 ### Success Indicators
 
-✅ No Python import errors
-✅ All modules load correctly
-✅ Can configure module options
-✅ Scans produce JSON output files
-✅ Clean exit with Ctrl+C or `exit`
+ No Python import errors
+ All modules load correctly
+ Can configure module options
+ Scans produce JSON output files
+ Clean exit with Ctrl+C or `exit`
 
 ### Report Issues
 

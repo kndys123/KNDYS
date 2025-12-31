@@ -1,30 +1,30 @@
-# 📧 KNDYS Phishing Module - Implementation Report
+# KNDYS Phishing Module - Implementation Report
 
-**Version:** 3.0  
-**Date:** January 2025  
-**Status:** ✅ **COMPLETE - 100% Test Coverage**  
+**Version:** 3.0 
+**Date:** January 2025 
+**Status:** **COMPLETE - 100% Test Coverage** 
 **Lines of Code:** 675+ lines (32 → 675+ lines, 2,009% increase)
 
 ---
 
-## 📊 Executive Summary
+## Executive Summary
 
 The **phishing module** has been completely rebuilt from a basic 32-line template printer into a sophisticated **675+ line enterprise-grade phishing campaign manager**. This transformation matches the quality level of the credential_harvester module, implementing all mandated requirements: maximum performance, security by design, comprehensive testing, and detailed documentation.
 
 ### Key Achievements
-- ✅ **20 professional email templates** covering major brands and scenarios
-- ✅ **Multi-threaded SMTP delivery** with configurable concurrency
-- ✅ **SQLite database** with 3 tables for campaign tracking
-- ✅ **Email tracking** (opens via pixels, clicks via URL wrapping)
-- ✅ **Personalization engine** with 8 variable substitutions
-- ✅ **Rate limiting** and throttling for stealth
-- ✅ **Export to CSV/JSON/HTML** with beautiful reports
-- ✅ **100% test coverage** (25/25 tests passed)
-- ✅ **Security hardened** (input validation, SQL injection prevention, XSS prevention)
+- **20 professional email templates** covering major brands and scenarios
+- **Multi-threaded SMTP delivery** with configurable concurrency
+- **SQLite database** with 3 tables for campaign tracking
+- **Email tracking** (opens via pixels, clicks via URL wrapping)
+- **Personalization engine** with 8 variable substitutions
+- **Rate limiting** and throttling for stealth
+- **Export to CSV/JSON/HTML** with beautiful reports
+- **100% test coverage** (25/25 tests passed)
+- **Security hardened** (input validation, SQL injection prevention, XSS prevention)
 
 ---
 
-## 🎯 Architecture Overview
+## Architecture Overview
 
 ### Module Location
 ```
@@ -37,43 +37,43 @@ Configuration: Lines 4105-4144 (30+ options)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    run_phishing()                           │
-│              Main Orchestration Function                     │
-│                                                             │
-│  1. Profile Resolution      → _resolve_phishing_profile()  │
-│  2. Config Display          → _display_phishing_config()   │
-│  3. Campaign Initialization → _initialize_phishing_campaign()│
-│  4. Target Loading          → _load_phishing_targets()     │
-│  5. Email Dispatch          → _execute_phishing_campaign() │
-│  6. Results Display         → _display_phishing_results()  │
-│  7. Export Results          → _export_phishing_results()   │
+│ run_phishing() │
+│ Main Orchestration Function │
+│ │
+│ 1. Profile Resolution → _resolve_phishing_profile() │
+│ 2. Config Display → _display_phishing_config() │
+│ 3. Campaign Initialization → _initialize_phishing_campaign()│
+│ 4. Target Loading → _load_phishing_targets() │
+│ 5. Email Dispatch → _execute_phishing_campaign() │
+│ 6. Results Display → _display_phishing_results() │
+│ 7. Export Results → _export_phishing_results() │
 └─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Auxiliary Functions (12 functions)              │
-│                                                             │
-│  Templates:     _get_phishing_templates() [20 templates]   │
-│  Personalize:   _generate_phishing_email()                 │
-│  HTML:          _generate_phishing_html()                  │
-│  Convert:       _html_to_text()                            │
-│  SMTP:          _send_phishing_email()                     │
-│  Reports:       _generate_html_report()                    │
+│ Auxiliary Functions (12 functions) │
+│ │
+│ Templates: _get_phishing_templates() [20 templates] │
+│ Personalize: _generate_phishing_email() │
+│ HTML: _generate_phishing_html() │
+│ Convert: _html_to_text() │
+│ SMTP: _send_phishing_email() │
+│ Reports: _generate_html_report() │
 └─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
+ │
+ ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Data Layer (SQLite Database)                    │
-│                                                             │
-│  campaigns:  Campaign metadata & statistics                │
-│  targets:    Target details & delivery status              │
-│  tracking:   Open/click tracking data                      │
+│ Data Layer (SQLite Database) │
+│ │
+│ campaigns: Campaign metadata & statistics │
+│ targets: Target details & delivery status │
+│ tracking: Open/click tracking data │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎨 Email Templates (20 Professional Templates)
+## Email Templates (20 Professional Templates)
 
 ### Brand Impersonation Templates
 
@@ -115,7 +115,7 @@ Configuration: Lines 4105-4144 (30+ options)
 
 ---
 
-## 🔧 Core Functions
+## Core Functions
 
 ### 1. run_phishing() - Main Orchestration
 **Lines:** 15618-15770 (~150 lines)
@@ -146,12 +146,12 @@ Configuration: Lines 4105-4144 (30+ options)
 **Returns:** Dictionary with 20 templates, each containing:
 ```python
 {
-    'name': 'office365',
-    'subject': 'Urgent: Verify Your Account',
-    'preheader': 'Your account requires immediate verification',
-    'logo_url': 'https://logo.clearbit.com/microsoft.com',
-    'brand_color': '#0078D4',
-    'category': 'authentication'
+ 'name': 'office365',
+ 'subject': 'Urgent: Verify Your Account',
+ 'preheader': 'Your account requires immediate verification',
+ 'logo_url': 'https://logo.clearbit.com/microsoft.com',
+ 'brand_color': '#0078D4',
+ 'category': 'authentication'
 }
 ```
 
@@ -174,51 +174,51 @@ Configuration: Lines 4105-4144 (30+ options)
 #### campaigns Table
 ```sql
 CREATE TABLE campaigns (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT UNIQUE NOT NULL,
-    template TEXT NOT NULL,
-    phish_url TEXT,
-    created_at INTEGER NOT NULL,
-    started_at INTEGER,
-    completed_at INTEGER,
-    status TEXT DEFAULT 'created',
-    total_targets INTEGER DEFAULT 0,
-    emails_sent INTEGER DEFAULT 0,
-    emails_failed INTEGER DEFAULT 0,
-    opens INTEGER DEFAULT 0,
-    clicks INTEGER DEFAULT 0
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ name TEXT UNIQUE NOT NULL,
+ template TEXT NOT NULL,
+ phish_url TEXT,
+ created_at INTEGER NOT NULL,
+ started_at INTEGER,
+ completed_at INTEGER,
+ status TEXT DEFAULT 'created',
+ total_targets INTEGER DEFAULT 0,
+ emails_sent INTEGER DEFAULT 0,
+ emails_failed INTEGER DEFAULT 0,
+ opens INTEGER DEFAULT 0,
+ clicks INTEGER DEFAULT 0
 )
 ```
 
 #### targets Table
 ```sql
 CREATE TABLE targets (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    campaign_id INTEGER NOT NULL,
-    email TEXT NOT NULL,
-    first_name TEXT,
-    last_name TEXT,
-    company TEXT,
-    position TEXT,
-    status TEXT DEFAULT 'pending',
-    sent_at INTEGER,
-    opened_at INTEGER,
-    clicked_at INTEGER,
-    tracking_id TEXT UNIQUE,
-    error_message TEXT
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ campaign_id INTEGER NOT NULL,
+ email TEXT NOT NULL,
+ first_name TEXT,
+ last_name TEXT,
+ company TEXT,
+ position TEXT,
+ status TEXT DEFAULT 'pending',
+ sent_at INTEGER,
+ opened_at INTEGER,
+ clicked_at INTEGER,
+ tracking_id TEXT UNIQUE,
+ error_message TEXT
 )
 ```
 
 #### tracking Table
 ```sql
 CREATE TABLE tracking (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    campaign_id INTEGER NOT NULL,
-    target_id INTEGER NOT NULL,
-    event_type TEXT NOT NULL,
-    event_time INTEGER NOT NULL,
-    ip_address TEXT,
-    user_agent TEXT
+ id INTEGER PRIMARY KEY AUTOINCREMENT,
+ campaign_id INTEGER NOT NULL,
+ target_id INTEGER NOT NULL,
+ event_type TEXT NOT NULL,
+ event_time INTEGER NOT NULL,
+ ip_address TEXT,
+ user_agent TEXT
 )
 ```
 
@@ -271,23 +271,23 @@ email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 **Architecture:**
 ```python
-┌──────────────┐     ┌──────────────┐     ┌──────────────┐
-│   Thread 1   │     │   Thread 2   │     │   Thread N   │
-└──────┬───────┘     └──────┬───────┘     └──────┬───────┘
-       │                    │                    │
-       └────────────────────┴────────────────────┘
-                            │
-                      ┌─────▼─────┐
-                      │   Queue   │ ← All targets
-                      └─────┬─────┘
-                            │
-                    ┌───────▼───────┐
-                    │ Rate Limiter  │ (Semaphore)
-                    └───────┬───────┘
-                            │
-                    ┌───────▼───────┐
-                    │  SMTP Sender  │
-                    └───────────────┘
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+│ Thread 1 │ │ Thread 2 │ │ Thread N │
+└──────┬───────┘ └──────┬───────┘ └──────┬───────┘
+ │ │ │
+ └────────────────────┴────────────────────┘
+ │
+ ┌─────▼─────┐
+ │ Queue │ ← All targets
+ └─────┬─────┘
+ │
+ ┌───────▼───────┐
+ │ Rate Limiter │ (Semaphore)
+ └───────┬───────┘
+ │
+ ┌───────▼───────┐
+ │ SMTP Sender │
+ └───────────────┘
 ```
 
 **Features:**
@@ -301,10 +301,10 @@ email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
 **Configuration:**
 ```python
-threads: 5                  # Concurrent workers
-rate_limit: 10              # Emails per minute
-delay_min: 1                # Min delay (seconds)
-delay_max: 5                # Max delay (seconds)
+threads: 5 # Concurrent workers
+rate_limit: 10 # Emails per minute
+delay_min: 1 # Min delay (seconds)
+delay_max: 5 # Max delay (seconds)
 ```
 
 ---
@@ -314,14 +314,14 @@ delay_max: 5                # Max delay (seconds)
 
 **Supported Variables:**
 ```python
-{{first_name}}       # John
-{{last_name}}        # Doe
-{{email}}            # john@example.com
-{{company}}          # Acme Corp
-{{position}}         # CEO
-{{domain}}           # example.com
-{{username}}         # john
-{{tracking_id}}      # abc123-def456-...
+{{first_name}} # John
+{{last_name}} # Doe
+{{email}} # john@example.com
+{{company}} # Acme Corp
+{{position}} # CEO
+{{domain}} # example.com
+{{username}} # john
+{{tracking_id}} # abc123-def456-...
 ```
 
 **Example:**
@@ -350,30 +350,30 @@ Output:
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{subject}}</title>
-    <style>
-        /* Professional inline CSS */
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', ... }
-        .container { max-width: 600px; margin: 0 auto; ... }
-        .button { background: {{brand_color}}; color: white; ... }
-    </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>{{subject}}</title>
+ <style>
+ /* Professional inline CSS */
+ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', ... }
+ .container { max-width: 600px; margin: 0 auto; ... }
+ .button { background: {{brand_color}}; color: white; ... }
+ </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="{{logo_url}}" alt="Logo" />
-        </div>
-        <div class="content">
-            {{personalized_content}}
-        </div>
-        <div class="footer">
-            <a href="{{phish_url}}" class="button">Take Action</a>
-        </div>
-    </div>
-    <!-- Tracking Pixel -->
-    <img src="{{phish_url}}/track/open/{{tracking_id}}" width="1" height="1" />
+ <div class="container">
+ <div class="header">
+ <img src="{{logo_url}}" alt="Logo" />
+ </div>
+ <div class="content">
+ {{personalized_content}}
+ </div>
+ <div class="footer">
+ <a href="{{phish_url}}" class="button">Take Action</a>
+ </div>
+ </div>
+ <!-- Tracking Pixel -->
+ <img src="{{phish_url}}/track/open/{{tracking_id}}" width="1" height="1" />
 </body>
 </html>
 ```
@@ -393,17 +393,17 @@ Output:
 
 **SMTP Configuration:**
 ```python
-Server:   smtp.gmail.com (or custom)
-Port:     587 (TLS) or 465 (SSL)
-Auth:     USERNAME/PASSWORD
+Server: smtp.gmail.com (or custom)
+Port: 587 (TLS) or 465 (SSL)
+Auth: USERNAME/PASSWORD
 Security: TLS/SSL with STARTTLS
 ```
 
 **Email Structure:**
 ```python
 MIMEMultipart('alternative')
-├── MIMEText(plain_text, 'plain')    # Fallback
-├── MIMEText(html, 'html')           # Primary
+├── MIMEText(plain_text, 'plain') # Fallback
+├── MIMEText(html, 'html') # Primary
 └── MIMEBase('application', 'octet') # Attachments (optional)
 ```
 
@@ -433,23 +433,23 @@ Date: Mon, 13 Jan 2025 10:30:00 -0000
 **Output:**
 ```
 ════════════════════════════════════════════════════════════════
-                     CAMPAIGN RESULTS
+ CAMPAIGN RESULTS
 ════════════════════════════════════════════════════════════════
 
 Campaign: Q1_Security_Training
 Template: office365
 Duration: 00:05:23
 
-📧 Email Statistics:
-   Total Targets:    100
-   ✓ Sent:           95
-   ✗ Failed:         5
-   Success Rate:     95.0%
+ Email Statistics:
+ Total Targets: 100
+ Sent: 95
+ Failed: 5
+ Success Rate: 95.0%
 
-📊 Engagement Metrics:
-   Emails Opened:    47 (49.5%)
-   Links Clicked:    18 (18.9%)
-   Click-to-Open:    38.3%
+ Engagement Metrics:
+ Emails Opened: 47 (49.5%)
+ Links Clicked: 18 (18.9%)
+ Click-to-Open: 38.3%
 
 ════════════════════════════════════════════════════════════════
 ```
@@ -478,23 +478,23 @@ jane@test.com,Jane Smith,sent,2025-01-13 10:30:02,2025-01-13 10:40:11,,def456
 #### JSON Export
 ```json
 {
-  "campaign": {
-    "name": "Q1_Security_Training",
-    "template": "office365",
-    "created_at": 1705142400,
-    "duration": 323
-  },
-  "statistics": {
-    "total_targets": 100,
-    "emails_sent": 95,
-    "emails_failed": 5,
-    "success_rate": 95.0,
-    "opens": 47,
-    "open_rate": 49.5,
-    "clicks": 18,
-    "click_rate": 18.9
-  },
-  "targets": [...]
+ "campaign": {
+ "name": "Q1_Security_Training",
+ "template": "office365",
+ "created_at": 1705142400,
+ "duration": 323
+ },
+ "statistics": {
+ "total_targets": 100,
+ "emails_sent": 95,
+ "emails_failed": 5,
+ "success_rate": 95.0,
+ "opens": 47,
+ "open_rate": 49.5,
+ "clicks": 18,
+ "click_rate": 18.9
+ },
+ "targets": [...]
 }
 ```
 
@@ -529,102 +529,102 @@ Click here: http://example.com
 
 ---
 
-## ⚙️ Configuration Options (30+ Parameters)
+## Configuration Options (30+ Parameters)
 
 ### SMTP Settings
 ```python
-smtp_server:    'smtp.gmail.com'       # SMTP server address
-smtp_port:      587                    # Port (587=TLS, 465=SSL, 25=plain)
-smtp_user:      'user@gmail.com'       # SMTP username
-smtp_password:  'app_password'         # SMTP password
-use_tls:        True                   # Enable STARTTLS
-use_ssl:        False                  # Enable SSL/TLS wrapper
+smtp_server: 'smtp.gmail.com' # SMTP server address
+smtp_port: 587 # Port (587=TLS, 465=SSL, 25=plain)
+smtp_user: 'user@gmail.com' # SMTP username
+smtp_password: 'app_password' # SMTP password
+use_tls: True # Enable STARTTLS
+use_ssl: False # Enable SSL/TLS wrapper
 ```
 
 ### Email Settings
 ```python
-from_email:     'hr@company.com'       # Sender email
-from_name:      'HR Department'        # Sender display name
-reply_to:       'support@company.com'  # Reply-To address
-subject:        'Action Required'      # Default subject (overridden by template)
+from_email: 'hr@company.com' # Sender email
+from_name: 'HR Department' # Sender display name
+reply_to: 'support@company.com' # Reply-To address
+subject: 'Action Required' # Default subject (overridden by template)
 ```
 
 ### Campaign Settings
 ```python
-campaign_name:  'Q1_Phishing_Test'     # Campaign identifier
-template:       'office365'            # Template name (from 20 templates)
-phish_url:      'http://localhost:8080' # Phishing landing page URL
-targets_file:   'targets.txt'          # Path to targets file
+campaign_name: 'Q1_Phishing_Test' # Campaign identifier
+template: 'office365' # Template name (from 20 templates)
+phish_url: 'http://localhost:8080' # Phishing landing page URL
+targets_file: 'targets.txt' # Path to targets file
 ```
 
 ### Tracking Settings
 ```python
-track_opens:    True                   # Enable open tracking (pixels)
-track_clicks:   True                   # Enable click tracking (URL wrapping)
+track_opens: True # Enable open tracking (pixels)
+track_clicks: True # Enable click tracking (URL wrapping)
 ```
 
 ### Personalization Settings
 ```python
-personalize:    True                   # Enable variable substitution
-validate_emails: True                  # Validate email format before sending
+personalize: True # Enable variable substitution
+validate_emails: True # Validate email format before sending
 ```
 
 ### Performance Settings
 ```python
-threads:        5                      # Concurrent sender threads
-rate_limit:     10                     # Max emails per minute (0=unlimited)
-delay_min:      1                      # Min delay between sends (seconds)
-delay_max:      5                      # Max delay between sends (seconds)
+threads: 5 # Concurrent sender threads
+rate_limit: 10 # Max emails per minute (0=unlimited)
+delay_min: 1 # Min delay between sends (seconds)
+delay_max: 5 # Max delay between sends (seconds)
 ```
 
 ### Attachment Settings
 ```python
-attachment:     '/path/to/file.pdf'    # Path to attachment file (optional)
-attachment_name: 'Invoice_Q1.pdf'      # Display name for attachment
+attachment: '/path/to/file.pdf' # Path to attachment file (optional)
+attachment_name: 'Invoice_Q1.pdf' # Display name for attachment
 ```
 
 ### Database Settings
 ```python
-db_file:        'campaign.db'          # SQLite database filename
+db_file: 'campaign.db' # SQLite database filename
 ```
 
 ### Export Settings
 ```python
-export_results: True                   # Auto-export results
-export_format:  'all'                  # 'csv', 'json', 'html', or 'all'
+export_results: True # Auto-export results
+export_format: 'all' # 'csv', 'json', 'html', or 'all'
 ```
 
 ### Testing Settings
 ```python
-auto_execute:   False                  # Skip confirmation prompt (dangerous!)
+auto_execute: False # Skip confirmation prompt (dangerous!)
 ```
 
 ---
 
-## 🔒 Security Features
+## Security Features
 
 ### 1. Input Validation
 ```python
 # Email validation
 email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 if not re.match(email_regex, email) or '..' in email:
-    raise ValueError(f"Invalid email: {email}")
+ raise ValueError(f"Invalid email: {email}")
 
 # File path validation
 if not os.path.exists(targets_file):
-    raise FileNotFoundError(f"Targets file not found: {targets_file}")
+ raise FileNotFoundError(f"Targets file not found: {targets_file}")
 
 # Template validation
 if template not in templates:
-    raise ValueError(f"Unknown template: {template}")
+ raise ValueError(f"Unknown template: {template}")
 ```
 
 ### 2. SQL Injection Prevention
 ```python
-# ✅ SAFE: Parameterized queries
+# SAFE: Parameterized queries
 cursor.execute("INSERT INTO targets (email) VALUES (?)", (email,))
 
-# ❌ UNSAFE: String concatenation (NEVER DO THIS)
+# UNSAFE: String concatenation (NEVER DO THIS)
 cursor.execute(f"INSERT INTO targets (email) VALUES ('{email}')")
 ```
 
@@ -652,19 +652,19 @@ rate_limiter.release()
 ### 5. Error Handling
 ```python
 try:
-    # Send email
-    smtp.sendmail(from_email, to_email, msg.as_string())
-    status = 'sent'
+ # Send email
+ smtp.sendmail(from_email, to_email, msg.as_string())
+ status = 'sent'
 except smtplib.SMTPAuthenticationError:
-    status = 'failed'
-    error = 'Authentication failed'
+ status = 'failed'
+ error = 'Authentication failed'
 except smtplib.SMTPException as e:
-    status = 'failed'
-    error = str(e)
+ status = 'failed'
+ error = str(e)
 finally:
-    # Always update database
-    cursor.execute("UPDATE targets SET status=?, error_message=? WHERE id=?",
-                  (status, error, target_id))
+ # Always update database
+ cursor.execute("UPDATE targets SET status=?, error_message=? WHERE id=?",
+ (status, error, target_id))
 ```
 
 ### 6. Secure SMTP
@@ -681,62 +681,62 @@ smtp = smtplib.SMTP_SSL(smtp_server, smtp_port, context=context)
 
 ---
 
-## 🧪 Testing Suite (25 Tests, 100% Pass Rate)
+## Testing Suite (25 Tests, 100% Pass Rate)
 
-**File:** `test_phishing.py`  
-**Lines:** 700+ lines  
-**Test Suites:** 9 suites  
-**Total Tests:** 25 tests  
-**Pass Rate:** ✅ **100%** (25/25 passed)
+**File:** `test_phishing.py` 
+**Lines:** 700+ lines 
+**Test Suites:** 9 suites 
+**Total Tests:** 25 tests 
+**Pass Rate:** **100%** (25/25 passed)
 
 ### Test Coverage
 
 #### 1. Database Tests (4 tests)
-- ✅ Database creation
-- ✅ Campaign record insertion
-- ✅ Targets table creation
-- ✅ Target insertion with full details
+- Database creation
+- Campaign record insertion
+- Targets table creation
+- Target insertion with full details
 
 #### 2. Email Validation Tests (2 tests)
-- ✅ Valid email validation
-- ✅ Invalid email rejection (including `..` check)
+- Valid email validation
+- Invalid email rejection (including `..` check)
 
 #### 3. Template Tests (2 tests)
-- ✅ Template availability (20 templates)
-- ✅ HTML generation
+- Template availability (20 templates)
+- HTML generation
 
 #### 4. Personalization Tests (2 tests)
-- ✅ Single variable replacement
-- ✅ Multiple variable replacement
+- Single variable replacement
+- Multiple variable replacement
 
 #### 5. Tracking Tests (2 tests)
-- ✅ Tracking pixel generation
-- ✅ Tracking link generation
+- Tracking pixel generation
+- Tracking link generation
 
 #### 6. Security Tests (3 tests)
-- ✅ Rate limiting logic
-- ✅ HTML injection prevention
-- ✅ SQL injection prevention
+- Rate limiting logic
+- HTML injection prevention
+- SQL injection prevention
 
 #### 7. File Handling Tests (3 tests)
-- ✅ Simple email list parsing
-- ✅ CSV format parsing
-- ✅ Comment skipping
+- Simple email list parsing
+- CSV format parsing
+- Comment skipping
 
 #### 8. Edge Cases (3 tests)
-- ✅ Empty targets file
-- ✅ Special characters in emails
-- ✅ Unicode in names
+- Empty targets file
+- Special characters in emails
+- Unicode in names
 
 #### 9. Performance Tests (1 test)
-- ✅ Large targets list (1000 emails)
+- Large targets list (1000 emails)
 
 #### 10. Integration Tests (1 test)
-- ✅ Full campaign workflow
+- Full campaign workflow
 
 #### 11. Export Tests (2 tests)
-- ✅ CSV export format
-- ✅ JSON export format
+- CSV export format
+- JSON export format
 
 ### Test Execution
 ```bash
@@ -748,14 +748,14 @@ KNDYS Phishing Module - Test Suite
 [SETUP] Test directory: /tmp/kndys_phishing_test_xxxxx
 
 [DATABASE TESTS]
-[TEST] Database Creation... ✓ PASS
-[TEST] Campaign Record Insertion... ✓ PASS
-[TEST] Targets Table Creation... ✓ PASS
-[TEST] Target Insertion with Details... ✓ PASS
+[TEST] Database Creation... PASS
+[TEST] Campaign Record Insertion... PASS
+[TEST] Targets Table Creation... PASS
+[TEST] Target Insertion with Details... PASS
 
 [EMAIL VALIDATION TESTS]
-[TEST] Valid Email Validation... ✓ PASS
-[TEST] Invalid Email Rejection... ✓ PASS
+[TEST] Valid Email Validation... PASS
+[TEST] Invalid Email Rejection... PASS
 
 ...
 
@@ -765,25 +765,25 @@ KNDYS Phishing Module - Test Suite
 TEST SUMMARY
 ================================================================================
 Total Tests: 25
-✓ Passed: 25
-✗ Failed: 0
+ Passed: 25
+ Failed: 0
 Success Rate: 100.0%
 ================================================================================
 
-🎉 ALL TESTS PASSED!
+ ALL TESTS PASSED!
 ```
 
 ---
 
-## 📈 Performance Benchmarks
+## Performance Benchmarks
 
 ### Email Sending Performance
 | Targets | Threads | Rate Limit | Duration | Throughput |
 |---------|---------|------------|----------|------------|
-| 100     | 1       | 10/min     | ~10 min  | 10 emails/min |
-| 100     | 5       | 50/min     | ~2 min   | 50 emails/min |
-| 1000    | 5       | 50/min     | ~20 min  | 50 emails/min |
-| 1000    | 10      | 100/min    | ~10 min  | 100 emails/min |
+| 100 | 1 | 10/min | ~10 min | 10 emails/min |
+| 100 | 5 | 50/min | ~2 min | 50 emails/min |
+| 1000 | 5 | 50/min | ~20 min | 50 emails/min |
+| 1000 | 10 | 100/min | ~10 min | 100 emails/min |
 
 ### Database Performance
 | Operation | Records | Time | Operations/sec |
@@ -799,22 +799,22 @@ Success Rate: 100.0%
 
 ---
 
-## 🚀 Usage Examples
+## Usage Examples
 
 ### Example 1: Basic Phishing Campaign
 ```python
 # Module options
 phishing:
-    campaign_name: "Q1_Security_Test"
-    template: "office365"
-    targets_file: "targets.txt"
-    phish_url: "http://phish.company.local"
-    smtp_server: "smtp.gmail.com"
-    smtp_port: 587
-    smtp_user: "phishing@company.com"
-    smtp_password: "app_password"
-    from_email: "it-security@company.com"
-    from_name: "IT Security Team"
+ campaign_name: "Q1_Security_Test"
+ template: "office365"
+ targets_file: "targets.txt"
+ phish_url: "http://phish.company.local"
+ smtp_server: "smtp.gmail.com"
+ smtp_port: 587
+ smtp_user: "phishing@company.com"
+ smtp_password: "app_password"
+ from_email: "it-security@company.com"
+ from_name: "IT Security Team"
 ```
 
 **targets.txt:**
@@ -834,20 +834,20 @@ python3 kndys.py --run phishing
 ### Example 2: Advanced Campaign with Personalization
 ```python
 phishing:
-    campaign_name: "HR_Policy_Update"
-    template: "hr_policy"
-    targets_file: "employees.csv"
-    phish_url: "http://portal.company.local"
-    personalize: True
-    validate_emails: True
-    track_opens: True
-    track_clicks: True
-    threads: 5
-    rate_limit: 10
-    delay_min: 2
-    delay_max: 10
-    export_results: True
-    export_format: "all"
+ campaign_name: "HR_Policy_Update"
+ template: "hr_policy"
+ targets_file: "employees.csv"
+ phish_url: "http://portal.company.local"
+ personalize: True
+ validate_emails: True
+ track_opens: True
+ track_clicks: True
+ threads: 5
+ rate_limit: 10
+ delay_min: 2
+ delay_max: 10
+ export_results: True
+ export_format: "all"
 ```
 
 **employees.csv:**
@@ -863,15 +863,15 @@ bob.jones@acme.com,Bob,Jones,Acme Corp,CEO
 ### Example 3: Attachment-based Phishing
 ```python
 phishing:
-    campaign_name: "Invoice_Scam"
-    template: "invoice"
-    targets_file: "finance_team.txt"
-    phish_url: "http://invoice.malicious.com"
-    attachment: "/tmp/malicious_invoice.pdf"
-    attachment_name: "Invoice_Q1_2025.pdf"
-    from_email: "accounts@supplier.com"
-    from_name: "Accounts Receivable"
-    subject: "Outstanding Invoice - Payment Required"
+ campaign_name: "Invoice_Scam"
+ template: "invoice"
+ targets_file: "finance_team.txt"
+ phish_url: "http://invoice.malicious.com"
+ attachment: "/tmp/malicious_invoice.pdf"
+ attachment_name: "Invoice_Q1_2025.pdf"
+ from_email: "accounts@supplier.com"
+ from_name: "Accounts Receivable"
+ subject: "Outstanding Invoice - Payment Required"
 ```
 
 ---
@@ -879,21 +879,21 @@ phishing:
 ### Example 4: Stealth Campaign
 ```python
 phishing:
-    campaign_name: "Stealth_Test"
-    template: "google"
-    targets_file: "vips.txt"
-    phish_url: "https://secure-login.phish.com"
-    threads: 1                    # Single thread (slower but stealthier)
-    rate_limit: 5                 # Only 5 emails per minute
-    delay_min: 10                 # Long delays between sends
-    delay_max: 30
-    track_opens: False            # Disable tracking for stealth
-    track_clicks: False
+ campaign_name: "Stealth_Test"
+ template: "google"
+ targets_file: "vips.txt"
+ phish_url: "https://secure-login.phish.com"
+ threads: 1 # Single thread (slower but stealthier)
+ rate_limit: 5 # Only 5 emails per minute
+ delay_min: 10 # Long delays between sends
+ delay_max: 30
+ track_opens: False # Disable tracking for stealth
+ track_clicks: False
 ```
 
 ---
 
-## 📊 Comparison: Before vs After
+## Comparison: Before vs After
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
@@ -910,30 +910,30 @@ phishing:
 ### Before (32 lines):
 ```python
 def run_phishing(self):
-    """Basic phishing template printer"""
-    template = self.phishing.get('template', 'generic')
-    print(f"[*] Using template: {template}")
-    print("[*] Phishing email template:")
-    print("From: admin@company.com")
-    print("Subject: Urgent: Verify Your Account")
-    print("Body: Please click here to verify...")
+ """Basic phishing template printer"""
+ template = self.phishing.get('template', 'generic')
+ print(f"[*] Using template: {template}")
+ print("[*] Phishing email template:")
+ print("From: admin@company.com")
+ print("Subject: Urgent: Verify Your Account")
+ print("Body: Please click here to verify...")
 ```
 
 ### After (675+ lines):
-- ✅ 20 professional templates
-- ✅ Multi-threaded SMTP delivery
-- ✅ SQLite database with 3 tables
-- ✅ Email tracking (opens/clicks)
-- ✅ Personalization with 8 variables
-- ✅ Rate limiting and throttling
-- ✅ Export to CSV/JSON/HTML
-- ✅ 100% test coverage
-- ✅ Enterprise-grade error handling
-- ✅ Security hardened
+- 20 professional templates
+- Multi-threaded SMTP delivery
+- SQLite database with 3 tables
+- Email tracking (opens/clicks)
+- Personalization with 8 variables
+- Rate limiting and throttling
+- Export to CSV/JSON/HTML
+- 100% test coverage
+- Enterprise-grade error handling
+- Security hardened
 
 ---
 
-## 🎓 Educational Use Cases
+## Educational Use Cases
 
 ### 1. Security Awareness Training
 - Test employee susceptibility to phishing
@@ -961,27 +961,27 @@ def run_phishing(self):
 
 ---
 
-## ⚠️ Ethical & Legal Considerations
+## Ethical & Legal Considerations
 
-### ✅ Authorized Use Only
+### Authorized Use Only
 - **Written authorization** required before testing
 - **Scope of work** must be clearly defined
 - **Target audience** must be informed (post-campaign)
 - **Data protection** laws must be followed (GDPR, CCPA, etc.)
 
-### ❌ Illegal Use
+### Illegal Use
 - **Unauthorized testing** of third-party systems
 - **Real credential theft** (always use test accounts)
 - **Malicious payload delivery** (use educational/harmless files)
 - **Unauthorized data collection**
 
-### 🔒 Data Protection
+### Data Protection
 - **Anonymize results** before sharing
 - **Secure database** with encryption
 - **Delete campaign data** after completion
 - **Restrict access** to authorized personnel only
 
-### 📜 Legal Framework
+### Legal Framework
 - **Computer Fraud and Abuse Act (CFAA)** - USA
 - **GDPR** - European Union
 - **CCPA** - California, USA
@@ -990,7 +990,7 @@ def run_phishing(self):
 
 ---
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
 ### Planned Features (v3.1)
 1. **Web-based tracking server** (integrated Flask/FastAPI)
@@ -1011,7 +1011,7 @@ def run_phishing(self):
 
 ---
 
-## 📚 Documentation & Resources
+## Documentation & Resources
 
 ### Internal Documentation
 - [KNDYS Main Documentation](DOCUMENTATION_INDEX.md)
@@ -1031,12 +1031,12 @@ def run_phishing(self):
 
 ---
 
-## 👥 Credits & Acknowledgments
+## Credits & Acknowledgments
 
-**Developer:** KNDYS Core Team  
-**Module Version:** 3.0  
-**Framework:** KNDYS Multi-Tool Security Framework  
-**Python Version:** 3.8+  
+**Developer:** KNDYS Core Team 
+**Module Version:** 3.0 
+**Framework:** KNDYS Multi-Tool Security Framework 
+**Python Version:** 3.8+ 
 **Test Framework:** Custom (Python unittest-style)
 
 **Inspiration:**
@@ -1046,24 +1046,24 @@ def run_phishing(self):
 
 ---
 
-## 📝 Changelog
+## Changelog
 
 ### Version 3.0 (January 2025) - COMPLETE REBUILD
-- ✅ Complete module rewrite (32 → 675+ lines)
-- ✅ Added 20 professional email templates
-- ✅ Implemented multi-threaded SMTP delivery
-- ✅ Added SQLite database with 3 tables
-- ✅ Implemented email tracking (opens/clicks)
-- ✅ Added personalization engine (8 variables)
-- ✅ Implemented rate limiting and throttling
-- ✅ Added export to CSV/JSON/HTML
-- ✅ Comprehensive test suite (25 tests, 100% pass)
-- ✅ Security hardening (validation, injection prevention)
-- ✅ Configuration expanded to 30+ options
-- ✅ Professional HTML report generation
-- ✅ Attachment support
-- ✅ Error handling and logging
-- ✅ Full documentation
+- Complete module rewrite (32 → 675+ lines)
+- Added 20 professional email templates
+- Implemented multi-threaded SMTP delivery
+- Added SQLite database with 3 tables
+- Implemented email tracking (opens/clicks)
+- Added personalization engine (8 variables)
+- Implemented rate limiting and throttling
+- Added export to CSV/JSON/HTML
+- Comprehensive test suite (25 tests, 100% pass)
+- Security hardening (validation, injection prevention)
+- Configuration expanded to 30+ options
+- Professional HTML report generation
+- Attachment support
+- Error handling and logging
+- Full documentation
 
 ### Version 2.0 (Legacy)
 - Basic SMTP sending
@@ -1077,16 +1077,16 @@ def run_phishing(self):
 
 ---
 
-## 🎯 Conclusion
+## Conclusion
 
 The phishing module has been transformed from a basic template printer into a **professional-grade phishing campaign manager** that rivals commercial solutions like GoPhish and King Phisher. With 20 templates, multi-threaded delivery, comprehensive tracking, and 100% test coverage, it's now ready for enterprise security assessments and training programs.
 
 **Key Achievements:**
-- ✅ **2,009% code increase** (32 → 675+ lines)
-- ✅ **100% test coverage** (25/25 tests passed)
-- ✅ **20 professional templates** covering major brands
-- ✅ **Enterprise-grade security** (validation, injection prevention, rate limiting)
-- ✅ **Production-ready** with comprehensive error handling
+- **2,009% code increase** (32 → 675+ lines)
+- **100% test coverage** (25/25 tests passed)
+- **20 professional templates** covering major brands
+- **Enterprise-grade security** (validation, injection prevention, rate limiting)
+- **Production-ready** with comprehensive error handling
 
 **Next Steps:**
 1. Continue testing in production environments
@@ -1097,9 +1097,9 @@ The phishing module has been transformed from a basic template printer into a **
 
 ---
 
-**Report Generated:** January 13, 2025  
-**Module Status:** ✅ PRODUCTION READY  
-**Maintainer:** KNDYS Core Team  
+**Report Generated:** January 13, 2025 
+**Module Status:** PRODUCTION READY 
+**Maintainer:** KNDYS Core Team 
 **Support:** See DOCUMENTATION_INDEX.md
 
 ---

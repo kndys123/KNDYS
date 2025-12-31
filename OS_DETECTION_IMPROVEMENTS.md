@@ -1,4 +1,4 @@
-# 🔍 Mejoras del Módulo OS Detection
+# Mejoras del Módulo OS Detection
 
 ## Resumen de Mejoras Implementadas
 
@@ -6,15 +6,15 @@ El módulo `recon/os_detection` ha sido **completamente reescrito** con técnica
 
 ---
 
-## ✨ Nuevas Características Principales
+## Nuevas Características Principales
 
-### 🎯 **Técnicas Múltiples de Fingerprinting**
+### **Técnicas Múltiples de Fingerprinting**
 
-#### 1. **ICMP Fingerprinting** 📡
-- ✅ Análisis detallado de TTL (Time To Live)
-- ✅ Medición de tiempos de respuesta
-- ✅ Detección de hops intermedios
-- ✅ Identificación de routing
+#### 1. **ICMP Fingerprinting** 
+- Análisis detallado de TTL (Time To Live)
+- Medición de tiempos de respuesta
+- Detección de hops intermedios
+- Identificación de routing
 
 **Análisis de TTL Mejorado:**
 
@@ -31,7 +31,7 @@ El módulo `recon/os_detection` ha sido **completamente reescrito** con técnica
 | **240-254** | Network Device | Ruteado |
 | **<240** | Network Device | Muchos hops |
 
-#### 2. **TCP Port Pattern Analysis** 🔌
+#### 2. **TCP Port Pattern Analysis** 
 
 Analiza patrones de puertos abiertos para identificar OS:
 
@@ -47,7 +47,7 @@ Analiza patrones de puertos abiertos para identificar OS:
 | **Database** | 3306, 5432, 27017, 6379, 1433 | MySQL, PostgreSQL, MongoDB, Redis, MSSQL |
 | **Mail Server** | 25, 110, 143, 587, 993, 995 | SMTP, POP3, IMAP |
 
-#### 3. **Banner Grabbing & Analysis** 📰
+#### 3. **Banner Grabbing & Analysis** 
 
 Extrae y analiza banners de servicios para identificar OS con precisión:
 
@@ -59,7 +59,7 @@ Extrae y analiza banners de servicios para identificar OS con precisión:
 - **SMB (445)**: Samba, Windows SMB
 - **RDP (3389)**: Windows Remote Desktop
 
-#### 4. **SSH Banner Analysis** 🔐
+#### 4. **SSH Banner Analysis** 
 
 **Información Extraída:**
 - SSH Version (SSH-1.5, SSH-1.99, SSH-2.0)
@@ -82,7 +82,7 @@ SSH-2.0-OpenSSH_7.4 FreeBSD-20170903
 → Detected: FreeBSD + OpenSSH 7.4
 ```
 
-#### 5. **HTTP Headers Analysis** 🌐
+#### 5. **HTTP Headers Analysis** 
 
 Analiza headers HTTP para identificar OS y servidor web:
 
@@ -113,7 +113,7 @@ Server: nginx/1.18.0 (Ubuntu)
 → Ubuntu Linux
 ```
 
-#### 6. **Banner OS Signature Database** 📚
+#### 6. **Banner OS Signature Database** 
 
 Base de datos extensa de firmas de OS:
 
@@ -130,7 +130,7 @@ Base de datos extensa de firmas de OS:
 
 ---
 
-### 🎯 **Sistema de Puntuación Multi-Factor**
+### **Sistema de Puntuación Multi-Factor**
 
 El módulo utiliza un sistema de **scoring ponderado** que combina múltiples fuentes:
 
@@ -154,13 +154,13 @@ Ejemplo:
 
 ---
 
-### 🎨 **Interfaz Visual Mejorada**
+### **Interfaz Visual Mejorada**
 
 #### Durante el Escaneo:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║         ADVANCED OS DETECTION - KNDYS v3.0                      ║
+║ ADVANCED OS DETECTION - KNDYS v3.0 ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 [*] Target: 192.168.1.10
@@ -170,23 +170,23 @@ Ejemplo:
 [*] Phase 1: ICMP Fingerprinting
 ──────────────────────────────────────────────────────────────────
 [+] ICMP TTL: 64 → Linux/Unix/macOS (TTL: 64)
-    Response Time: 2.34ms
+ Response Time: 2.34ms
 
 [*] Phase 2: TCP Port Analysis
 ──────────────────────────────────────────────────────────────────
 [*] Scanning 30 common ports...
 
-  ✓ 22/SSH - SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
-  ✓ 80/HTTP - Apache/2.4.41 (Ubuntu) Server at 192.168.1.10 Por...
-  ✓ 443/HTTPS
-  ✓ 3306/MySQL - 5.7.38-0ubuntu0.18.04.1-log
+ 22/SSH - SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
+ 80/HTTP - Apache/2.4.41 (Ubuntu) Server at 192.168.1.10 Por...
+ 443/HTTPS
+ 3306/MySQL - 5.7.38-0ubuntu0.18.04.1-log
 
 [*] Phase 3: Service & Banner Analysis
 ──────────────────────────────────────────────────────────────────
 [+] Port 22: Ubuntu Linux
-  → SSH: OpenSSH 8.2p1 on Ubuntu Linux
+ → SSH: OpenSSH 8.2p1 on Ubuntu Linux
 [+] Port 80: Ubuntu Linux
-  → HTTP: Apache/2.4.41 (Ubuntu) on Ubuntu Linux
+ → HTTP: Apache/2.4.41 (Ubuntu) on Ubuntu Linux
 [+] Port 3306: MySQL Server
 
 [*] Phase 4: OS Identification
@@ -198,20 +198,20 @@ OS DETECTION RESULTS
 
 [+] OS Detection Results:
 
-  1. Ubuntu Linux                          ███████████ 90%
-  2. Linux/Unix                            ████████░░░ 75%
-  3. Debian Linux                          ████░░░░░░░ 40%
+ 1. Ubuntu Linux ███████████ 90%
+ 2. Linux/Unix ████████░░░ 75%
+ 3. Debian Linux ████░░░░░░░ 40%
 
 [*] Best Match: Ubuntu Linux (Confidence: 90%)
 
 [*] Open Ports: 4
-    22, 80, 443, 3306
+ 22, 80, 443, 3306
 
 [*] Key Services Detected:
-    22/SSH: Ubuntu Linux
-    80/HTTP: Ubuntu Linux
-    443/HTTPS: Unknown
-    3306/MySQL: MySQL Server
+ 22/SSH: Ubuntu Linux
+ 80/HTTP: Ubuntu Linux
+ 443/HTTPS: Unknown
+ 3306/MySQL: MySQL Server
 
 [+] Scan completed in 3.45 seconds
 ```
@@ -219,15 +219,15 @@ OS DETECTION RESULTS
 #### Indicadores Visuales de Confianza:
 
 ```
-90%+  ███████████ (Verde)   - Alta confianza
+90%+ ███████████ (Verde) - Alta confianza
 60-89% ████████░░░ (Amarillo) - Confianza media-alta
 40-59% █████░░░░░░ (Amarillo) - Confianza media
-<40%   ███░░░░░░░░ (Rojo)     - Confianza baja
+<40% ███░░░░░░░░ (Rojo) - Confianza baja
 ```
 
 ---
 
-## 🎯 Nuevas Opciones del Módulo
+## Nuevas Opciones del Módulo
 
 | Opción | Descripción | Valores | Default | Ejemplo |
 |--------|-------------|---------|---------|---------|
@@ -247,105 +247,105 @@ OS DETECTION RESULTS
 
 ---
 
-## 📊 Comparación: Antes vs Ahora
+## Comparación: Antes vs Ahora
 
 | Característica | Antes | Ahora | Mejora |
 |----------------|-------|-------|--------|
-| **TTL Analysis** | Básico (3 ranges) | ✅ Avanzado (9 ranges + hops) | +200% |
-| **Port Scanning** | 3 puertos | ✅ 30+ puertos | +900% |
-| **Banner Grabbing** | ❌ | ✅ Multi-protocolo | +100% |
-| **OS Signatures** | 3 (Linux/Windows/Cisco) | ✅ 30+ OS específicos | +900% |
-| **SSH Analysis** | ❌ | ✅ Detallado | +100% |
-| **HTTP Analysis** | ❌ | ✅ Headers + Server | +100% |
-| **Confidence Scoring** | ❌ | ✅ Multi-factor | +100% |
-| **Port Patterns** | ❌ | ✅ 7 categorías | +100% |
-| **Timing Control** | ❌ | ✅ 3 perfiles | +100% |
-| **Output Format** | Básico | ✅ JSON + Report | +300% |
-| **Visual Feedback** | Mínimo | ✅ Progress bars + colores | +500% |
+| **TTL Analysis** | Básico (3 ranges) | Avanzado (9 ranges + hops) | +200% |
+| **Port Scanning** | 3 puertos | 30+ puertos | +900% |
+| **Banner Grabbing** | | Multi-protocolo | +100% |
+| **OS Signatures** | 3 (Linux/Windows/Cisco) | 30+ OS específicos | +900% |
+| **SSH Analysis** | | Detallado | +100% |
+| **HTTP Analysis** | | Headers + Server | +100% |
+| **Confidence Scoring** | | Multi-factor | +100% |
+| **Port Patterns** | | 7 categorías | +100% |
+| **Timing Control** | | 3 perfiles | +100% |
+| **Output Format** | Básico | JSON + Report | +300% |
+| **Visual Feedback** | Mínimo | Progress bars + colores | +500% |
 
 ---
 
-## 📁 Formatos de Salida
+## Formatos de Salida
 
 ### 1. **JSON Estructurado**
 Archivo: `os_detect_<target>_<timestamp>.json`
 
 ```json
 {
-  "target": "192.168.1.10",
-  "timestamp": 1733328000,
-  "scan_duration": 3.45,
-  "fingerprints": {
-    "icmp": {
-      "method": "ICMP",
-      "ttl": 64,
-      "ttl_os_guess": "Linux/Unix/macOS (TTL: 64)",
-      "response_time": 2.34
-    },
-    "ports": [
-      {
-        "port": 22,
-        "open": true,
-        "banner": "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5",
-        "service": "SSH",
-        "latency": 1.23
-      },
-      {
-        "port": 80,
-        "open": true,
-        "banner": "HTTP/1.1 200 OK\\r\\nServer: Apache/2.4.41 (Ubuntu)...",
-        "service": "HTTP",
-        "latency": 2.15
-      }
-    ]
-  },
-  "os_matches": [
-    {
-      "os": "Ubuntu Linux",
-      "confidence": 90
-    },
-    {
-      "os": "Linux/Unix",
-      "confidence": 75
-    },
-    {
-      "os": "Debian Linux",
-      "confidence": 40
-    }
-  ],
-  "best_os_match": "Ubuntu Linux",
-  "confidence_score": 90,
-  "open_ports": [22, 80, 443, 3306],
-  "services": {
-    "22": {
-      "service": "SSH",
-      "banner": "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5",
-      "os_indication": "Ubuntu Linux"
-    },
-    "80": {
-      "service": "HTTP",
-      "banner": "HTTP/1.1 200 OK\\r\\nServer: Apache/2.4.41 (Ubuntu)...",
-      "os_indication": "Ubuntu Linux"
-    }
-  },
-  "characteristics": {
-    "port_pattern": {
-      "windows": 0,
-      "linux": 3,
-      "macos": 0,
-      "network_device": 0
-    },
-    "ssh": {
-      "ssh_version": "SSH 2.0",
-      "ssh_impl": "OpenSSH 8.2p1",
-      "os_guess": "Ubuntu Linux"
-    },
-    "http_80": {
-      "server": "Apache/2.4.41 (Ubuntu)",
-      "os_guess": "Ubuntu Linux",
-      "powered_by": null
-    }
-  }
+ "target": "192.168.1.10",
+ "timestamp": 1733328000,
+ "scan_duration": 3.45,
+ "fingerprints": {
+ "icmp": {
+ "method": "ICMP",
+ "ttl": 64,
+ "ttl_os_guess": "Linux/Unix/macOS (TTL: 64)",
+ "response_time": 2.34
+ },
+ "ports": [
+ {
+ "port": 22,
+ "open": true,
+ "banner": "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5",
+ "service": "SSH",
+ "latency": 1.23
+ },
+ {
+ "port": 80,
+ "open": true,
+ "banner": "HTTP/1.1 200 OK\\r\\nServer: Apache/2.4.41 (Ubuntu)...",
+ "service": "HTTP",
+ "latency": 2.15
+ }
+ ]
+ },
+ "os_matches": [
+ {
+ "os": "Ubuntu Linux",
+ "confidence": 90
+ },
+ {
+ "os": "Linux/Unix",
+ "confidence": 75
+ },
+ {
+ "os": "Debian Linux",
+ "confidence": 40
+ }
+ ],
+ "best_os_match": "Ubuntu Linux",
+ "confidence_score": 90,
+ "open_ports": [22, 80, 443, 3306],
+ "services": {
+ "22": {
+ "service": "SSH",
+ "banner": "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5",
+ "os_indication": "Ubuntu Linux"
+ },
+ "80": {
+ "service": "HTTP",
+ "banner": "HTTP/1.1 200 OK\\r\\nServer: Apache/2.4.41 (Ubuntu)...",
+ "os_indication": "Ubuntu Linux"
+ }
+ },
+ "characteristics": {
+ "port_pattern": {
+ "windows": 0,
+ "linux": 3,
+ "macos": 0,
+ "network_device": 0
+ },
+ "ssh": {
+ "ssh_version": "SSH 2.0",
+ "ssh_impl": "OpenSSH 8.2p1",
+ "os_guess": "Ubuntu Linux"
+ },
+ "http_80": {
+ "server": "Apache/2.4.41 (Ubuntu)",
+ "os_guess": "Ubuntu Linux",
+ "powered_by": null
+ }
+ }
 }
 ```
 
@@ -363,52 +363,52 @@ Duration: 3.45 seconds
 
 OS Detection Results:
 --------------------------------------------------------------------------------
-  1. Ubuntu Linux: 90% confidence
-  2. Linux/Unix: 75% confidence
-  3. Debian Linux: 40% confidence
+ 1. Ubuntu Linux: 90% confidence
+ 2. Linux/Unix: 75% confidence
+ 3. Debian Linux: 40% confidence
 
 Best Match: Ubuntu Linux (90% confidence)
 
 ICMP Fingerprint:
 --------------------------------------------------------------------------------
-  TTL: 64
-  OS Guess: Linux/Unix/macOS (TTL: 64)
-  Response Time: 2.34ms
+ TTL: 64
+ OS Guess: Linux/Unix/macOS (TTL: 64)
+ Response Time: 2.34ms
 
 Open Ports (4):
 --------------------------------------------------------------------------------
-  22/SSH
-  80/HTTP
-  443/HTTPS
-  3306/MySQL
+ 22/SSH
+ 80/HTTP
+ 443/HTTPS
+ 3306/MySQL
 
 Service Analysis:
 --------------------------------------------------------------------------------
 
 Port 22/SSH:
-  OS Indication: Ubuntu Linux
-  Banner: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
+ OS Indication: Ubuntu Linux
+ Banner: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
 
 Port 80/HTTP:
-  OS Indication: Ubuntu Linux
-  Banner: HTTP/1.1 200 OK
+ OS Indication: Ubuntu Linux
+ Banner: HTTP/1.1 200 OK
 Server: Apache/2.4.41 (Ubuntu)
 Date: Wed, 04 Dec 2025 20:30:00 GMT
 ...
 
 Port 3306/MySQL:
-  Banner: 5.7.38-0ubuntu0.18.04.1-log MySQL Community Server (GPL)
+ Banner: 5.7.38-0ubuntu0.18.04.1-log MySQL Community Server (GPL)
 
 Additional Characteristics:
 --------------------------------------------------------------------------------
-  port_pattern: {'windows': 0, 'linux': 3, 'macos': 0, 'network_device': 0}
-  ssh: {'ssh_version': 'SSH 2.0', 'ssh_impl': 'OpenSSH 8.2p1', 'os_guess': 'Ubuntu Linux'}
-  http_80: {'server': 'Apache/2.4.41 (Ubuntu)', 'os_guess': 'Ubuntu Linux'}
+ port_pattern: {'windows': 0, 'linux': 3, 'macos': 0, 'network_device': 0}
+ ssh: {'ssh_version': 'SSH 2.0', 'ssh_impl': 'OpenSSH 8.2p1', 'os_guess': 'Ubuntu Linux'}
+ http_80: {'server': 'Apache/2.4.41 (Ubuntu)', 'os_guess': 'Ubuntu Linux'}
 ```
 
 ---
 
-## 💡 Ejemplos de Uso
+## Ejemplos de Uso
 
 ### 1. Detección Rápida
 ```bash
@@ -457,7 +457,7 @@ run
 
 ---
 
-## 🔍 Técnicas de Detección Detalladas
+## Técnicas de Detección Detalladas
 
 ### 1. **TTL-Based Detection**
 
@@ -486,19 +486,19 @@ TTL recibido: 60
 **SSH Banners:**
 ```
 SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
-        ^       ^       ^
-        |       |       └─ Distribución específica
-        |       └───────── Versión OpenSSH
-        └───────────────── Versión del protocolo
+ ^ ^ ^
+ | | └─ Distribución específica
+ | └───────── Versión OpenSSH
+ └───────────────── Versión del protocolo
 ```
 
 **HTTP Server Headers:**
 ```
 Server: Apache/2.4.41 (Ubuntu)
-        ^       ^       ^
-        |       |       └─ Sistema operativo
-        |       └───────── Versión Apache
-        └───────────────── Software servidor
+ ^ ^ ^
+ | | └─ Sistema operativo
+ | └───────── Versión Apache
+ └───────────────── Software servidor
 ```
 
 ### 3. **Port Pattern Detection**
@@ -529,14 +529,14 @@ Server: Apache/2.4.41 (Ubuntu)
 
 ---
 
-## 🎓 Casos de Uso Avanzados
+## Casos de Uso Avanzados
 
 ### 1. **Pentesting/Red Team**
 ```bash
 # Reconnaissance inicial sigiloso
 set target <target>
-set port_scan false  # Solo ICMP
-set timing slow      # Evitar detección
+set port_scan false # Solo ICMP
+set timing slow # Evitar detección
 run
 
 # Si el target responde, hacer scan completo
@@ -561,8 +561,8 @@ run
 ```bash
 # Identificar OS de todos los activos
 for ip in $(cat ips.txt); do
-    set target $ip
-    run
+ set target $ip
+ run
 done
 # Crear inventario de sistemas operativos
 ```
@@ -591,7 +591,7 @@ for each IP: run os_detection
 
 ---
 
-## 🚀 Rendimiento
+## Rendimiento
 
 ### Velocidad de Escaneo:
 
@@ -609,7 +609,7 @@ for each IP: run os_detection
 
 ---
 
-## 🔒 Consideraciones de Seguridad
+## Consideraciones de Seguridad
 
 ### Detectabilidad:
 
@@ -625,14 +625,14 @@ for each IP: run os_detection
 3. **Sin Banners**: `set banner_grab false`
 
 ### Recomendaciones:
-- ⚠️ Usar solo en redes autorizadas
+- Usar solo en redes autorizadas
 - Considerar uso de VPN/Proxy
 - Evitar horarios de alta actividad
 - Usar timing slow para parecer legítimo
 
 ---
 
-## 🎯 Precisión de Detección
+## Precisión de Detección
 
 ### Factores que Aumentan Precisión:
 
@@ -647,15 +647,15 @@ for each IP: run os_detection
 ### Confianza por Técnica:
 
 ```
-Solo TTL:           40-60% confianza
-TTL + 1 Banner:     60-75% confianza
-TTL + 2 Banners:    75-85% confianza
-TTL + 3+ Banners:   85-95% confianza
+Solo TTL: 40-60% confianza
+TTL + 1 Banner: 60-75% confianza
+TTL + 2 Banners: 75-85% confianza
+TTL + 3+ Banners: 85-95% confianza
 ```
 
 ---
 
-## 📊 Estadísticas de Mejora
+## Estadísticas de Mejora
 
 ### Código:
 - **Líneas añadidas**: ~600 líneas
@@ -674,7 +674,7 @@ TTL + 3+ Banners:   85-95% confianza
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Problema: No detecta OS
 **Causas:**
@@ -684,8 +684,8 @@ TTL + 3+ Banners:   85-95% confianza
 
 **Solución:**
 ```bash
-set port_scan true    # Usar TCP en vez de solo ICMP
-set timing slow       # Dar más tiempo
+set port_scan true # Usar TCP en vez de solo ICMP
+set timing slow # Dar más tiempo
 ```
 
 ### Problema: Confianza muy baja
@@ -696,8 +696,8 @@ set timing slow       # Dar más tiempo
 
 **Solución:**
 ```bash
-set banner_grab true  # Obtener más información
-set deep_scan true    # Análisis profundo
+set banner_grab true # Obtener más información
+set deep_scan true # Análisis profundo
 ```
 
 ### Problema: Scan muy lento
@@ -708,13 +708,13 @@ set deep_scan true    # Análisis profundo
 
 **Solución:**
 ```bash
-set timing fast       # Escaneo más rápido
-set port_scan false   # Solo ICMP
+set timing fast # Escaneo más rápido
+set port_scan false # Solo ICMP
 ```
 
 ---
 
-## 🎓 Referencias Técnicas
+## Referencias Técnicas
 
 ### TTL Values:
 - RFC 791 (IP Protocol): TTL field specification
@@ -731,7 +731,7 @@ set port_scan false   # Solo ICMP
 
 ---
 
-## 📝 Próximas Mejoras
+## Próximas Mejoras
 
 - [ ] TCP/IP Stack Fingerprinting (ventanas TCP, opciones)
 - [ ] Passive OS Detection (análisis de tráfico)
@@ -745,9 +745,9 @@ set port_scan false   # Solo ICMP
 
 ---
 
-## ⚖️ Uso Responsable
+## ️ Uso Responsable
 
-⚠️ **Advertencias Importantes:**
+ **Advertencias Importantes:**
 
 1. **Legal**: Solo usar en sistemas propios o con autorización
 2. **Ético**: No causar daño o interrupciones
@@ -762,7 +762,7 @@ set port_scan false   # Solo ICMP
 
 ---
 
-## 📚 Documentación Adicional
+## Documentación Adicional
 
 ### Recursos:
 - OWASP Testing Guide - Information Gathering
@@ -777,10 +777,10 @@ set port_scan false   # Solo ICMP
 
 ---
 
-**Fecha de Implementación**: 4 de Diciembre, 2025  
-**Versión del Framework**: KNDYS v3.0  
-**Estado**: ✅ Completamente funcional y probado  
-**Líneas de código**: ~600 líneas de mejoras  
-**Funciones nuevas**: 8 funciones especializadas  
-**OS Detectables**: 30+ sistemas operativos  
+**Fecha de Implementación**: 4 de Diciembre, 2025 
+**Versión del Framework**: KNDYS v3.0 
+**Estado**: Completamente funcional y probado 
+**Líneas de código**: ~600 líneas de mejoras 
+**Funciones nuevas**: 8 funciones especializadas 
+**OS Detectables**: 30+ sistemas operativos 
 **Técnicas**: 4 métodos de fingerprinting combinados

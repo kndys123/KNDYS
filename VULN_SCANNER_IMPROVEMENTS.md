@@ -1,271 +1,271 @@
-# 🔍 VULN_SCANNER MODULE - Advanced Improvements
+# VULN_SCANNER MODULE - Advanced Improvements
 
-## 📊 Overview
+## Overview
 Complete rewrite of the `vuln_scanner` module transforming it into a **professional-grade vulnerability scanner** with comprehensive OWASP Top 10 coverage, 33 different vulnerability checks, and advanced reporting capabilities.
 
 ---
 
-## 🎯 Key Improvements
+## Key Improvements
 
 ### 1. **Enhanced Module Options**
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ target         → Target URL to scan                     │
-│ scan_type      → quick/web/api/full (default: full)     │
-│ threads        → Concurrent threads (default: 5)         │
-│ depth          → Crawl depth (default: 2)                │
-│ aggressive     → Enable aggressive mode (default: false) │
-│ stealth_mode   → Enable stealth scanning (default: false)│
+│ target → Target URL to scan │
+│ scan_type → quick/web/api/full (default: full) │
+│ threads → Concurrent threads (default: 5) │
+│ depth → Crawl depth (default: 2) │
+│ aggressive → Enable aggressive mode (default: false) │
+│ stealth_mode → Enable stealth scanning (default: false)│
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Previous:** 3 basic options (target, scan_type, output)  
+**Previous:** 3 basic options (target, scan_type, output) 
 **Now:** 6 advanced options with multiple scan modes
 
 ---
 
-## 🛡️ Vulnerability Coverage (33 Checks)
+## Vulnerability Coverage (33 Checks)
 
 ### **Category 1: Injection (5 checks)**
 1. **SQL Injection (Advanced)**
-   - 7+ payloads: Basic, Boolean-based, UNION-based, Time-based
-   - Error-based detection with 15+ SQL error patterns
-   - Time-based blind SQL injection (5-10 second delays)
-   - Aggressive mode with additional complex payloads
-   - **Severity:** Critical
+ - 7+ payloads: Basic, Boolean-based, UNION-based, Time-based
+ - Error-based detection with 15+ SQL error patterns
+ - Time-based blind SQL injection (5-10 second delays)
+ - Aggressive mode with additional complex payloads
+ - **Severity:** Critical
 
 2. **NoSQL Injection**
-   - MongoDB operator injection ($gt, $ne, $exists)
-   - Payload arrays and object injection
-   - Response size analysis
-   - **Severity:** High
+ - MongoDB operator injection ($gt, $ne, $exists)
+ - Payload arrays and object injection
+ - Response size analysis
+ - **Severity:** High
 
 3. **Command Injection (Advanced)**
-   - Time-based OS command injection
-   - Unix (sleep) and Windows (timeout) payloads
-   - Backticks and command substitution
-   - Response time analysis (≥2.5s delay = vulnerable)
-   - **Severity:** Critical
+ - Time-based OS command injection
+ - Unix (sleep) and Windows (timeout) payloads
+ - Backticks and command substitution
+ - Response time analysis (≥2.5s delay = vulnerable)
+ - **Severity:** Critical
 
 4. **LDAP Injection**
-   - LDAP special character injection
-   - Payloads: `*`, `*)(objectClass=*`, `*()|`
-   - LDAP error detection
-   - **Severity:** High
+ - LDAP special character injection
+ - Payloads: `*`, `*)(objectClass=*`, `*()|`
+ - LDAP error detection
+ - **Severity:** High
 
 5. **XML Injection**
-   - XML content processing validation
-   - XML indicators detection
-   - **Severity:** Medium
+ - XML content processing validation
+ - XML indicators detection
+ - **Severity:** Medium
 
 ---
 
 ### **Category 2: Cross-Site Scripting (3 checks)**
 6. **Reflected XSS**
-   - 3-6 XSS payloads with encoding variants
-   - Basic script tags, img onerror, svg onload
-   - Aggressive mode: quote breaking, JS protocol
-   - Payload reflection detection
-   - **Severity:** High
+ - 3-6 XSS payloads with encoding variants
+ - Basic script tags, img onerror, svg onload
+ - Aggressive mode: quote breaking, JS protocol
+ - Payload reflection detection
+ - **Severity:** High
 
 7. **Stored XSS**
-   - Form detection and monitoring
-   - Placeholder for advanced testing
-   - **Severity:** High
+ - Form detection and monitoring
+ - Placeholder for advanced testing
+ - **Severity:** High
 
 8. **DOM-based XSS**
-   - JavaScript dangerous sink detection
-   - Checks: document.write, innerHTML, eval, setTimeout, location
-   - Source code analysis
-   - **Severity:** Medium
+ - JavaScript dangerous sink detection
+ - Checks: document.write, innerHTML, eval, setTimeout, location
+ - Source code analysis
+ - **Severity:** Medium
 
 ---
 
 ### **Category 3: Broken Authentication (3 checks)**
 9. **Weak Authentication**
-   - Login form detection
-   - Common credential testing framework
-   - Rate limiting checks
-   - **Severity:** Info/High
+ - Login form detection
+ - Common credential testing framework
+ - Rate limiting checks
+ - **Severity:** Info/High
 
 10. **Session Management**
-    - Cookie security flags (Secure, HttpOnly)
-    - Session fixation detection
-    - Cookie expiration validation
-    - **Severity:** Medium
+ - Cookie security flags (Secure, HttpOnly)
+ - Session fixation detection
+ - Cookie expiration validation
+ - **Severity:** Medium
 
 11. **JWT Vulnerabilities**
-    - JWT token detection
-    - Algorithm validation (none, weak algorithms)
-    - Signature verification checks
-    - **Severity:** Info/High
+ - JWT token detection
+ - Algorithm validation (none, weak algorithms)
+ - Signature verification checks
+ - **Severity:** Info/High
 
 ---
 
 ### **Category 4: Sensitive Data Exposure (3 checks)**
 12. **Sensitive Data Detection**
-    - API keys in responses
-    - Passwords in code
-    - Access tokens
-    - Private keys (RSA, SSH)
-    - **Severity:** High
+ - API keys in responses
+ - Passwords in code
+ - Access tokens
+ - Private keys (RSA, SSH)
+ - **Severity:** High
 
 13. **Backup Files**
-    - Common backup extensions: .bak, .old, .backup, ~, .swp, .zip
-    - Accessible backup detection
-    - **Severity:** High
+ - Common backup extensions: .bak, .old, .backup, ~, .swp, .zip
+ - Accessible backup detection
+ - **Severity:** High
 
 14. **Information Disclosure**
-    - Server version disclosure
-    - Error message exposure
-    - Debug information leakage
-    - **Severity:** Low/Medium
+ - Server version disclosure
+ - Error message exposure
+ - Debug information leakage
+ - **Severity:** Low/Medium
 
 ---
 
 ### **Category 5: XXE (1 check)**
 15. **XXE (XML External Entity) Advanced**
-    - File reading via XXE (file:///etc/passwd)
-    - External entity parsing
-    - DTD processing validation
-    - **Severity:** Critical
+ - File reading via XXE (file:///etc/passwd)
+ - External entity parsing
+ - DTD processing validation
+ - **Severity:** Critical
 
 ---
 
 ### **Category 6: Broken Access Control (3 checks)**
 16. **IDOR (Insecure Direct Object Reference)**
-    - ID parameter detection
-    - Sequential ID analysis
-    - **Severity:** Medium
+ - ID parameter detection
+ - Sequential ID analysis
+ - **Severity:** Medium
 
 17. **Path Traversal (Advanced)**
-    - Multiple payloads: ../../../etc/passwd, ..\..\windows\win.ini
-    - Encoded variations: ....//....//
-    - File content verification
-    - **Severity:** High
+ - Multiple payloads: ../../../etc/passwd, ..\..\windows\win.ini
+ - Encoded variations: ....//....//
+ - File content verification
+ - **Severity:** High
 
 18. **File Inclusion (Advanced)**
-    - LFI (Local File Inclusion)
-    - PHP filters: php://filter/convert.base64-encode
-    - Remote file inclusion checks
-    - **Severity:** Critical
+ - LFI (Local File Inclusion)
+ - PHP filters: php://filter/convert.base64-encode
+ - Remote file inclusion checks
+ - **Severity:** Critical
 
 ---
 
 ### **Category 7: Security Misconfiguration (4 checks)**
 19. **Security Headers (Advanced)**
-    - HSTS (Strict-Transport-Security)
-    - X-Frame-Options
-    - X-Content-Type-Options
-    - Content-Security-Policy (CSP)
-    - X-XSS-Protection
-    - **Severity:** Low/Medium/High
+ - HSTS (Strict-Transport-Security)
+ - X-Frame-Options
+ - X-Content-Type-Options
+ - Content-Security-Policy (CSP)
+ - X-XSS-Protection
+ - **Severity:** Low/Medium/High
 
 20. **CORS Misconfiguration**
-    - Access-Control-Allow-Origin validation
-    - Wildcard (*) detection
-    - Origin reflection testing
-    - **Severity:** High
+ - Access-Control-Allow-Origin validation
+ - Wildcard (*) detection
+ - Origin reflection testing
+ - **Severity:** High
 
 21. **HTTP Methods**
-    - Dangerous methods: PUT, DELETE, TRACE, CONNECT
-    - Method availability testing
-    - **Severity:** Medium
+ - Dangerous methods: PUT, DELETE, TRACE, CONNECT
+ - Method availability testing
+ - **Severity:** Medium
 
 22. **Default Credentials**
-    - Common username/password combinations
-    - Framework for credential testing
-    - **Severity:** Critical
+ - Common username/password combinations
+ - Framework for credential testing
+ - **Severity:** Critical
 
 ---
 
 ### **Category 8: CSRF (1 check)**
 23. **CSRF (Advanced)**
-    - POST form analysis
-    - CSRF token detection
-    - Token validation
-    - **Severity:** Medium
+ - POST form analysis
+ - CSRF token detection
+ - Token validation
+ - **Severity:** Medium
 
 ---
 
 ### **Category 9: Vulnerable Components (2 checks)**
 24. **Outdated JavaScript Libraries**
-    - jQuery < 1.9
-    - AngularJS < 1.6
-    - Bootstrap < 4
-    - Version pattern matching
-    - **Severity:** Medium
+ - jQuery < 1.9
+ - AngularJS < 1.6
+ - Bootstrap < 4
+ - Version pattern matching
+ - **Severity:** Medium
 
 25. **Known CVEs**
-    - Framework for CVE database integration
-    - Component version detection
-    - **Severity:** Variable
+ - Framework for CVE database integration
+ - Component version detection
+ - **Severity:** Variable
 
 ---
 
 ### **Category 10: Logging & Monitoring (2 checks)**
 26. **Verbose Error Messages**
-    - Exception details exposure
-    - Stack trace detection
-    - Error page analysis
-    - **Severity:** Low
+ - Exception details exposure
+ - Stack trace detection
+ - Error page analysis
+ - **Severity:** Low
 
 27. **Debug Mode**
-    - Debug indicators detection
-    - Traceback exposure
-    - Development mode checks
-    - **Severity:** Medium
+ - Debug indicators detection
+ - Traceback exposure
+ - Development mode checks
+ - **Severity:** Medium
 
 ---
 
 ### **Category 11: SSRF (1 check)**
 28. **SSRF (Server-Side Request Forgery) Advanced**
-    - AWS metadata endpoint (169.254.169.254)
-    - Internal service access (localhost)
-    - URL parameter exploitation
-    - **Severity:** High
+ - AWS metadata endpoint (169.254.169.254)
+ - Internal service access (localhost)
+ - URL parameter exploitation
+ - **Severity:** High
 
 ---
 
 ### **Category 12: API Security (2 checks)**
 29. **API Security**
-    - API documentation exposure (/api/docs, /swagger, /api-docs)
-    - Endpoint enumeration
-    - Authentication bypass
-    - **Severity:** Info/Medium
+ - API documentation exposure (/api/docs, /swagger, /api-docs)
+ - Endpoint enumeration
+ - Authentication bypass
+ - **Severity:** Info/Medium
 
 30. **GraphQL Vulnerabilities**
-    - Introspection query testing
-    - Schema exposure
-    - Query depth/complexity validation
-    - **Severity:** Low/Medium
+ - Introspection query testing
+ - Schema exposure
+ - Query depth/complexity validation
+ - **Severity:** Low/Medium
 
 ---
 
 ### **Category 13: Modern Web Vulnerabilities (3 checks)**
 31. **Open Redirect**
-    - Unvalidated redirect detection
-    - External URL redirection
-    - **Severity:** Medium
+ - Unvalidated redirect detection
+ - External URL redirection
+ - **Severity:** Medium
 
 32. **Clickjacking**
-    - X-Frame-Options validation
-    - CSP frame-ancestors check
-    - **Severity:** Medium
+ - X-Frame-Options validation
+ - CSP frame-ancestors check
+ - **Severity:** Medium
 
 33. **Host Header Injection**
-    - Host header reflection
-    - Password reset poisoning
-    - **Severity:** Medium
+ - Host header reflection
+ - Password reset poisoning
+ - **Severity:** Medium
 
 ---
 
-## 🎨 Enhanced Output
+## Enhanced Output
 
 ### **During Scan:**
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║      ADVANCED VULNERABILITY SCANNER - KNDYS v3.0                ║
+║ ADVANCED VULNERABILITY SCANNER - KNDYS v3.0 ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 [*] Target: http://example.com
@@ -276,15 +276,15 @@ Complete rewrite of the `vuln_scanner` module transforming it into a **professio
 [*] Category: Injection
 ──────────────────────────────────────────────────────────────────
 [+] CRITICAL: SQL Injection - Error-based SQLi detected
-    └─ SQL error detected with payload: '
-    └─ Remediation: Use parameterized queries, input validation
+ └─ SQL error detected with payload: '
+ └─ Remediation: Use parameterized queries, input validation
 [1/33] Checking: NoSQL Injection...
 
 [*] Category: XSS
 ──────────────────────────────────────────────────────────────────
 [+] HIGH: Reflected XSS - Basic script tag
-    └─ XSS detected: <script>alert(1)</script>
-    └─ Evidence: Payload reflected in response
+ └─ XSS detected: <script>alert(1)</script>
+ └─ Evidence: Payload reflected in response
 [4/33] Checking: DOM XSS...
 ```
 
@@ -297,35 +297,35 @@ VULNERABILITY SCAN SUMMARY
 [!] Found 15 vulnerabilities
 
 Risk Distribution:
-  ● Critical: 3
-  ● High: 5
-  ● Medium: 4
-  ● Low: 2
-  ● Info: 1
+ ● Critical: 3
+ ● High: 5
+ ● Medium: 4
+ ● Low: 2
+ ● Info: 1
 
 Top Vulnerabilities:
-  1. [CRITICAL] SQL Injection (Error-based)
-     └─ SQL error detected with payload: '
-     └─ Remediation: Use parameterized queries
-  
-  2. [CRITICAL] Command Injection
-     └─ Time-based command injection: Unix sleep
-     └─ Remediation: Sanitize user input, avoid shell commands
-  
-  3. [HIGH] CORS Misconfiguration
-     └─ Access-Control-Allow-Origin: *
-     └─ Remediation: Restrict CORS to specific origins
+ 1. [CRITICAL] SQL Injection (Error-based)
+ └─ SQL error detected with payload: '
+ └─ Remediation: Use parameterized queries
+
+ 2. [CRITICAL] Command Injection
+ └─ Time-based command injection: Unix sleep
+ └─ Remediation: Sanitize user input, avoid shell commands
+
+ 3. [HIGH] CORS Misconfiguration
+ └─ Access-Control-Allow-Origin: *
+ └─ Remediation: Restrict CORS to specific origins
 
 [+] Scan completed in 45.23 seconds
 [+] Total checks performed: 33
 [+] Reports saved to:
-    • vuln_scan_1234567890.json (JSON)
-    • vuln_scan_1234567890.txt (Detailed report)
+ • vuln_scan_1234567890.json (JSON)
+ • vuln_scan_1234567890.txt (Detailed report)
 ```
 
 ---
 
-## 📝 Scan Types
+## Scan Types
 
 ### **1. Quick Scan** (`scan_type=quick`)
 Fast scan focusing on high-impact vulnerabilities:
@@ -354,7 +354,7 @@ Comprehensive scan with all 33 checks across 13 categories
 
 ---
 
-## 🔧 Advanced Features
+## Advanced Features
 
 ### **1. Aggressive Mode**
 ```bash
@@ -392,35 +392,35 @@ set depth 3
 
 ---
 
-## 📊 Reporting
+## Reporting
 
 ### **JSON Report** (`vuln_scan_[timestamp].json`)
 ```json
 {
-  "target": "http://example.com",
-  "timestamp": 1234567890,
-  "vulnerabilities": [
-    {
-      "title": "SQL Injection",
-      "severity": "critical",
-      "category": "Injection",
-      "description": "Error-based SQL injection",
-      "evidence": "SQL error: syntax error",
-      "remediation": "Use parameterized queries",
-      "references": ["OWASP-A03:2021", "CWE-89"]
-    }
-  ],
-  "risk_summary": {
-    "critical": 3,
-    "high": 5,
-    "medium": 4,
-    "low": 2,
-    "info": 1
-  },
-  "statistics": {
-    "total_checks": 33,
-    "elapsed_time": 45.23
-  }
+ "target": "http://example.com",
+ "timestamp": 1234567890,
+ "vulnerabilities": [
+ {
+ "title": "SQL Injection",
+ "severity": "critical",
+ "category": "Injection",
+ "description": "Error-based SQL injection",
+ "evidence": "SQL error: syntax error",
+ "remediation": "Use parameterized queries",
+ "references": ["OWASP-A03:2021", "CWE-89"]
+ }
+ ],
+ "risk_summary": {
+ "critical": 3,
+ "high": 5,
+ "medium": 4,
+ "low": 2,
+ "info": 1
+ },
+ "statistics": {
+ "total_checks": 33,
+ "elapsed_time": 45.23
+ }
 }
 ```
 
@@ -435,7 +435,7 @@ Detailed human-readable report with:
 
 ---
 
-## 🎯 Usage Examples
+## Usage Examples
 
 ### **Basic Scan:**
 ```bash
@@ -475,14 +475,14 @@ run
 
 ---
 
-## 📈 Technical Details
+## Technical Details
 
 ### **Code Statistics:**
 - **Lines Added:** ~1,055 lines
 - **Functions Created:** 36 total
-  - 1 main scanning function (run_vuln_scanner)
-  - 3 helper functions
-  - 33 vulnerability check functions (one per check)
+ - 1 main scanning function (run_vuln_scanner)
+ - 3 helper functions
+ - 33 vulnerability check functions (one per check)
 - **Previous:** Basic scanner with ~50 lines
 - **Now:** Professional scanner with ~1,100 lines
 
@@ -492,14 +492,14 @@ run
 - **Growth:** +1,055 lines (12.7% increase)
 
 ### **Coverage:**
-- ✅ OWASP Top 10 2021: Complete
-- ✅ API Security Top 10: Partial
-- ✅ CWE References: 25+ mapped
-- ✅ Severity Levels: 5 (Critical/High/Medium/Low/Info)
+- OWASP Top 10 2021: Complete
+- API Security Top 10: Partial
+- CWE References: 25+ mapped
+- Severity Levels: 5 (Critical/High/Medium/Low/Info)
 
 ---
 
-## 🔍 Detection Techniques
+## Detection Techniques
 
 ### **1. Pattern Matching**
 - Error message detection (SQL, LDAP, XML errors)
@@ -525,7 +525,7 @@ run
 
 ---
 
-## 🛠️ Integration
+## ️ Integration
 
 ### **Session Logging:**
 All findings automatically logged to:
@@ -536,7 +536,7 @@ kndys_session_[timestamp].json
 ### **Rate Limiting:**
 Integrated with framework's rate limiting:
 ```python
-self.rate_limit()  # Respects stealth_mode
+self.rate_limit() # Respects stealth_mode
 ```
 
 ### **Error Handling:**
@@ -548,7 +548,7 @@ Graceful error handling for:
 
 ---
 
-## 🎓 Educational Value
+## Educational Value
 
 ### **OWASP Top 10 2021 Mapping:**
 1. **A01:2021** - Broken Access Control → IDOR, Path Traversal, File Inclusion
@@ -570,10 +570,10 @@ Graceful error handling for:
 
 ---
 
-## 🔒 Security Considerations
+## Security Considerations
 
 ### **Ethical Use:**
-⚠️ **WARNING:** Only use this tool on systems you own or have explicit permission to test.
+ **WARNING:** Only use this tool on systems you own or have explicit permission to test.
 
 ### **Legal Compliance:**
 - Obtain written authorization before scanning
@@ -588,7 +588,7 @@ Graceful error handling for:
 
 ---
 
-## 📚 References
+## References
 
 - **OWASP Top 10 2021:** https://owasp.org/Top10/
 - **OWASP Testing Guide:** https://owasp.org/www-project-web-security-testing-guide/
@@ -597,7 +597,7 @@ Graceful error handling for:
 
 ---
 
-## 🚀 Future Enhancements
+## Future Enhancements
 
 ### **Planned Features:**
 - [ ] Active exploitation capabilities
@@ -613,25 +613,25 @@ Graceful error handling for:
 
 ---
 
-## ✅ Summary
+## Summary
 
 The `vuln_scanner` module has been transformed from a basic vulnerability checker into a **professional-grade security assessment tool** with:
 
-✅ **33 comprehensive vulnerability checks**  
-✅ **13 vulnerability categories**  
-✅ **Complete OWASP Top 10 coverage**  
-✅ **5-level severity classification**  
-✅ **Multiple scan modes** (quick/web/api/full)  
-✅ **Advanced features** (aggressive, stealth, multi-threading)  
-✅ **Professional reporting** (JSON + detailed text)  
-✅ **Educational content** (remediation, references)  
-✅ **Production-ready code** with error handling
+ **33 comprehensive vulnerability checks** 
+ **13 vulnerability categories** 
+ **Complete OWASP Top 10 coverage** 
+ **5-level severity classification** 
+ **Multiple scan modes** (quick/web/api/full) 
+ **Advanced features** (aggressive, stealth, multi-threading) 
+ **Professional reporting** (JSON + detailed text) 
+ **Educational content** (remediation, references) 
+ **Production-ready code** with error handling
 
 **Perfect for:** Penetration testing, security assessments, vulnerability research, and security education.
 
 ---
 
-**Module:** scan/vuln_scanner  
-**Status:** ✅ Complete  
-**Version:** KNDYS v3.0  
+**Module:** scan/vuln_scanner 
+**Status:** Complete 
+**Version:** KNDYS v3.0 
 **Last Updated:** 2024

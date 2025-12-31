@@ -1,10 +1,10 @@
-# 🚀 KNDYS v3.1 - Quick Start Examples
+# KNDYS v3.1 - Quick Start Examples
 
 Ejemplos rápidos de uso de los nuevos módulos para empezar inmediatamente.
 
 ---
 
-## 📧 Social Engineering - Ejemplos
+## Social Engineering - Ejemplos
 
 ### 1. Generar Código QR de Phishing
 ```bash
@@ -80,7 +80,7 @@ python3 tt
 
 ---
 
-## 🌐 Network Attacks - Ejemplos
+## Network Attacks - Ejemplos
 
 ### 6. ARP Spoofing / MITM
 ```bash
@@ -146,7 +146,7 @@ python3 tt
 
 ---
 
-## 🔐 Web Application - Ejemplos
+## Web Application - Ejemplos
 
 ### 10. Escanear Configuración CORS
 ```bash
@@ -213,7 +213,7 @@ python3 tt
 
 ---
 
-## 🎯 Escenarios Completos
+## Escenarios Completos
 
 ### Scenario A: Phishing Campaign Corporativo
 
@@ -300,38 +300,38 @@ run
 
 ---
 
-## 💡 Tips Rápidos
+## Tips Rápidos
 
 ### Ver Todos los Módulos
 ```bash
-show modules              # Todos
-show modules social       # Solo social engineering
-show modules network      # Solo network attacks
-show modules webapp       # Solo web application
+show modules # Todos
+show modules social # Solo social engineering
+show modules network # Solo network attacks
+show modules webapp # Solo web application
 ```
 
 ### Ayuda de Módulo Específico
 ```bash
 use social/mass_mailer
-options                   # Ver todas las opciones
-info                      # Ver información detallada
+options # Ver todas las opciones
+info # Ver información detallada
 ```
 
 ### Configuración Global
 ```bash
-setg lhost 192.168.1.100  # IP del atacante
-setg lport 4444           # Puerto listener
+setg lhost 192.168.1.100 # IP del atacante
+setg lport 4444 # Puerto listener
 ```
 
 ### Wordlists Disponibles
 ```bash
-show wordlists            # Ver diccionarios
-download wordlist 1       # Descargar rockyou.txt
+show wordlists # Ver diccionarios
+download wordlist 1 # Descargar rockyou.txt
 ```
 
 ---
 
-## 🔧 Setup Rápido de Herramientas
+## Setup Rápido de Herramientas
 
 ### Para Network Attacks
 ```bash
@@ -358,15 +358,15 @@ pip install requests
 
 ---
 
-## ⚠️ Recordatorios Legales
+## Recordatorios Legales
 
 Antes de usar cualquier módulo:
 
-1. ✅ Obtener **autorización por escrito**
-2. ✅ Definir **scope claramente**
-3. ✅ Usar solo en **entornos controlados**
-4. ✅ Documentar **todas las acciones**
-5. ✅ Eliminar **artefactos post-testing**
+1. Obtener **autorización por escrito**
+2. Definir **scope claramente**
+3. Usar solo en **entornos controlados**
+4. Documentar **todas las acciones**
+5. Eliminar **artefactos post-testing**
 
 **Módulos que requieren especial autorización**:
 - sms_spoofing (ilegal en muchas jurisdicciones)
@@ -376,7 +376,7 @@ Antes de usar cualquier módulo:
 
 ---
 
-## 📚 Documentación Completa
+## Documentación Completa
 
 Para información detallada, consultar:
 
@@ -387,7 +387,7 @@ Para información detallada, consultar:
 
 ---
 
-## 🎓 Recursos de Aprendizaje
+## Recursos de Aprendizaje
 
 ### Documentación Oficial
 - OWASP Testing Guide
@@ -408,7 +408,7 @@ Para información detallada, consultar:
 
 ---
 
-## 🚀 Siguiente Paso
+## Siguiente Paso
 
 ```bash
 # Empezar ahora:
@@ -421,7 +421,7 @@ python3 tt
 
 ---
 
-**KNDYS Framework v3.1**  
+**KNDYS Framework v3.1** 
 *54+ Modules | 10 Categories | Ready for Production*
 
-*Use Responsibly - Always Get Authorization* 🔒
+*Use Responsibly - Always Get Authorization* 

@@ -1,4 +1,4 @@
-# 🎯 KNDYS - Ultra Simple Installation Summary
+# KNDYS - Ultra Simple Installation Summary
 
 ## What Changed?
 
@@ -6,7 +6,7 @@ KNDYS now has **auto-installation**! No more complex setup steps.
 
 ---
 
-## 🚀 New Installation (Super Simple!)
+## New Installation (Super Simple!)
 
 ### Just 2 commands:
 
@@ -25,14 +25,14 @@ cd KNDYS && chmod +x kndys.py && ./kndys.py
 2. **Every other run:** Starts instantly
 
 No more:
-- ❌ Running install.sh scripts
-- ❌ Manual pip install commands
-- ❌ Finding requirements.txt files
-- ❌ Dealing with PEP 668 errors
+- Running install.sh scripts
+- Manual pip install commands
+- Finding requirements.txt files
+- Dealing with PEP 668 errors
 
 Just:
-- ✅ Clone
-- ✅ Run
+- Clone
+- Run
 
 ---
 
@@ -45,7 +45,7 @@ When you run `./kndys.py` for the first time:
 [*] This is a one-time setup and will take a few minutes.
 
 Installing: requests, colorama, beautifulsoup4, lxml...
-[✓] All dependencies installed successfully!
+[] All dependencies installed successfully!
 ```
 
 The auto-installer tries multiple methods:
@@ -148,11 +148,11 @@ The auto-installer handles everything - even the PEP 668 issue!
 
 ## Benefits
 
-✅ **Simplest possible installation** - Just like Metasploit, Hydra, etc.
-✅ **No manual dependency management** - Auto-installs on first run
-✅ **Handles modern Python restrictions** - Tries multiple methods
-✅ **Beginner-friendly** - Clear documentation with examples
-✅ **Professional presentation** - Clean, corporate-style docs
+ **Simplest possible installation** - Just like Metasploit, Hydra, etc.
+ **No manual dependency management** - Auto-installs on first run
+ **Handles modern Python restrictions** - Tries multiple methods
+ **Beginner-friendly** - Clear documentation with examples
+ **Professional presentation** - Clean, corporate-style docs
 
 ---
 
@@ -174,7 +174,7 @@ KNDYS is now as easy to install as any major hacking tool:
 ```bash
 git clone ...
 cd KNDYS
-pip3 install -r requirements.txt  # Error!
+pip3 install -r requirements.txt # Error!
 pip3 install --break-system-packages ...
 # etc...
 ```
@@ -188,7 +188,7 @@ cd KNDYS && chmod +x kndys.py && ./kndys.py
 
 ---
 
-**Ready to use!** 🚀
+**Ready to use!** 
 
 Push to GitHub and share with: 
 ```bash

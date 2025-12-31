@@ -1,4 +1,4 @@
-# 🔍 Mejoras del Módulo Port Scanner
+# Mejoras del Módulo Port Scanner
 
 ## Resumen de Mejoras Implementadas
 
@@ -6,94 +6,94 @@ El módulo `recon/port_scanner` ha sido completamente reescrito y mejorado con c
 
 ---
 
-## ✨ Nuevas Características
+## Nuevas Características
 
 ### 1. **Banner Grabbing Avanzado**
-- ✅ Detección automática de protocolo por puerto
-- ✅ Probes específicos para cada servicio:
-  - **HTTP/HTTPS**: Petición GET con análisis de headers
-  - **SSH**: Detección de versión OpenSSH
-  - **FTP**: Análisis de banner 220
-  - **SMTP**: Identificación de servidor de correo
-  - **MySQL**: Detección de servidor MySQL
-  - **Redis**: Verificación con comando PING
-- ✅ Extracción de información de versión
-- ✅ Identificación de servidor web (Apache, Nginx, IIS, etc.)
+- Detección automática de protocolo por puerto
+- Probes específicos para cada servicio:
+ - **HTTP/HTTPS**: Petición GET con análisis de headers
+ - **SSH**: Detección de versión OpenSSH
+ - **FTP**: Análisis de banner 220
+ - **SMTP**: Identificación de servidor de correo
+ - **MySQL**: Detección de servidor MySQL
+ - **Redis**: Verificación con comando PING
+- Extracción de información de versión
+- Identificación de servidor web (Apache, Nginx, IIS, etc.)
 
 ### 2. **Detección de Vulnerabilidades (Modo Agresivo)**
 Nueva opción `aggressive=true` que incluye:
-- ✅ **FTP Anónimo**: Detecta si el servidor permite login anónimo
-- ✅ **Redis sin Auth**: Identifica instancias Redis sin autenticación
-- ✅ **MongoDB Expuesto**: Alerta sobre puertos MongoDB abiertos
-- ✅ **Elasticsearch Abierto**: Verifica acceso sin autenticación
+- **FTP Anónimo**: Detecta si el servidor permite login anónimo
+- **Redis sin Auth**: Identifica instancias Redis sin autenticación
+- **MongoDB Expuesto**: Alerta sobre puertos MongoDB abiertos
+- **Elasticsearch Abierto**: Verifica acceso sin autenticación
 
 ### 3. **Integración con Sistemas de Seguridad**
-- ✅ **Rate Limiting**: Respeta los límites de solicitudes (100 req/60s)
-- ✅ **Connection Pooling**: Gestión eficiente de conexiones (max 50)
-- ✅ **Validación de Inputs**: Prevención de ataques de inyección
-- ✅ **Error Handling**: Manejo robusto de errores de red
+- **Rate Limiting**: Respeta los límites de solicitudes (100 req/60s)
+- **Connection Pooling**: Gestión eficiente de conexiones (max 50)
+- **Validación de Inputs**: Prevención de ataques de inyección
+- **Error Handling**: Manejo robusto de errores de red
 
 ### 4. **Base de Datos de Servicios Extendida**
 Ampliada de **14 servicios** a **90+ servicios**, incluyendo:
 
 **Nuevas Categorías:**
-- 📁 File Transfer: FTP, SFTP, TFTP, FTPS
-- 📧 Email: SMTP, POP3, IMAP, SMTPS, IMAPS
-- 🌐 Web: HTTP, HTTPS, múltiples puertos alternativos
-- 🗄️ Databases: MySQL, PostgreSQL, MongoDB, Redis, Elasticsearch, Cassandra, CouchDB, ArangoDB
-- 🖥️ Remote Access: SSH, Telnet, RDP, VNC
-- 📋 Directory Services: LDAP, Kerberos, Global Catalog
-- 📂 File Sharing: SMB/CIFS, NFS, NetBIOS
-- 🔧 Monitoring: SNMP, Syslog, Webmin, Netdata
-- 🐳 Container: Docker, Docker Swarm
-- ☸️ Kubernetes: API Server, Kubelet, Scheduler
-- 🎮 Game Servers: Minecraft, Source Engine, Terraria
-- 🔗 IoT: MQTT, CoAP
-- 📊 Application Servers: Grafana, Kibana, Prometheus, ActiveMQ
+- File Transfer: FTP, SFTP, TFTP, FTPS
+- Email: SMTP, POP3, IMAP, SMTPS, IMAPS
+- Web: HTTP, HTTPS, múltiples puertos alternativos
+- ️ Databases: MySQL, PostgreSQL, MongoDB, Redis, Elasticsearch, Cassandra, CouchDB, ArangoDB
+- Remote Access: SSH, Telnet, RDP, VNC
+- Directory Services: LDAP, Kerberos, Global Catalog
+- File Sharing: SMB/CIFS, NFS, NetBIOS
+- Monitoring: SNMP, Syslog, Webmin, Netdata
+- Container: Docker, Docker Swarm
+- ️ Kubernetes: API Server, Kubelet, Scheduler
+- Game Servers: Minecraft, Source Engine, Terraria
+- IoT: MQTT, CoAP
+- Application Servers: Grafana, Kibana, Prometheus, ActiveMQ
 
 ### 5. **Escaneo UDP**
-- ✅ Soporte para escaneo UDP con `scan_type=udp`
-- ✅ Detección de puertos UDP abiertos/filtrados
-- ✅ Extracción de banners UDP
+- Soporte para escaneo UDP con `scan_type=udp`
+- Detección de puertos UDP abiertos/filtrados
+- Extracción de banners UDP
 
 ### 6. **Guardado Estructurado de Resultados**
 Los resultados se guardan en formato JSON con:
 ```json
 {
-  "target": "scanme.nmap.org",
-  "scan_type": "tcp_connect",
-  "timestamp": 1764840013,
-  "duration": 2.46,
-  "ports_scanned": 4,
-  "open_ports": 2,
-  "results": {
-    "22": {
-      "port": 22,
-      "state": "open",
-      "protocol": "tcp",
-      "service": "SSH/SFTP",
-      "banner": "SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13",
-      "version": "",
-      "vulnerabilities": []
-    }
-  }
+ "target": "scanme.nmap.org",
+ "scan_type": "tcp_connect",
+ "timestamp": 1764840013,
+ "duration": 2.46,
+ "ports_scanned": 4,
+ "open_ports": 2,
+ "results": {
+ "22": {
+ "port": 22,
+ "state": "open",
+ "protocol": "tcp",
+ "service": "SSH/SFTP",
+ "banner": "SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13",
+ "version": "",
+ "vulnerabilities": []
+ }
+ }
 }
 ```
 
 ### 7. **Interfaz Mejorada**
-- ✅ Indicador de progreso en tiempo real
-- ✅ Colores codificados por tipo de información:
-  - 🟢 Verde: Puertos abiertos
-  - 🔵 Azul: Banners
-  - 🟣 Magenta: Versiones
-  - 🔴 Rojo: Vulnerabilidades
-- ✅ Resumen detallado de servicios al finalizar
-- ✅ Estadísticas de tiempo de ejecución
-- ✅ Sugerencias de troubleshooting
+- Indicador de progreso en tiempo real
+- Colores codificados por tipo de información:
+ - Verde: Puertos abiertos
+ - Azul: Banners
+ - Magenta: Versiones
+ - Rojo: Vulnerabilidades
+- Resumen detallado de servicios al finalizar
+- Estadísticas de tiempo de ejecución
+- Sugerencias de troubleshooting
 
 ---
 
-## 🎯 Opciones del Módulo
+## Opciones del Módulo
 
 ### Opciones Básicas
 | Opción | Descripción | Valor por Defecto | Ejemplo |
@@ -107,7 +107,7 @@ Los resultados se guardan en formato JSON con:
 
 ---
 
-## 📋 Ejemplos de Uso
+## Ejemplos de Uso
 
 ### Escaneo Rápido de Puertos Comunes
 ```bash
@@ -158,7 +158,7 @@ run
 
 ---
 
-## 🔒 Seguridad Implementada
+## Seguridad Implementada
 
 ### Rate Limiting
 - Limita las conexiones a 100 por minuto
@@ -182,24 +182,24 @@ run
 
 ---
 
-## 📊 Comparación: Antes vs Ahora
+## Comparación: Antes vs Ahora
 
 | Característica | Antes | Ahora |
 |----------------|-------|-------|
 | **Servicios en DB** | 14 | 90+ |
 | **Banner Grabbing** | Solo HTTP básico | 6+ protocolos |
-| **Detección de Vulnerabilidades** | ❌ No | ✅ Sí (modo agresivo) |
-| **Escaneo UDP** | ❌ No | ✅ Sí |
-| **Rate Limiting** | ❌ No | ✅ Sí |
-| **Connection Pooling** | ❌ No | ✅ Sí |
-| **Guardado JSON** | ❌ No | ✅ Sí |
-| **Detección de Versiones** | ❌ No | ✅ Sí |
-| **Progress Indicator** | ❌ No | ✅ Sí |
-| **Logging de Hallazgos** | ❌ No | ✅ Sí |
+| **Detección de Vulnerabilidades** | No | Sí (modo agresivo) |
+| **Escaneo UDP** | No | Sí |
+| **Rate Limiting** | No | Sí |
+| **Connection Pooling** | No | Sí |
+| **Guardado JSON** | No | Sí |
+| **Detección de Versiones** | No | Sí |
+| **Progress Indicator** | No | Sí |
+| **Logging de Hallazgos** | No | Sí |
 
 ---
 
-## 🚀 Rendimiento
+## Rendimiento
 
 - **Velocidad**: ~500-1000 puertos/segundo con 50 threads
 - **Precisión**: Banner grabbing en puertos comunes (21, 22, 25, 80, 443, etc.)
@@ -208,23 +208,23 @@ run
 
 ---
 
-## ⚠️ Detección de Vulnerabilidades Incluidas
+## Detección de Vulnerabilidades Incluidas
 
 ### FTP (Puerto 21)
-- ✅ Login anónimo permitido
+- Login anónimo permitido
 
 ### Redis (Puerto 6379)
-- ✅ Sin autenticación configurada
+- Sin autenticación configurada
 
 ### MongoDB (Puerto 27017)
-- ✅ Puerto expuesto públicamente
+- Puerto expuesto públicamente
 
 ### Elasticsearch (Puerto 9200)
-- ✅ API accesible sin autenticación
+- API accesible sin autenticación
 
 ---
 
-## 📝 Archivos de Salida
+## Archivos de Salida
 
 ### Archivo JSON
 **Nombre**: `portscan_<target>_<timestamp>.json`
@@ -236,7 +236,7 @@ run
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### No se encuentran puertos abiertos
 1. Verifica que el host esté activo: `ping <target>`
@@ -256,7 +256,7 @@ run
 
 ---
 
-## 🎓 Próximas Mejoras Sugeridas
+## Próximas Mejoras Sugeridas
 
 - [ ] Escaneo SYN (requiere privilegios root)
 - [ ] Detección de OS fingerprinting
@@ -269,7 +269,7 @@ run
 
 ---
 
-## 📚 Referencias
+## Referencias
 
 - **Nmap Service Database**: Inspirado en nmap-services
 - **Banner Grabbing Techniques**: RFC-compliant probes
@@ -277,6 +277,6 @@ run
 
 ---
 
-**Fecha de Implementación**: 4 de Diciembre, 2025  
-**Versión del Framework**: KNDYS v3.0  
-**Estado**: ✅ Completamente funcional y probado
+**Fecha de Implementación**: 4 de Diciembre, 2025 
+**Versión del Framework**: KNDYS v3.0 
+**Estado**: Completamente funcional y probado

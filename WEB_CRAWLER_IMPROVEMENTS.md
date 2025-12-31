@@ -1,4 +1,4 @@
-# 🕷️ Mejoras del Módulo Web Crawler
+# ️ Mejoras del Módulo Web Crawler
 
 ## Resumen de Mejoras Implementadas
 
@@ -6,19 +6,19 @@ El módulo `recon/web_crawler` ha sido completamente reescrito con capacidades a
 
 ---
 
-## ✨ Nuevas Características Principales
+## Nuevas Características Principales
 
-### 🎯 **Análisis Multidimensional**
+### **Análisis Multidimensional**
 
 #### 1. **Crawling Inteligente**
-- ✅ Respeto de robots.txt (configurable)
-- ✅ Límite de páginas configurable
-- ✅ Permanece dentro del dominio objetivo
-- ✅ Eliminación de fragmentos de URL (#)
-- ✅ Rate limiting integrado
-- ✅ Progress tracking en tiempo real
+- Respeto de robots.txt (configurable)
+- Límite de páginas configurable
+- Permanece dentro del dominio objetivo
+- Eliminación de fragmentos de URL (#)
+- Rate limiting integrado
+- Progress tracking en tiempo real
 
-#### 2. **Detección de Archivos Sensibles** ⚠️
+#### 2. **Detección de Archivos Sensibles** 
 Busca automáticamente **30+ archivos sensibles comunes**:
 
 | Categoría | Archivos |
@@ -34,12 +34,12 @@ Busca automáticamente **30+ archivos sensibles comunes**:
 | **Sistema** | .DS_Store, desktop.ini |
 
 #### 3. **Análisis de Formularios con Detección de Vulnerabilidades**
-- ✅ Extracción completa de campos
-- ✅ Detección de **CSRF** (Cross-Site Request Forgery)
-- ✅ Verificación de tokens de seguridad
-- ✅ Detección de autocomplete en passwords
-- ✅ Análisis de métodos HTTP
-- ✅ Mapping de acciones de formularios
+- Extracción completa de campos
+- Detección de **CSRF** (Cross-Site Request Forgery)
+- Verificación de tokens de seguridad
+- Detección de autocomplete en passwords
+- Análisis de métodos HTTP
+- Mapping de acciones de formularios
 
 #### 4. **Extracción de Archivos Categorizada**
 Clasifica automáticamente archivos encontrados:
@@ -51,25 +51,25 @@ Clasifica automáticamente archivos encontrados:
 - **Media**: Video y Audio (de tags `<video>` y `<audio>`)
 
 #### 5. **Inteligencia de Contacto**
-- ✅ **Emails**: Extracción con regex avanzado
-- ✅ **Números de teléfono**: Múltiples formatos internacionales
-  - `+1-234-567-8900`
-  - `(234) 567-8900`
-  - `234-567-8900`
+- **Emails**: Extracción con regex avanzado
+- **Números de teléfono**: Múltiples formatos internacionales
+ - `+1-234-567-8900`
+ - `(234) 567-8900`
+ - `234-567-8900`
 
-#### 6. **Análisis de JavaScript** 🔍
-- ✅ Extracción de endpoints de API
-- ✅ Detección de llamadas AJAX/Fetch/Axios
-- ✅ Identificación de rutas JavaScript
-- ✅ Análisis de código inline y externo
-- ✅ Patrones de API REST detectados:
-  - `/api/*`
-  - `/v1/*`, `/v2/*`
-  - `fetch()` calls
-  - `axios.get/post()`
-  - `$.ajax()`
+#### 6. **Análisis de JavaScript** 
+- Extracción de endpoints de API
+- Detección de llamadas AJAX/Fetch/Axios
+- Identificación de rutas JavaScript
+- Análisis de código inline y externo
+- Patrones de API REST detectados:
+ - `/api/*`
+ - `/v1/*`, `/v2/*`
+ - `fetch()` calls
+ - `axios.get/post()`
+ - `$.ajax()`
 
-#### 7. **Detección de Tecnologías** 🔧
+#### 7. **Detección de Tecnologías** 
 Identifica **15+ tecnologías web**:
 
 | Tipo | Tecnologías |
@@ -86,7 +86,7 @@ Métodos de detección:
 - Firmas en contenido HTML
 - Rutas características
 
-#### 8. **Análisis de Seguridad de Headers** 🔒
+#### 8. **Análisis de Seguridad de Headers** 
 Verifica **7 headers de seguridad críticos**:
 
 | Header | Propósito |
@@ -99,7 +99,7 @@ Verifica **7 headers de seguridad críticos**:
 | `Referrer-Policy` | Control de información de referrer |
 | `Permissions-Policy` | Control de features del navegador |
 
-#### 9. **Análisis de Cookies** 🍪
+#### 9. **Análisis de Cookies** 
 Extrae y analiza cookies:
 - Nombre y valor (truncado)
 - Dominio
@@ -107,7 +107,7 @@ Extrae y analiza cookies:
 - Flag `HttpOnly`
 - Detección de cookies inseguras
 
-#### 10. **Detección de Vulnerabilidades** ⚠️
+#### 10. **Detección de Vulnerabilidades** 
 Cuando `scan_vulns=true`, detecta:
 
 | Vulnerabilidad | Severidad | Descripción |
@@ -118,19 +118,19 @@ Cuando `scan_vulns=true`, detecta:
 | **Directory Listing** | Medium | Listado de directorios habilitado |
 
 #### 11. **Extracción de Parámetros**
-- ✅ Identifica parámetros de URL únicos
-- ✅ Útil para fuzzing posterior
-- ✅ Detección de puntos de entrada
+- Identifica parámetros de URL únicos
+- Útil para fuzzing posterior
+- Detección de puntos de entrada
 
 #### 12. **Extracción de Comentarios HTML**
-- ✅ Encuentra comentarios `<!-- -->`
-- ✅ Filtra comentarios cortos (<10 caracteres)
-- ✅ Busca información sensible en comentarios
-- ✅ Guarda URL donde se encontró
+- Encuentra comentarios `<!-- -->`
+- Filtra comentarios cortos (<10 caracteres)
+- Busca información sensible en comentarios
+- Guarda URL donde se encontró
 
 ---
 
-## 🎯 Nuevas Opciones del Módulo
+## Nuevas Opciones del Módulo
 
 | Opción | Descripción | Valor Default | Ejemplo |
 |--------|-------------|---------------|---------|
@@ -144,88 +144,88 @@ Cuando `scan_vulns=true`, detecta:
 
 ---
 
-## 📊 Comparación: Antes vs Ahora
+## Comparación: Antes vs Ahora
 
 | Característica | Antes | Ahora | Mejora |
 |----------------|-------|-------|--------|
-| **Archivos Sensibles** | ❌ | ✅ 30+ archivos | +100% |
-| **Detección de Vulns** | ❌ | ✅ 4 tipos | +100% |
-| **Análisis de JS** | ❌ | ✅ API + Endpoints | +100% |
-| **Tech Detection** | Básico | ✅ 15+ techs | +300% |
-| **Security Headers** | ❌ | ✅ 7 headers | +100% |
-| **Cookie Analysis** | ❌ | ✅ Completo | +100% |
-| **CSRF Detection** | ❌ | ✅ Sí | +100% |
-| **Rate Limiting** | ❌ | ✅ Sí | +100% |
-| **robots.txt** | ❌ | ✅ Respetado | +100% |
-| **File Categorization** | ❌ | ✅ 5 categorías | +100% |
-| **Contact Info** | Solo emails | ✅ Emails + Phones | +100% |
-| **Progress Tracking** | ❌ | ✅ Tiempo real | +100% |
-| **Structured Output** | Básico | ✅ JSON + Report | +200% |
+| **Archivos Sensibles** | | 30+ archivos | +100% |
+| **Detección de Vulns** | | 4 tipos | +100% |
+| **Análisis de JS** | | API + Endpoints | +100% |
+| **Tech Detection** | Básico | 15+ techs | +300% |
+| **Security Headers** | | 7 headers | +100% |
+| **Cookie Analysis** | | Completo | +100% |
+| **CSRF Detection** | | Sí | +100% |
+| **Rate Limiting** | | Sí | +100% |
+| **robots.txt** | | Respetado | +100% |
+| **File Categorization** | | 5 categorías | +100% |
+| **Contact Info** | Solo emails | Emails + Phones | +100% |
+| **Progress Tracking** | | Tiempo real | +100% |
+| **Structured Output** | Básico | JSON + Report | +200% |
 
 ---
 
-## 📁 Formatos de Salida
+## Formatos de Salida
 
 ### 1. **JSON Estructurado**
 Archivo: `crawler_<domain>_<timestamp>.json`
 
 ```json
 {
-  "url": "https://example.com",
-  "timestamp": 1764842000,
-  "duration": 45.67,
-  "pages": {
-    "https://example.com/": {
-      "status_code": 200,
-      "title": "Example Domain",
-      "forms_count": 2,
-      "links_count": 15,
-      "depth": 0
-    }
-  },
-  "links": ["https://example.com/about", ...],
-  "forms": [
-    {
-      "url": "https://example.com/login",
-      "action": "/auth/login",
-      "method": "POST",
-      "inputs": [...],
-      "vulnerabilities": [...]
-    }
-  ],
-  "files": {
-    "documents": ["https://example.com/doc.pdf"],
-    "images": ["https://example.com/logo.png"],
-    "scripts": ["https://example.com/app.js"],
-    "stylesheets": ["https://example.com/style.css"],
-    "media": []
-  },
-  "emails": ["contact@example.com"],
-  "phone_numbers": ["+1-234-567-8900"],
-  "js_endpoints": ["/api/users", "/api/products"],
-  "api_endpoints": ["https://example.com/api/v1/data"],
-  "parameters": ["id", "page", "query"],
-  "sensitive_files": ["https://example.com/.git/config"],
-  "technologies": ["Apache/2.4.41", "PHP", "WordPress"],
-  "security_headers": {
-    "X-Frame-Options": "Present",
-    "Content-Security-Policy": "Missing"
-  },
-  "cookies": [
-    {
-      "name": "session_id",
-      "secure": true,
-      "httponly": true
-    }
-  ],
-  "vulnerabilities": [
-    {
-      "type": "Missing CSRF Protection",
-      "url": "https://example.com/form",
-      "severity": "Medium",
-      "description": "Form does not have CSRF protection"
-    }
-  ]
+ "url": "https://example.com",
+ "timestamp": 1764842000,
+ "duration": 45.67,
+ "pages": {
+ "https://example.com/": {
+ "status_code": 200,
+ "title": "Example Domain",
+ "forms_count": 2,
+ "links_count": 15,
+ "depth": 0
+ }
+ },
+ "links": ["https://example.com/about", ...],
+ "forms": [
+ {
+ "url": "https://example.com/login",
+ "action": "/auth/login",
+ "method": "POST",
+ "inputs": [...],
+ "vulnerabilities": [...]
+ }
+ ],
+ "files": {
+ "documents": ["https://example.com/doc.pdf"],
+ "images": ["https://example.com/logo.png"],
+ "scripts": ["https://example.com/app.js"],
+ "stylesheets": ["https://example.com/style.css"],
+ "media": []
+ },
+ "emails": ["contact@example.com"],
+ "phone_numbers": ["+1-234-567-8900"],
+ "js_endpoints": ["/api/users", "/api/products"],
+ "api_endpoints": ["https://example.com/api/v1/data"],
+ "parameters": ["id", "page", "query"],
+ "sensitive_files": ["https://example.com/.git/config"],
+ "technologies": ["Apache/2.4.41", "PHP", "WordPress"],
+ "security_headers": {
+ "X-Frame-Options": "Present",
+ "Content-Security-Policy": "Missing"
+ },
+ "cookies": [
+ {
+ "name": "session_id",
+ "secure": true,
+ "httponly": true
+ }
+ ],
+ "vulnerabilities": [
+ {
+ "type": "Missing CSRF Protection",
+ "url": "https://example.com/form",
+ "severity": "Medium",
+ "description": "Form does not have CSRF protection"
+ }
+ ]
 }
 ```
 
@@ -241,30 +241,30 @@ Date: 2025-12-04 10:30:00
 Duration: 45.67 seconds
 
 Statistics:
-  Pages Crawled: 25
-  Links Found: 150
-  Forms Found: 5
-  Emails Found: 8
-  Vulnerabilities: 3
+ Pages Crawled: 25
+ Links Found: 150
+ Forms Found: 5
+ Emails Found: 8
+ Vulnerabilities: 3
 
 Sensitive Files:
-  - https://example.com/.git/config
-  - https://example.com/.env
-  - https://example.com/backup.sql
+ - https://example.com/.git/config
+ - https://example.com/.env
+ - https://example.com/backup.sql
 
 Vulnerabilities:
-  [Medium] Missing CSRF Protection
-    URL: https://example.com/contact
-    Description: Form does not appear to have CSRF protection
+ [Medium] Missing CSRF Protection
+ URL: https://example.com/contact
+ Description: Form does not appear to have CSRF protection
 
-  [Low] Password Autocomplete Enabled
-    URL: https://example.com/login
-    Description: Password field "password" allows autocomplete
+ [Low] Password Autocomplete Enabled
+ URL: https://example.com/login
+ Description: Password field "password" allows autocomplete
 ```
 
 ---
 
-## 💡 Ejemplos de Uso
+## Ejemplos de Uso
 
 ### Crawling Básico
 ```bash
@@ -318,35 +318,35 @@ run
 
 ---
 
-## 🔍 Información Extraída
+## Información Extraída
 
 ### Por Página Crawleada:
-- ✅ URL completa
-- ✅ Código de estado HTTP
-- ✅ Tipo de contenido
-- ✅ Tamaño del contenido
-- ✅ Profundidad de crawl
-- ✅ Título de página
-- ✅ Cantidad de formularios
-- ✅ Cantidad de enlaces
+- URL completa
+- Código de estado HTTP
+- Tipo de contenido
+- Tamaño del contenido
+- Profundidad de crawl
+- Título de página
+- Cantidad de formularios
+- Cantidad de enlaces
 
 ### Inteligencia Global:
-- ✅ Total de páginas únicas visitadas
-- ✅ Total de enlaces descubiertos
-- ✅ Formularios con análisis de seguridad
-- ✅ Archivos categorizados por tipo
-- ✅ Información de contacto
-- ✅ Comentarios HTML con contexto
-- ✅ Endpoints JavaScript y API
-- ✅ Parámetros únicos identificados
-- ✅ Stack tecnológico completo
-- ✅ Análisis de headers de seguridad
-- ✅ Cookies con flags de seguridad
-- ✅ Vulnerabilidades encontradas
+- Total de páginas únicas visitadas
+- Total de enlaces descubiertos
+- Formularios con análisis de seguridad
+- Archivos categorizados por tipo
+- Información de contacto
+- Comentarios HTML con contexto
+- Endpoints JavaScript y API
+- Parámetros únicos identificados
+- Stack tecnológico completo
+- Análisis de headers de seguridad
+- Cookies con flags de seguridad
+- Vulnerabilidades encontradas
 
 ---
 
-## 🔒 Seguridad Implementada
+## Seguridad Implementada
 
 ### Rate Limiting
 - Integrado con el sistema global
@@ -370,23 +370,23 @@ run
 
 ---
 
-## 🎨 Interfaz Mejorada
+## Interfaz Mejorada
 
 ### Durante el Crawling:
 ```
-✓ https://example.com/                          [200] Forms:2 Links:15
-✓ https://example.com/about                     [200] Forms:0 Links:8
-⏱ Timeout: https://example.com/slow-page
-✗ Error: https://example.com/broken - Connection failed
-↳ https://example.com/image.jpg                 [200]
+ https://example.com/ [200] Forms:2 Links:15
+ https://example.com/about [200] Forms:0 Links:8
+ Timeout: https://example.com/slow-page
+ Error: https://example.com/broken - Connection failed
+↳ https://example.com/image.jpg [200]
 ```
 
 ### Códigos de Color:
-- 🟢 Verde: Página crawleada exitosamente
-- 🟡 Amarillo: Timeout o warning
-- 🔴 Rojo: Error o archivo sensible
-- 🔵 Azul: Información general
-- 🟣 Magenta: Tecnologías detectadas
+- Verde: Página crawleada exitosamente
+- Amarillo: Timeout o warning
+- Rojo: Error o archivo sensible
+- Azul: Información general
+- Magenta: Tecnologías detectadas
 
 ### Progress Tracking:
 ```
@@ -395,35 +395,35 @@ run
 
 ---
 
-## ⚠️ Vulnerabilidades Detectadas
+## Vulnerabilidades Detectadas
 
 ### 1. Missing CSRF Protection
-**Severidad**: Medium  
-**Descripción**: Formulario POST sin token CSRF  
-**Impacto**: Permite ataques CSRF  
+**Severidad**: Medium 
+**Descripción**: Formulario POST sin token CSRF 
+**Impacto**: Permite ataques CSRF 
 **Recomendación**: Implementar tokens anti-CSRF
 
 ### 2. Password Autocomplete Enabled
-**Severidad**: Low  
-**Descripción**: Campo password permite autocompletar  
-**Impacto**: Passwords almacenados en navegador  
+**Severidad**: Low 
+**Descripción**: Campo password permite autocompletar 
+**Impacto**: Passwords almacenados en navegador 
 **Recomendación**: Agregar `autocomplete="off"`
 
 ### 3. Information Disclosure
-**Severidad**: Low  
-**Descripción**: Página contiene info de debug/error  
-**Impacto**: Revela estructura interna  
+**Severidad**: Low 
+**Descripción**: Página contiene info de debug/error 
+**Impacto**: Revela estructura interna 
 **Recomendación**: Deshabilitar debug en producción
 
 ### 4. Directory Listing
-**Severidad**: Medium  
-**Descripción**: Listado de directorios habilitado  
-**Impacto**: Exposición de estructura de archivos  
+**Severidad**: Medium 
+**Descripción**: Listado de directorios habilitado 
+**Impacto**: Exposición de estructura de archivos 
 **Recomendación**: Deshabilitar directory listing
 
 ---
 
-## 📊 Análisis de Archivos Sensibles
+## Análisis de Archivos Sensibles
 
 ### Archivos de Configuración
 - `.env`, `.env.local`, `.env.production`
@@ -451,7 +451,7 @@ run
 
 ---
 
-## 🎓 Casos de Uso Avanzados
+## Casos de Uso Avanzados
 
 ### 1. Reconnaissance Completo
 ```bash
@@ -513,7 +513,7 @@ run
 
 ---
 
-## 🚀 Rendimiento
+## Rendimiento
 
 - **Velocidad**: ~5-10 páginas/segundo (con rate limiting)
 - **Concurrencia**: Hasta 20 threads recomendados
@@ -522,7 +522,7 @@ run
 
 ---
 
-## 🔧 Dependencias
+## Dependencias
 
 ### Requeridas:
 - `requests`: HTTP client
@@ -533,7 +533,7 @@ run
 
 ---
 
-## 📝 Logging y Tracking
+## Logging y Tracking
 
 ### Archivo de Sesión
 Todos los findings se registran en:
@@ -544,24 +544,24 @@ kndys_session_<timestamp>.json
 ### Estructura del Log
 ```json
 {
-  "findings": [
-    {
-      "timestamp": "2025-12-04T10:30:00",
-      "type": "Web Crawler",
-      "data": {
-        "url": "https://example.com",
-        "pages_crawled": 50,
-        "vulnerabilities": 3,
-        "duration": 45.67
-      }
-    }
-  ]
+ "findings": [
+ {
+ "timestamp": "2025-12-04T10:30:00",
+ "type": "Web Crawler",
+ "data": {
+ "url": "https://example.com",
+ "pages_crawled": 50,
+ "vulnerabilities": 3,
+ "duration": 45.67
+ }
+ }
+ ]
 }
 ```
 
 ---
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Crawling muy lento
 1. Aumentar threads: `set threads 20`
@@ -582,7 +582,7 @@ kndys_session_<timestamp>.json
 
 ---
 
-## 🎯 Próximas Mejoras Sugeridas
+## Próximas Mejoras Sugeridas
 
 - [ ] Rendering de JavaScript (headless browser)
 - [ ] Screenshot de páginas
@@ -597,7 +597,7 @@ kndys_session_<timestamp>.json
 
 ---
 
-## 📚 Referencias
+## Referencias
 
 - **OWASP Testing Guide**: Vulnerability detection patterns
 - **OWASP Top 10**: Common vulnerabilities
@@ -606,8 +606,8 @@ kndys_session_<timestamp>.json
 
 ---
 
-**Fecha de Implementación**: 4 de Diciembre, 2025  
-**Versión del Framework**: KNDYS v3.0  
-**Estado**: ✅ Completamente funcional y probado  
-**Líneas de código**: ~550 líneas de mejoras  
+**Fecha de Implementación**: 4 de Diciembre, 2025 
+**Versión del Framework**: KNDYS v3.0 
+**Estado**: Completamente funcional y probado 
+**Líneas de código**: ~550 líneas de mejoras 
 **Funciones nuevas**: 12 funciones especializadas

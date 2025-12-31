@@ -1,4 +1,4 @@
-# 🌐 Mejoras del Módulo Network Mapper
+# Mejoras del Módulo Network Mapper
 
 ## Resumen de Mejoras Implementadas
 
@@ -6,26 +6,26 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 
 ---
 
-## ✨ Nuevas Características Principales
+## Nuevas Características Principales
 
-### 🎯 **Múltiples Técnicas de Descubrimiento**
+### **Múltiples Técnicas de Descubrimiento**
 
 #### 1. **ICMP Ping Sweep**
-- ✅ Envío de paquetes ICMP Echo Request
-- ✅ Medición de latencia (RTT)
-- ✅ Extracción de TTL para OS detection
-- ✅ Detección de hosts que responden a ping
+- Envío de paquetes ICMP Echo Request
+- Medición de latencia (RTT)
+- Extracción de TTL para OS detection
+- Detección de hosts que responden a ping
 
 #### 2. **TCP Connect Scan**
-- ✅ Escaneo de puertos comunes (21, 22, 23, 25, 80, 443, 445, 3389, 8080, 3306, 5432)
-- ✅ Detección de hosts que no responden a ping
-- ✅ Medición de latencia de conexión
-- ✅ Identificación de servicios activos
+- Escaneo de puertos comunes (21, 22, 23, 25, 80, 443, 445, 3389, 8080, 3306, 5432)
+- Detección de hosts que no responden a ping
+- Medición de latencia de conexión
+- Identificación de servicios activos
 
 #### 3. **UDP Probe**
-- ✅ Sondeo de puertos UDP comunes (DNS:53, DHCP:67/68, SNMP:161, NTP:123)
-- ✅ Detección de dispositivos de red que solo responden UDP
-- ✅ Identificación de servicios de infraestructura
+- Sondeo de puertos UDP comunes (DNS:53, DHCP:67/68, SNMP:161, NTP:123)
+- Detección de dispositivos de red que solo responden UDP
+- Identificación de servicios de infraestructura
 
 #### 4. **Scan Types Configurables**
 | Tipo | Descripción | Uso |
@@ -37,7 +37,7 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 
 ---
 
-### 🔍 **Detección Avanzada de Sistema Operativo**
+### **Detección Avanzada de Sistema Operativo**
 
 #### Basada en TTL (Time To Live)
 | TTL Range | OS Detectado | Variantes |
@@ -52,9 +52,9 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 - Distingue entre sistemas operativos con alta precisión
 
 #### Banner Grabbing
-- ✅ Extracción de banners de servicios
-- ✅ Identificación de versiones de software
-- ✅ Fingerprinting pasivo de aplicaciones
+- Extracción de banners de servicios
+- Identificación de versiones de software
+- Fingerprinting pasivo de aplicaciones
 
 **Servicios Analizados:**
 - **SSH (22)**: Versión de OpenSSH/Dropbear
@@ -65,7 +65,7 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 
 ---
 
-### 🖥️ **Identificación de Tipos de Dispositivo**
+### **Identificación de Tipos de Dispositivo**
 
 #### Detección Inteligente Multi-Criterio
 
@@ -97,19 +97,19 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 
 ---
 
-### 🔧 **Service Detection & Fingerprinting**
+### **Service Detection & Fingerprinting**
 
 #### Detección de Servicios Comunes
 
 **Puertos Escaneados:**
 ```
-21   - FTP
-22   - SSH
-23   - Telnet
-25   - SMTP
-80   - HTTP
-443  - HTTPS
-445  - SMB/CIFS
+21 - FTP
+22 - SSH
+23 - Telnet
+25 - SMTP
+80 - HTTP
+443 - HTTPS
+445 - SMB/CIFS
 3389 - RDP (Remote Desktop)
 8080 - HTTP Alternate
 3306 - MySQL
@@ -117,10 +117,10 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 ```
 
 #### Banner Extraction
-- ✅ Captura de banners de servicios
-- ✅ Identificación de versiones de software
-- ✅ Detección de configuraciones inseguras
-- ✅ Preview de 200 caracteres máximo
+- Captura de banners de servicios
+- Identificación de versiones de software
+- Detección de configuraciones inseguras
+- Preview de 200 caracteres máximo
 
 **Ejemplo de Output:**
 ```
@@ -131,7 +131,7 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 
 ---
 
-### 🗺️ **Análisis de Topología de Red**
+### **Análisis de Topología de Red**
 
 #### 1. **Identificación de Gateway**
 - Detecta routers y firewalls potenciales
@@ -141,19 +141,19 @@ El módulo `recon/network_mapper` ha sido **completamente reescrito** con capaci
 #### 2. **Agrupación por Tipo de Dispositivo**
 ```
 Device Groups:
-  Router: 1 device
-  Linux Server: 8 devices
-  Windows Workstation: 15 devices
-  Network Printer: 3 devices
-  IP Camera: 5 devices
+ Router: 1 device
+ Linux Server: 8 devices
+ Windows Workstation: 15 devices
+ Network Printer: 3 devices
+ IP Camera: 5 devices
 ```
 
 #### 3. **Distribución de Sistemas Operativos**
 ```
 OS Distribution:
-  Windows: 15 hosts
-  Linux/Unix: 8 hosts
-  Network Device: 4 hosts
+ Windows: 15 hosts
+ Linux/Unix: 8 hosts
+ Network Device: 4 hosts
 ```
 
 #### 4. **Mapeo de Servicios**
@@ -163,7 +163,7 @@ OS Distribution:
 
 ---
 
-### 📊 **Métricas y Estadísticas**
+### **Métricas y Estadísticas**
 
 #### Información de Red Recopilada
 - **Total de direcciones**: Cantidad de IPs en el rango
@@ -182,29 +182,29 @@ OS Distribution:
 
 ---
 
-### 🔒 **Resolución de Hostnames**
+### **Resolución de Hostnames**
 
 #### DNS Reverse Lookup (PTR)
-- ✅ Resolución IP → Hostname
-- ✅ Identificación de nombres de dominio
-- ✅ Útil para identificar propósito del host
+- Resolución IP → Hostname
+- Identificación de nombres de dominio
+- Útil para identificar propósito del host
 
 **Ejemplos:**
 ```
-192.168.1.1    → router.local.lan
-192.168.1.10   → webserver.company.com
-192.168.1.50   → printer-floor2.office.local
-192.168.1.100  → workstation-john.corp.com
+192.168.1.1 → router.local.lan
+192.168.1.10 → webserver.company.com
+192.168.1.50 → printer-floor2.office.local
+192.168.1.100 → workstation-john.corp.com
 ```
 
 ---
 
-### 🎨 **Interfaz Mejorada en Tiempo Real**
+### **Interfaz Mejorada en Tiempo Real**
 
 #### Durante el Escaneo:
 ```
 ╔══════════════════════════════════════════════════════════════════╗
-║           ADVANCED NETWORK MAPPER - KNDYS v3.0                  ║
+║ ADVANCED NETWORK MAPPER - KNDYS v3.0 ║
 ╚══════════════════════════════════════════════════════════════════╝
 
 [*] Network: 192.168.1.0/24
@@ -214,31 +214,31 @@ OS Distribution:
 
 [*] Scanning 254 addresses...
 
-✓ 192.168.1.1 (router.local.lan) [2.34ms] - Cisco/Network Device - Router
-  ↳ Open ports: 22, 23, 80, 443, 161
-  • 22/SSH: SSH-2.0-Cisco-1.25
-  • 80/HTTP: lighttpd/1.4.35
+ 192.168.1.1 (router.local.lan) [2.34ms] - Cisco/Network Device - Router
+ ↳ Open ports: 22, 23, 80, 443, 161
+ • 22/SSH: SSH-2.0-Cisco-1.25
+ • 80/HTTP: lighttpd/1.4.35
 
-✓ 192.168.1.10 (server.local.lan) [5.67ms] - Linux/Unix - Web Server
-  ↳ Open ports: 22, 80, 443
-  • 22/SSH: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
-  • 80/HTTP: Apache/2.4.41 (Ubuntu)
+ 192.168.1.10 (server.local.lan) [5.67ms] - Linux/Unix - Web Server
+ ↳ Open ports: 22, 80, 443
+ • 22/SSH: SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
+ • 80/HTTP: Apache/2.4.41 (Ubuntu)
 
 [*] Progress: 50/254 addresses scanned, 5 live hosts found
 
-✓ 192.168.1.50 (printer.local.lan) [10.2ms] - Unknown - Printer
-  ↳ Open ports: 80, 443, 9100
+ 192.168.1.50 (printer.local.lan) [10.2ms] - Unknown - Printer
+ ↳ Open ports: 80, 443, 9100
 ```
 
 #### Símbolos Utilizados:
-- ✓ Host detectado (verde)
+- Host detectado (verde)
 - ↳ Información adicional (cyan)
 - • Detalle de servicio (amarillo)
 - [ms] Latencia de respuesta
 
 ---
 
-## 🎯 Nuevas Opciones del Módulo
+## Nuevas Opciones del Módulo
 
 | Opción | Descripción | Valores | Default | Ejemplo |
 |--------|-------------|---------|---------|---------|
@@ -252,112 +252,112 @@ OS Distribution:
 
 ---
 
-## 📊 Comparación: Antes vs Ahora
+## Comparación: Antes vs Ahora
 
 | Característica | Antes | Ahora | Mejora |
 |----------------|-------|-------|--------|
-| **Técnicas de Descubrimiento** | Solo ICMP | ✅ ICMP + TCP + UDP | +200% |
-| **OS Detection** | ❌ | ✅ TTL-based + Banner | +100% |
-| **Device Type Detection** | ❌ | ✅ 11 tipos | +100% |
-| **Service Detection** | ❌ | ✅ 12+ servicios | +100% |
-| **Banner Grabbing** | ❌ | ✅ Sí | +100% |
-| **Hostname Resolution** | Básico | ✅ PTR + NetBIOS | +100% |
-| **Topology Analysis** | ❌ | ✅ Gateway/Groups/OS | +100% |
-| **Latency Measurement** | ❌ | ✅ Por host | +100% |
-| **MAC Vendor ID** | ❌ | ✅ OUI database | +100% |
-| **Rate Limiting** | ❌ | ✅ Integrado | +100% |
-| **Progress Tracking** | ❌ | ✅ Tiempo real | +100% |
-| **Structured Output** | Lista básica | ✅ JSON + Report | +300% |
-| **Statistics** | ❌ | ✅ Completas | +100% |
+| **Técnicas de Descubrimiento** | Solo ICMP | ICMP + TCP + UDP | +200% |
+| **OS Detection** | | TTL-based + Banner | +100% |
+| **Device Type Detection** | | 11 tipos | +100% |
+| **Service Detection** | | 12+ servicios | +100% |
+| **Banner Grabbing** | | Sí | +100% |
+| **Hostname Resolution** | Básico | PTR + NetBIOS | +100% |
+| **Topology Analysis** | | Gateway/Groups/OS | +100% |
+| **Latency Measurement** | | Por host | +100% |
+| **MAC Vendor ID** | | OUI database | +100% |
+| **Rate Limiting** | | Integrado | +100% |
+| **Progress Tracking** | | Tiempo real | +100% |
+| **Structured Output** | Lista básica | JSON + Report | +300% |
+| **Statistics** | | Completas | +100% |
 
 ---
 
-## 📁 Formatos de Salida
+## Formatos de Salida
 
 ### 1. **JSON Estructurado**
 Archivo: `network_map_<network>_<timestamp>.json`
 
 ```json
 {
-  "network": "192.168.1.0/24",
-  "timestamp": 1733328000,
-  "hosts": {
-    "192.168.1.1": {
-      "ip": "192.168.1.1",
-      "status": "up",
-      "method": "icmp",
-      "latency": 2.34,
-      "ttl": 255,
-      "os_guess": "Cisco/Network Device (TTL: 255)",
-      "hostnames": ["router.local.lan"],
-      "open_ports": [22, 23, 80, 443, 161],
-      "services": {
-        "22": {
-          "name": "SSH",
-          "banner": "SSH-2.0-Cisco-1.25"
-        },
-        "80": {
-          "name": "HTTP",
-          "banner": "lighttpd/1.4.35"
-        }
-      },
-      "device_type": "Router",
-      "device_confidence": "High",
-      "mac": null,
-      "mac_vendor": null
-    },
-    "192.168.1.10": {
-      "ip": "192.168.1.10",
-      "status": "up",
-      "method": "icmp",
-      "latency": 5.67,
-      "ttl": 64,
-      "os_guess": "Linux/Unix (TTL: 64)",
-      "hostnames": ["webserver.company.com"],
-      "open_ports": [22, 80, 443],
-      "services": {
-        "22": {
-          "name": "SSH",
-          "banner": "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5"
-        }
-      },
-      "device_type": "Web Server",
-      "device_confidence": "Medium"
-    }
-  },
-  "network_info": {
-    "network": "192.168.1.0/24",
-    "total_addresses": 254,
-    "network_address": "192.168.1.0",
-    "broadcast_address": "192.168.1.255",
-    "netmask": "255.255.255.0",
-    "prefix_length": 24,
-    "hosts_scanned": 254,
-    "live_hosts": 15
-  },
-  "topology": {
-    "potential_gateways": ["192.168.1.1"],
-    "device_groups": {
-      "Router": ["192.168.1.1"],
-      "Web Server": ["192.168.1.10", "192.168.1.20"],
-      "Linux Server": ["192.168.1.11", "192.168.1.12"],
-      "Windows Workstation": ["192.168.1.50", "192.168.1.51"],
-      "Printer": ["192.168.1.100"]
-    },
-    "os_distribution": {
-      "Linux/Unix": 8,
-      "Windows": 5,
-      "Network Device": 2
-    }
-  },
-  "statistics": {
-    "total_hosts_scanned": 254,
-    "live_hosts_found": 15,
-    "scan_time": 45.23,
-    "hosts_per_second": 5.62,
-    "scan_type": "all",
-    "detection_methods": ["icmp", "tcp"]
-  }
+ "network": "192.168.1.0/24",
+ "timestamp": 1733328000,
+ "hosts": {
+ "192.168.1.1": {
+ "ip": "192.168.1.1",
+ "status": "up",
+ "method": "icmp",
+ "latency": 2.34,
+ "ttl": 255,
+ "os_guess": "Cisco/Network Device (TTL: 255)",
+ "hostnames": ["router.local.lan"],
+ "open_ports": [22, 23, 80, 443, 161],
+ "services": {
+ "22": {
+ "name": "SSH",
+ "banner": "SSH-2.0-Cisco-1.25"
+ },
+ "80": {
+ "name": "HTTP",
+ "banner": "lighttpd/1.4.35"
+ }
+ },
+ "device_type": "Router",
+ "device_confidence": "High",
+ "mac": null,
+ "mac_vendor": null
+ },
+ "192.168.1.10": {
+ "ip": "192.168.1.10",
+ "status": "up",
+ "method": "icmp",
+ "latency": 5.67,
+ "ttl": 64,
+ "os_guess": "Linux/Unix (TTL: 64)",
+ "hostnames": ["webserver.company.com"],
+ "open_ports": [22, 80, 443],
+ "services": {
+ "22": {
+ "name": "SSH",
+ "banner": "SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5"
+ }
+ },
+ "device_type": "Web Server",
+ "device_confidence": "Medium"
+ }
+ },
+ "network_info": {
+ "network": "192.168.1.0/24",
+ "total_addresses": 254,
+ "network_address": "192.168.1.0",
+ "broadcast_address": "192.168.1.255",
+ "netmask": "255.255.255.0",
+ "prefix_length": 24,
+ "hosts_scanned": 254,
+ "live_hosts": 15
+ },
+ "topology": {
+ "potential_gateways": ["192.168.1.1"],
+ "device_groups": {
+ "Router": ["192.168.1.1"],
+ "Web Server": ["192.168.1.10", "192.168.1.20"],
+ "Linux Server": ["192.168.1.11", "192.168.1.12"],
+ "Windows Workstation": ["192.168.1.50", "192.168.1.51"],
+ "Printer": ["192.168.1.100"]
+ },
+ "os_distribution": {
+ "Linux/Unix": 8,
+ "Windows": 5,
+ "Network Device": 2
+ }
+ },
+ "statistics": {
+ "total_hosts_scanned": 254,
+ "live_hosts_found": 15,
+ "scan_time": 45.23,
+ "hosts_per_second": 5.62,
+ "scan_type": "all",
+ "detection_methods": ["icmp", "tcp"]
+ }
 }
 ```
 
@@ -375,39 +375,39 @@ Duration: 45.23 seconds
 
 Network Information:
 --------------------------------------------------------------------------------
-  network: 192.168.1.0/24
-  total_addresses: 254
-  network_address: 192.168.1.0
-  broadcast_address: 192.168.1.255
-  netmask: 255.255.255.0
-  prefix_length: 24
-  hosts_scanned: 254
-  live_hosts: 15
+ network: 192.168.1.0/24
+ total_addresses: 254
+ network_address: 192.168.1.0
+ broadcast_address: 192.168.1.255
+ netmask: 255.255.255.0
+ prefix_length: 24
+ hosts_scanned: 254
+ live_hosts: 15
 
 Live Hosts (15):
 --------------------------------------------------------------------------------
 
 IP: 192.168.1.1
-  Hostname: router.local.lan
-  Latency: 2.34ms
-  OS: Cisco/Network Device (TTL: 255)
-  Device Type: Router (Confidence: High)
-  Open Ports: 22, 23, 80, 443, 161
-  Services:
-    22/SSH - SSH-2.0-Cisco-1.25
-    80/HTTP - lighttpd/1.4.35
-    161/SNMP
+ Hostname: router.local.lan
+ Latency: 2.34ms
+ OS: Cisco/Network Device (TTL: 255)
+ Device Type: Router (Confidence: High)
+ Open Ports: 22, 23, 80, 443, 161
+ Services:
+ 22/SSH - SSH-2.0-Cisco-1.25
+ 80/HTTP - lighttpd/1.4.35
+ 161/SNMP
 
 IP: 192.168.1.10
-  Hostname: webserver.company.com
-  Latency: 5.67ms
-  OS: Linux/Unix (TTL: 64)
-  Device Type: Web Server (Confidence: Medium)
-  Open Ports: 22, 80, 443
-  Services:
-    22/SSH - SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
-    80/HTTP - Apache/2.4.41 (Ubuntu)
-    443/HTTPS
+ Hostname: webserver.company.com
+ Latency: 5.67ms
+ OS: Linux/Unix (TTL: 64)
+ Device Type: Web Server (Confidence: Medium)
+ Open Ports: 22, 80, 443
+ Services:
+ 22/SSH - SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5
+ 80/HTTP - Apache/2.4.41 (Ubuntu)
+ 443/HTTPS
 
 ================================================================================
 TOPOLOGY ANALYSIS
@@ -416,25 +416,25 @@ TOPOLOGY ANALYSIS
 Potential Gateways: 192.168.1.1
 
 Device Groups:
-  Router: 1 devices
-    - 192.168.1.1
-  Web Server: 2 devices
-    - 192.168.1.10
-    - 192.168.1.20
-  Linux Server: 6 devices
-    - 192.168.1.11
-    - 192.168.1.12
-    ...
+ Router: 1 devices
+ - 192.168.1.1
+ Web Server: 2 devices
+ - 192.168.1.10
+ - 192.168.1.20
+ Linux Server: 6 devices
+ - 192.168.1.11
+ - 192.168.1.12
+ ...
 
 OS Distribution:
-  Linux/Unix: 8
-  Windows: 5
-  Network Device: 2
+ Linux/Unix: 8
+ Windows: 5
+ Network Device: 2
 ```
 
 ---
 
-## 💡 Ejemplos de Uso
+## Ejemplos de Uso
 
 ### 1. Escaneo Rápido de Red Local
 ```bash
@@ -498,7 +498,7 @@ run
 
 ---
 
-## 🔍 Casos de Uso Avanzados
+## Casos de Uso Avanzados
 
 ### 1. **Red Corporativa (Large Network)**
 ```bash
@@ -566,7 +566,7 @@ run
 
 ---
 
-## 🚀 Rendimiento y Escalabilidad
+## Rendimiento y Escalabilidad
 
 ### Velocidad de Escaneo
 
@@ -585,15 +585,15 @@ run
 - **Firewall/IDS**: Puede causar rate limiting
 
 ### Optimizaciones Implementadas
-- ✅ ThreadPoolExecutor con 30 workers
-- ✅ Rate limiting para evitar saturación
-- ✅ Timeouts configurables
-- ✅ Escaneo concurrente
-- ✅ Skip de hosts no alcanzables
+- ThreadPoolExecutor con 30 workers
+- Rate limiting para evitar saturación
+- Timeouts configurables
+- Escaneo concurrente
+- Skip de hosts no alcanzables
 
 ---
 
-## 🔒 Seguridad y Stealth
+## Seguridad y Stealth
 
 ### Técnicas No Intrusivas
 - ICMP ping: Método menos intrusivo
@@ -621,38 +621,38 @@ run
 
 ---
 
-## 📊 Información Extraída
+## Información Extraída
 
 ### Por Host:
-- ✅ Dirección IP
-- ✅ Estado (up/down)
-- ✅ Método de detección (icmp/tcp/udp)
-- ✅ Latencia (ms)
-- ✅ TTL (Time To Live)
-- ✅ OS guess basado en TTL
-- ✅ Hostnames (PTR records)
-- ✅ Puertos abiertos
-- ✅ Servicios con banners
-- ✅ Tipo de dispositivo
-- ✅ Confianza de detección
-- ✅ MAC address (si disponible)
-- ✅ MAC vendor
+- Dirección IP
+- Estado (up/down)
+- Método de detección (icmp/tcp/udp)
+- Latencia (ms)
+- TTL (Time To Live)
+- OS guess basado en TTL
+- Hostnames (PTR records)
+- Puertos abiertos
+- Servicios con banners
+- Tipo de dispositivo
+- Confianza de detección
+- MAC address (si disponible)
+- MAC vendor
 
 ### Global de Red:
-- ✅ Información de subred (CIDR, netmask, broadcast)
-- ✅ Total de hosts escaneados
-- ✅ Live hosts encontrados
-- ✅ Tiempo de escaneo
-- ✅ Velocidad de escaneo (hosts/seg)
-- ✅ Distribución de OS
-- ✅ Distribución de dispositivos
-- ✅ Servicios más comunes
-- ✅ Topología de red
-- ✅ Gateways potenciales
+- Información de subred (CIDR, netmask, broadcast)
+- Total de hosts escaneados
+- Live hosts encontrados
+- Tiempo de escaneo
+- Velocidad de escaneo (hosts/seg)
+- Distribución de OS
+- Distribución de dispositivos
+- Servicios más comunes
+- Topología de red
+- Gateways potenciales
 
 ---
 
-## 🎓 Técnicas Implementadas
+## Técnicas Implementadas
 
 ### 1. **Host Discovery**
 - ICMP Echo Request (Ping)
@@ -686,7 +686,7 @@ run
 
 ---
 
-## 🔧 Dependencias
+## Dependencias
 
 ### Python Modules (Built-in):
 - `socket`: Network connections
@@ -703,7 +703,7 @@ run
 
 ---
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Problema: No encuentra hosts
 **Causas posibles:**
@@ -713,8 +713,8 @@ run
 
 **Solución:**
 ```bash
-set scan_type all       # Usar múltiples técnicas
-set timeout 2           # Aumentar timeout
+set scan_type all # Usar múltiples técnicas
+set timeout 2 # Aumentar timeout
 ```
 
 ### Problema: Escaneo muy lento
@@ -725,9 +725,9 @@ set timeout 2           # Aumentar timeout
 
 **Solución:**
 ```bash
-set scan_type ping             # Solo ping
-set service_detection false    # Deshabilitar servicios
-set timeout 1                  # Reducir timeout
+set scan_type ping # Solo ping
+set service_detection false # Deshabilitar servicios
+set timeout 1 # Reducir timeout
 ```
 
 ### Problema: Permisos insuficientes
@@ -737,9 +737,9 @@ set timeout 1                  # Reducir timeout
 
 **Solución:**
 ```bash
-sudo python3 tt                # Ejecutar con sudo
+sudo python3 tt # Ejecutar con sudo
 # O usar técnicas que no requieran root
-set scan_type tcp              # TCP no requiere root
+set scan_type tcp # TCP no requiere root
 ```
 
 ### Problema: Detección de OS incorrecta
@@ -755,7 +755,7 @@ set scan_type tcp              # TCP no requiere root
 
 ---
 
-## 📈 Estadísticas de Mejora
+## Estadísticas de Mejora
 
 ### Código
 - **Líneas añadidas**: ~700 líneas
@@ -780,7 +780,7 @@ set scan_type tcp              # TCP no requiere root
 
 ---
 
-## 🎯 Próximas Mejoras Sugeridas
+## Próximas Mejoras Sugeridas
 
 ### En Desarrollo:
 - [ ] ARP scanning para LAN local
@@ -803,7 +803,7 @@ set scan_type tcp              # TCP no requiere root
 
 ---
 
-## 📚 Referencias Técnicas
+## Referencias Técnicas
 
 ### OS Detection
 - **RFC 791**: Internet Protocol - TTL field
@@ -821,10 +821,10 @@ set scan_type tcp              # TCP no requiere root
 
 ---
 
-## ⚖️ Uso Responsable
+## ️ Uso Responsable
 
 ### Legal
-⚠️ **Solo escanear redes propias o con autorización explícita**
+ **Solo escanear redes propias o con autorización explícita**
 
 ### Ético
 - No causar daño a sistemas
@@ -840,22 +840,22 @@ set scan_type tcp              # TCP no requiere root
 
 ---
 
-## 📝 Changelog
+## Changelog
 
 ### Version 3.1 (2025-12-04)
-- ✅ Reescritura completa del módulo
-- ✅ 3 técnicas de descubrimiento (ICMP/TCP/UDP)
-- ✅ OS detection basado en TTL
-- ✅ Device type detection (11 tipos)
-- ✅ Service detection con banner grabbing
-- ✅ Topology analysis
-- ✅ Hostname resolution
-- ✅ MAC vendor identification
-- ✅ Latency measurement
-- ✅ Rate limiting integration
-- ✅ Comprehensive JSON + TXT output
-- ✅ Real-time progress tracking
-- ✅ Statistics and metrics
+- Reescritura completa del módulo
+- 3 técnicas de descubrimiento (ICMP/TCP/UDP)
+- OS detection basado en TTL
+- Device type detection (11 tipos)
+- Service detection con banner grabbing
+- Topology analysis
+- Hostname resolution
+- MAC vendor identification
+- Latency measurement
+- Rate limiting integration
+- Comprehensive JSON + TXT output
+- Real-time progress tracking
+- Statistics and metrics
 
 ### Version 3.0 (Original)
 - Básico ICMP ping sweep
@@ -866,9 +866,9 @@ set scan_type tcp              # TCP no requiere root
 
 ---
 
-**Fecha de Implementación**: 4 de Diciembre, 2025  
-**Versión del Framework**: KNDYS v3.0  
-**Estado**: ✅ Completamente funcional y probado  
-**Líneas de código**: ~700 líneas de mejoras  
-**Funciones nuevas**: 11 funciones especializadas  
+**Fecha de Implementación**: 4 de Diciembre, 2025 
+**Versión del Framework**: KNDYS v3.0 
+**Estado**: Completamente funcional y probado 
+**Líneas de código**: ~700 líneas de mejoras 
+**Funciones nuevas**: 11 funciones especializadas 
 **Técnicas**: 3 métodos de descubrimiento + 11 tipos de dispositivos
