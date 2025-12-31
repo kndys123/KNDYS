@@ -1,0 +1,84 @@
+# Wordlists (too large for GitHub)
+wordlists/rockyou.txt
+wordlists/kndys-passwords-master.txt
+wordlists/kndys-usernames-master.txt
+wordlists/xato-net-10-million-usernames.txt
+
+# Large wordlists (>50MB)
+wordlists/*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Session files
+kndys_session_*.json
+credentials_*.txt
+
+# Test files
+test_*.txt
+test_*.json
+test_*.csv
+
+# Reports
+*_report.txt
+*_report.json
+*_report.html
+crawler_*.txt
+crawler_*.json
+csrf_scan_*.txt
+csrf_scan_*.json
+dir_traversal_*.txt
+dir_traversal_*.json
+exercise_*.txt
+exercise_*.json
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
