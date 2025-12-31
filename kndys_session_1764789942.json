@@ -1,0 +1,10 @@
+{
+  "actions": [
+    {
+      "timestamp": "2025-12-03T19:25:42.237496",
+      "data": "Running module: social/pretexting"
+    }
+  ],
+  "findings": [],
+  "credentials": []
+}

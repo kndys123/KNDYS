@@ -1,0 +1,51 @@
+{
+  "url": "https://example.com",
+  "timestamp": 1764849914,
+  "duration": 5.897992372512817,
+  "statistics": {
+    "pages_crawled": 1,
+    "links_found": 0,
+    "forms_found": 0,
+    "emails": 0,
+    "phone_numbers": 0,
+    "js_endpoints": 0,
+    "sensitive_files": 0,
+    "vulnerabilities": 0
+  },
+  "pages": {
+    "https://example.com": {
+      "status_code": 200,
+      "title": "Example Domain",
+      "depth": 0,
+      "content_length": 513
+    }
+  },
+  "links": [],
+  "forms": [],
+  "files": {
+    "documents": [],
+    "images": [],
+    "scripts": [],
+    "stylesheets": [],
+    "media": []
+  },
+  "emails": [],
+  "phone_numbers": [],
+  "js_endpoints": [],
+  "api_endpoints": [],
+  "parameters": [],
+  "sensitive_files": [],
+  "technologies": [],
+  "security_headers": {
+    "X-Frame-Options": "Missing",
+    "X-Content-Type-Options": "Missing",
+    "X-XSS-Protection": "Missing",
+    "Strict-Transport-Security": "Missing",
+    "Content-Security-Policy": "Missing",
+    "Referrer-Policy": "Missing",
+    "Permissions-Policy": "Missing"
+  },
+  "cookies": [],
+  "vulnerabilities": [],
+  "comments": []
+}

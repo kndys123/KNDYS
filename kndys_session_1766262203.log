@@ -1,0 +1,33 @@
+[2025-12-20 20:26:17] [INFO] Running module: password/hash_cracker
+2025-12-20 20:26:17,727 [INFO] Running module: password/hash_cracker
+[2025-12-20 20:26:17] [SUCCESS] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+2025-12-20 20:26:17,741 [INFO] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+[2025-12-20 20:26:17] [INFO] Module hash_cracker completed successfully
+2025-12-20 20:26:17,742 [INFO] Module hash_cracker completed successfully
+[2025-12-20 20:28:13] [INFO] Running module: password/hash_cracker
+2025-12-20 20:28:13,042 [INFO] Running module: password/hash_cracker
+[2025-12-20 20:28:13] [SUCCESS] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+2025-12-20 20:28:13,054 [INFO] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+[2025-12-20 20:28:13] [INFO] Module hash_cracker completed successfully
+2025-12-20 20:28:13,055 [INFO] Module hash_cracker completed successfully
+[2025-12-20 20:28:32] [DEBUG] Background cleanup completed
+[2025-12-20 20:33:32] [DEBUG] Background cleanup completed
+[2025-12-20 20:38:32] [DEBUG] Background cleanup completed
+[2025-12-20 20:39:39] [INFO] Running module: password/hash_cracker
+2025-12-20 20:39:39,546 [INFO] Running module: password/hash_cracker
+[2025-12-20 20:39:39] [SUCCESS] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+2025-12-20 20:39:39,558 [INFO] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+[2025-12-20 20:39:39] [INFO] Module hash_cracker completed successfully
+2025-12-20 20:39:39,559 [INFO] Module hash_cracker completed successfully
+[2025-12-20 20:43:26] [INFO] Running module: password/hash_cracker
+2025-12-20 20:43:26,263 [INFO] Running module: password/hash_cracker
+[2025-12-20 20:43:26] [SUCCESS] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+2025-12-20 20:43:26,275 [INFO] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+[2025-12-20 20:43:26] [INFO] Module hash_cracker completed successfully
+2025-12-20 20:43:26,276 [INFO] Module hash_cracker completed successfully
+[2025-12-20 20:43:32] [DEBUG] Background cleanup completed
+[2025-12-20 20:48:32] [DEBUG] Background cleanup completed
+[2025-12-20 20:53:32] [DEBUG] Background cleanup completed
+[2025-12-20 20:58:32] [DEBUG] Background cleanup completed
+[2025-12-20 21:03:32] [DEBUG] Background cleanup completed
+[2025-12-20 21:08:32] [DEBUG] Background cleanup completed

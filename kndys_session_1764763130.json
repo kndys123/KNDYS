@@ -1,0 +1,14 @@
+{
+  "actions": [
+    {
+      "timestamp": "2025-12-03T11:58:50.984884",
+      "data": "Running module: wireless/wifi_scanner"
+    },
+    {
+      "timestamp": "2025-12-03T11:58:50.985463",
+      "data": "Running module: wireless/rogue_ap"
+    }
+  ],
+  "findings": [],
+  "credentials": []
+}

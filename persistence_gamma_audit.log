@@ -1,0 +1,9 @@
+{"timestamp": "2025-12-06T18:50:57.365011Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-06T18:51:11.750007Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-06T18:53:57.030938Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-06T19:07:09.375163Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-06T20:32:03.559614Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-06T20:33:05.700529Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-19T19:06:11.636746Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-19T19:15:56.104017Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}
+{"timestamp": "2025-12-19T19:29:09.501626Z", "session": "gamma", "technique": "linux_cron_pull", "category": "cron", "risk": "high"}

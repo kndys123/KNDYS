@@ -1,0 +1,108 @@
+{
+  "target": "example.com:443",
+  "mode": "balanced",
+  "baseline": {
+    "tls_version": "TLSv1.3",
+    "cipher": {
+      "name": "TLS_AES_256_GCM_SHA384",
+      "protocol": "TLSv1.3",
+      "bits": 256
+    },
+    "alpn": "h2",
+    "session_reused": false,
+    "ocsp_stapled": false
+  },
+  "certificate": {
+    "subject": "countryName=US, stateOrProvinceName=California, localityName=Los Angeles, organizationName=Internet Corporation for Assigned Names and Numbers, commonName=*.example.com",
+    "issuer": "countryName=US, organizationName=DigiCert Inc, commonName=DigiCert Global G3 TLS ECC SHA384 2020 CA1",
+    "not_before": "2025-01-15 00:00:00",
+    "not_after": "2026-01-15 23:59:59",
+    "days_remaining": 42,
+    "san": [
+      "*.example.com",
+      "example.com"
+    ],
+    "key_type": "EC",
+    "key_size": 256,
+    "signature_algorithm": "sha384",
+    "is_self_signed": false,
+    "warnings": []
+  },
+  "protocols": [
+    {
+      "version": "TLSV1",
+      "supported": false
+    },
+    {
+      "version": "TLSV1.1",
+      "supported": false
+    },
+    {
+      "version": "TLSV1.2",
+      "supported": true
+    },
+    {
+      "version": "TLSV1.3",
+      "supported": true
+    }
+  ],
+  "ciphers": [
+    {
+      "cipher": "RC4-SHA",
+      "accepted": true
+    },
+    {
+      "cipher": "DES-CBC3-SHA",
+      "accepted": true
+    },
+    {
+      "cipher": "EXP-EDH-RSA-DES-CBC-SHA",
+      "accepted": true
+    }
+  ],
+  "resumption": {},
+  "http_headers": {
+    "url": "https://example.com/",
+    "status": 200,
+    "hsts": null,
+    "csp": null,
+    "expect_ct": null,
+    "server": null
+  },
+  "score": 0,
+  "grade": "F",
+  "issues": [
+    {
+      "severity": "High",
+      "detail": "Weak RSA key size (256 bits)",
+      "remediation": "Use >=2048-bit RSA or elliptic curve keys"
+    },
+    {
+      "severity": "High",
+      "detail": "Legacy cipher accepted: RC4-SHA",
+      "remediation": "Disable export/legacy cipher suites"
+    },
+    {
+      "severity": "High",
+      "detail": "Legacy cipher accepted: DES-CBC3-SHA",
+      "remediation": "Disable export/legacy cipher suites"
+    },
+    {
+      "severity": "High",
+      "detail": "Legacy cipher accepted: EXP-EDH-RSA-DES-CBC-SHA",
+      "remediation": "Disable export/legacy cipher suites"
+    },
+    {
+      "severity": "Low",
+      "detail": "No OCSP stapling detected",
+      "remediation": "Enable OCSP stapling"
+    },
+    {
+      "severity": "Medium",
+      "detail": "Missing Strict-Transport-Security header",
+      "remediation": "Deploy HSTS to enforce HTTPS"
+    }
+  ],
+  "timestamp": 1764859506,
+  "duration": 2.5956075191497803
+}

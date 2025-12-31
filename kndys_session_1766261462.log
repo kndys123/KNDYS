@@ -1,0 +1,10 @@
+[2025-12-20 20:13:17] [INFO] Running module: password/hash_cracker
+2025-12-20 20:13:17,265 [INFO] Running module: password/hash_cracker
+[2025-12-20 20:13:17] [INFO] Module hash_cracker completed successfully
+2025-12-20 20:13:17,352 [INFO] Module hash_cracker completed successfully
+[2025-12-20 20:14:11] [INFO] Running module: password/hash_cracker
+2025-12-20 20:14:11,600 [INFO] Running module: password/hash_cracker
+[2025-12-20 20:14:11] [SUCCESS] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+2025-12-20 20:14:11,614 [INFO] Hash cracked (md5) 6a9156ea96a7... -> MiC0ntraS3ñaEsmUYd1FiCil@!op
+[2025-12-20 20:14:11] [INFO] Module hash_cracker completed successfully
+2025-12-20 20:14:11,615 [INFO] Module hash_cracker completed successfully

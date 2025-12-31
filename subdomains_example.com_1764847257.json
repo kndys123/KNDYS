@@ -1,0 +1,14 @@
+{
+  "domain": "example.com",
+  "timestamp": 1764847257,
+  "scan_time": "11.48s",
+  "total_subdomains": 1,
+  "subdomains": {
+    "www.example.com": {
+      "ip": "104.110.240.227",
+      "source": "BRUTE",
+      "http_status": "",
+      "server": ""
+    }
+  }
+}

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>KNDYS Banner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+    * { box-sizing: border-box; }
+    body {
+      background: #020305;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Space Mono', Consolas, monospace;
+    }
+    .kndys-banner {
+      background: radial-gradient(circle at 15% 20%, rgba(37,244,255,0.25), transparent 45%),
+                  radial-gradient(circle at 85% 10%, rgba(255,42,208,0.20), transparent 50%),
+                  #05070d;
+      color: #d7e7ff;
+      border: 1px solid rgba(80, 255, 255, 0.35);
+      box-shadow: 0 0 28px rgba(0, 255, 255, 0.15);
+      padding: 32px;
+      width: min(900px, 95%);
+      position: relative;
+      overflow: hidden;
+    }
+    .kndys-banner::before,
+    .kndys-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .kndys-banner::before {
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 100% 3px;
+      mix-blend-mode: screen;
+      animation: scan 4s linear infinite;
+    }
+    .kndys-banner::after {
+      background-image: repeating-linear-gradient(90deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.02) 2px,
+          transparent 2px,
+          transparent 4px);
+      opacity: 0.25;
+      animation: glitchShift 3s steps(2) infinite;
+    }
+    .grid-overlay {
+      position: absolute;
+      inset: 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+      pointer-events: none;
+    }
+    .panel-stack {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      position: relative;
+      z-index: 2;
+    }
+    .panel {
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 18px;
+      background: rgba(5, 7, 13, 0.85);
+      position: relative;
+      overflow: hidden;
+    }
+    .panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(0,255,255,0.06), rgba(255, 42, 208, 0.06));
+      mix-blend-mode: screen;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+    .panel h3 {
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      font-size: 13px;
+      margin: 0 0 12px;
+      color: #25f4ff;
+    }
+    .panel p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .logo-block {
+      grid-column: span 2;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .logo-text {
+      font-size: clamp(48px, 8vw, 86px);
+      letter-spacing: 0.15em;
+      color: #25f4ff;
+      text-shadow: 0 0 20px rgba(37, 244, 255, 0.5);
+    }
+    .logo-text span {
+      display: inline-block;
+      animation: flicker 2.4s linear infinite;
+    }
+    .logo-tag {
+      font-size: 13px;
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 6px 10px;
+      letter-spacing: 0.3em;
+    }
+    .warning {
+      color: #ff2ad0;
+      font-weight: bold;
+    }
+    .data-stream {
+      display: grid;
+      gap: 8px;
+      font-size: 12px;
+      color: rgba(215, 231, 255, 0.8);
+    }
+    .data-stream span {
+      display: inline-block;
+      animation: glitchText 1.6s steps(2) infinite;
+    }
+    .terminal {
+      background: rgba(0,0,0,0.45);
+      padding: 16px;
+      border: 1px solid rgba(37,244,255,0.3);
+      font-size: 13px;
+      color: #5cff6d;
+      min-height: 90px;
+      position: relative;
+    }
+    .terminal::after {
+      content: '';
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #ff3750;
+      box-shadow: 0 0 10px #ff3750;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    .terminal-line {
+      margin-bottom: 6px;
+      display: flex;
+      gap: 6px;
+    }
+    .terminal-line label {
+      color: #25f4ff;
+    }
+    .tag-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+    }
+    .tag {
+      padding: 4px 10px;
+      border: 1px solid currentColor;
+      text-transform: uppercase;
+    }
+    .tag.cyan { color: #25f4ff; }
+    .tag.magenta { color: #ff2ad0; }
+    .tag.green { color: #5cff6d; }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      45% { opacity: 0.85; }
+      50% { opacity: 0.3; }
+      55% { opacity: 0.95; }
+    }
+    @keyframes scan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(3px); }
+    }
+    @keyframes glitchText {
+      0% { text-shadow: 3px 0 rgba(255, 42, 208, 0.4), -3px 0 rgba(37, 244, 255, 0.5); }
+      50% { text-shadow: -3px 0 rgba(255, 42, 208, 0.3), 3px 0 rgba(37, 244, 255, 0.4); }
+      100% { text-shadow: 1px 0 rgba(255, 42, 208, 0.5), -1px 0 rgba(37, 244, 255, 0.5); }
+    }
+    @keyframes glitchShift {
+      0% { transform: translate3d(0,0,0); }
+      100% { transform: translate3d(-6px, 3px, 0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; box-shadow: 0 0 4px #ff3750; }
+      50% { opacity: 1; box-shadow: 0 0 14px #ff3750; }
+    }
+  </style>
+</head>
+<body>
+  <div class="kndys-banner">
+    <div class="grid-overlay"></div>
+
+    <div class="panel-stack">
+      <div class="panel logo-block">
+        <div class="logo-text"><span>K</span><span>N</span><span>D</span><span>Y</span><span>S</span></div>
+        <div class="logo-tag">OFFENSIVE SYSTEM</div>
+      </div>
+      <div class="panel">
+        <h3>Signal</h3>
+        <div class="data-stream">
+          <span>core.grid = SYNCHRONIZED;</span>
+          <span>opsec.mode = LOW_PROFILE;</span>
+          <span>payload.bank = 37 vectors ready;</span>
+        </div>
+      </div>
+      <div class="panel terminal">
+        <div class="terminal-line"><label>&gt;</label><span>INIT AI_SENTINEL</span></div>
+        <div class="terminal-line warning">Aida will judge you</div>
+        <div class="terminal-line"><label>&gt;</label><span>THREAT SCORE: escalating…</span></div>
+      </div>
+      <div class="panel">
+        <h3>Vectors</h3>
+        <div class="tag-stack">
+          <span class="tag cyan">RECON</span>
+          <span class="tag magenta">SPRAY</span>
+          <span class="tag green">PERSIST</span>
+          <span class="tag cyan">PIVOT</span>
+          <span class="tag magenta">AUTON</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

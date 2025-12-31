@@ -1,0 +1,23 @@
+{
+  "target": "scanme.nmap.org",
+  "timestamp": 1764846990,
+  "scan_time": "0.52s",
+  "open_ports": 3,
+  "results": {
+    "80": {
+      "service": "HTTP",
+      "banner": "Apache/2.4.7 (Ubuntu)",
+      "vulnerabilities": []
+    },
+    "22": {
+      "service": "SSH/SFTP",
+      "banner": "SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13",
+      "vulnerabilities": []
+    },
+    "9929": {
+      "service": "Unknown(9929)",
+      "banner": "",
+      "vulnerabilities": []
+    }
+  }
+}

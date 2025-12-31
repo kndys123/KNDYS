@@ -1,0 +1,28 @@
+{
+  "target": "scanme.nmap.org",
+  "scan_type": "tcp_connect",
+  "timestamp": 1764840013.56966,
+  "duration": 2.4574828147888184,
+  "ports_scanned": 4,
+  "open_ports": 2,
+  "results": {
+    "22": {
+      "port": 22,
+      "state": "open",
+      "protocol": "tcp",
+      "service": "SSH/SFTP",
+      "banner": "SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13",
+      "version": "",
+      "vulnerabilities": []
+    },
+    "80": {
+      "port": 80,
+      "state": "open",
+      "protocol": "tcp",
+      "service": "Apache/2.4.7 (Ubuntu)",
+      "banner": "HTTP/1.1 200 OK\r\nDate: Thu, 04 Dec 2025 09:20:13 GMT\r\nServer: Apache/2.4.7 (Ubuntu)\r\nAccept-Ranges: bytes\r\nVary: Accept-Encoding\r\nTransfer-Encoding: chunked\r\nContent-Type: text/html\r\n\r\n4c\r\n<!DOCTYPE h",
+      "version": "",
+      "vulnerabilities": []
+    }
+  }
+}

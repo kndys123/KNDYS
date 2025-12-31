@@ -1,0 +1,10 @@
+{
+  "target": "http://example.com/download?file=FUZZ",
+  "timestamp": 1764876223,
+  "profile": "balanced",
+  "depth": 6,
+  "duration": 5.928796052932739,
+  "payloads_tested": 324,
+  "findings": [],
+  "errors": []
+}

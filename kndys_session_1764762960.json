@@ -1,0 +1,10 @@
+{
+  "actions": [
+    {
+      "timestamp": "2025-12-03T11:56:00.234395",
+      "data": "Running module: post/privilege_escalation"
+    }
+  ],
+  "findings": [],
+  "credentials": []
+}

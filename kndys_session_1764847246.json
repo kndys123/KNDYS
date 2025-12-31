@@ -1,0 +1,16 @@
+{
+  "actions": [
+    {
+      "timestamp": "2025-12-04T11:20:46.058721",
+      "data": "Running module: recon/subdomain_scanner"
+    },
+    {
+      "timestamp": "2025-12-04T11:20:57.544261",
+      "data": "Module subdomain_scanner completed successfully"
+    }
+  ],
+  "findings": [],
+  "credentials": [],
+  "errors": [],
+  "start_time": "2025-12-04T11:20:46.058714"
+}

@@ -1,0 +1,43 @@
+{
+  "target": "http://example.com/search",
+  "timestamp": 1764853967,
+  "duration": 1.0199203491210938,
+  "mode": "fast",
+  "scope": "single",
+  "method": "GET",
+  "options": {
+    "threads": 4,
+    "timeout": 8.0,
+    "payload_limit": 6,
+    "include_forms": true,
+    "include_dom": false,
+    "stored_check": false,
+    "stealth": false,
+    "manual_parameters": [
+      "q"
+    ],
+    "custom_headers": [],
+    "cookies": []
+  },
+  "stats": {
+    "pages_enumerated": 1,
+    "forms_processed": 0,
+    "parameters_enumerated": 0,
+    "cases_executed": 6,
+    "requests": 6,
+    "waf_events": 0,
+    "errors": 0
+  },
+  "vulnerabilities": [],
+  "dom_findings": [],
+  "stored_findings": [],
+  "waf_events": [],
+  "errors": [],
+  "observations": [],
+  "discovery": {
+    "pages": 1,
+    "forms": 0,
+    "errors": [],
+    "parameters": 0
+  }
+}

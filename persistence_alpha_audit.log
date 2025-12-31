@@ -1,0 +1,9 @@
+{"timestamp": "2025-12-06T18:50:57.364114Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-06T18:51:11.749073Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-06T18:53:57.030087Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-06T19:07:09.374107Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-06T20:32:03.558530Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-06T20:33:05.691002Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-19T19:06:11.633438Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-19T19:15:56.097360Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}
+{"timestamp": "2025-12-19T19:29:09.497793Z", "session": "alpha", "technique": "linux_systemd_watchdog", "category": "systemd", "risk": "critical"}

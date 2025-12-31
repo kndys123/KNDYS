@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dedsec">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KNDYS Cyberdeck Preview</title>
+  <link rel="stylesheet" href="dedsec_theme.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Orbitron:wght@500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="layout">
+    <nav class="nav-rail" aria-label="Operations">
+      <h1>KNDYS</h1>
+      <div class="nav-item is-active">NODE 03 <span>RECON</span></div>
+      <div class="nav-item">OPS.Δ <span>EXPLOIT</span></div>
+      <div class="nav-item">VX-07 <span>SHELL</span></div>
+      <div class="nav-item">SIGMA <span>PERSIST</span></div>
+      <div class="nav-item">TRACE <span>REPORTS</span></div>
+    </nav>
+
+    <main class="main-grid">
+      <section class="panel panel--status-recon">
+        <h2>INTRUSION FEED</h2>
+        <div class="badge badge--warning">TRACE DAMPED</div>
+        <div class="metric-grid" style="margin-top: 18px;">
+          <div class="metric-card">
+            <label>Active Sessions</label>
+            <span>07</span>
+          </div>
+          <div class="metric-card">
+            <label>Spray Rate</label>
+            <span>142/s</span>
+          </div>
+          <div class="metric-card">
+            <label>Detections</label>
+            <span class="text-amber">02</span>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn">Launch Recon</button>
+          <button class="btn btn--danger">Trigger Breach</button>
+        </div>
+      </section>
+
+      <section class="panel panel--status-breach">
+        <h2>BREACH WATCH</h2>
+        <div class="alert alert--breach">
+          CRITICAL LOCKOUT EVENT :: VECTOR ALPHA :: MITIGATION REQUIRED
+        </div>
+        <div class="log-feed" aria-live="polite">
+          <div class="log-line log-line--crit">
+            <time>12:02:11</time>
+            <span>!! rate spike detected :: limiting to 120 req/s</span>
+          </div>
+          <div class="log-line log-line--warn">
+            <time>12:01:58</time>
+            <span>gateway issued 429 lockout code</span>
+          </div>
+          <div class="log-line log-line--ok">
+            <time>12:01:41</time>
+            <span>credential beta:sec***t validated</span>
+          </div>
+          <div class="log-line">
+            <time>12:01:22</time>
+            <span>spray batch 004 completed (256 attempts)</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>VECTOR MAP</h2>
+        <table class="table" role="grid">
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Latency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>mock://alpha</td>
+              <td>HTTP</td>
+              <td class="text-green">OK</td>
+              <td>52ms</td>
+            </tr>
+            <tr>
+              <td>ssh://ops-vm</td>
+              <td>SSH</td>
+              <td class="text-amber">WARN</td>
+              <td>211ms</td>
+            </tr>
+            <tr>
+              <td>https://console</td>
+              <td>HTTP</td>
+              <td class="text-red">LOCK</td>
+              <td>604ms</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>COMMAND CONSOLE</h2>
+        <form>
+          <div class="form-field">
+            <label>&gt; target_url</label>
+            <input type="url" placeholder="https://example.com/login" />
+          </div>
+          <div class="form-field">
+            <label>&gt; spray_profile</label>
+            <select>
+              <option>core</option>
+              <option>enterprise</option>
+              <option>low_slow</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>&gt; payload</label>
+            <textarea rows="4" placeholder="set username=root; set wordlist=spray"></textarea>
+          </div>
+          <div class="btn-row">
+            <button type="submit" class="btn">Execute</button>
+            <button type="button" class="btn btn--danger">Abort</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

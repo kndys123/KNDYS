@@ -1,0 +1,28 @@
+Vulnerability Scan Report - http://slusik.eu
+Generated: 2025-12-02 15:51:11.226758
+==================================================
+
+[CSRF]
+Details: Form without CSRF protection: /
+------------------------------
+[SSRF]
+Details: Potential SSRF to: http://169.254.169.254/latest/meta-data/
+------------------------------
+[Security Headers]
+Details: Missing X-Frame-Options (clickjacking protection)
+------------------------------
+[Security Headers]
+Details: Missing X-Content-Type-Options (MIME sniffing protection)
+------------------------------
+[Security Headers]
+Details: Missing X-XSS-Protection (XSS filter)
+------------------------------
+[Security Headers]
+Details: Missing HSTS header
+------------------------------
+[Security Headers]
+Details: Missing Content-Security-Policy
+------------------------------
+[Security Headers]
+Details: Missing Referrer-Policy
+------------------------------

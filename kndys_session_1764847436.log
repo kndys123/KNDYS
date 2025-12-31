@@ -1,0 +1,4 @@
+[2025-12-04 11:23:56] [INFO] Running module: recon/subdomain_scanner
+2025-12-04 11:23:56,867 [INFO] Running module: recon/subdomain_scanner
+[2025-12-04 11:24:01] [WARNING] Module subdomain_scanner interrupted
+2025-12-04 11:24:01,389 [WARNING] Module subdomain_scanner interrupted

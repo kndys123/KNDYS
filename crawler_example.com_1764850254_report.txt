@@ -1,0 +1,17 @@
+======================================================================
+WEB CRAWLER REPORT - KNDYS v3.0
+======================================================================
+
+Target: https://example.com
+Date: 2025-12-04 12:10:54
+Duration: 1.07s
+
+Statistics:
+  • Pages Crawled: 1
+  • Links Found: 0
+  • Forms Found: 0
+  • Emails: 0
+  • Phone Numbers: 0
+  • Js Endpoints: 0
+  • Sensitive Files: 0
+  • Vulnerabilities: 0

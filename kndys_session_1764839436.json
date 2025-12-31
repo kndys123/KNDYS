@@ -1,0 +1,308 @@
+{
+  "actions": [
+    {
+      "timestamp": "2025-12-04T09:13:58.589342",
+      "data": "Running module: recon/os_detection"
+    },
+    {
+      "timestamp": "2025-12-04T09:13:58.591448",
+      "data": "Module os_detection completed successfully"
+    },
+    {
+      "timestamp": "2025-12-04T09:15:36.807194",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:20:36.807832",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:25:36.808591",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:30:36.809286",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:35:36.810010",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:40:36.810902",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:45:36.812018",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:50:36.812969",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T09:55:36.813665",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:00:36.814429",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:05:36.815178",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:10:36.816018",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:15:36.816955",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:20:36.817811",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:25:36.818520",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:30:36.819276",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:35:36.819981",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:40:36.820770",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:45:36.821541",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:50:36.822439",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T10:55:36.823399",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:00:36.824398",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:05:36.825176",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:10:36.825983",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:15:36.826879",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:20:36.827648",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:25:36.828439",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:30:36.829309",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:35:36.830170",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:40:36.831151",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:45:36.832339",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:50:36.833236",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T11:55:36.834135",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:00:36.835094",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:05:36.835935",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:10:36.836845",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:15:36.837816",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:20:36.838928",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:25:36.839871",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:30:36.840824",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:35:36.841824",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:40:36.842760",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:45:36.843711",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:50:36.844637",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T12:55:36.845736",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:00:36.846588",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:05:36.847675",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:10:36.848814",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:15:36.849657",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:20:36.850575",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:25:36.851571",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:30:36.852624",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:35:36.853544",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:40:36.854554",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:45:36.855823",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:50:36.856921",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T13:55:36.857988",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:00:36.858988",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:05:36.859889",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:10:36.860861",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:15:36.861887",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:20:36.863118",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:25:36.864061",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:30:36.865146",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:35:36.866230",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:40:36.867296",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:45:36.868407",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:50:36.869964",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T14:55:36.870966",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T15:00:36.871934",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T15:05:36.872994",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T15:10:36.874052",
+      "data": "Background cleanup completed"
+    },
+    {
+      "timestamp": "2025-12-04T15:15:36.875074",
+      "data": "Background cleanup completed"
+    }
+  ],
+  "findings": [],
+  "credentials": [],
+  "errors": [],
+  "start_time": "2025-12-04T09:13:58.589332"
+}

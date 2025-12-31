@@ -1,0 +1,10 @@
+{
+  "actions": [
+    {
+      "timestamp": "2025-12-03T11:55:49.999508",
+      "data": "Running module: post/credential_dumper"
+    }
+  ],
+  "findings": [],
+  "credentials": []
+}
