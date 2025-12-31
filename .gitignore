@@ -6,6 +6,7 @@ wordlists/xato-net-10-million-usernames.txt
 
 # Large wordlists (>50MB)
 wordlists/*.txt
+wordlists/*.lst
 
 # Python
 __pycache__/
