@@ -16,34 +16,17 @@
 
 ## Overview
 
-KNDYS is a comprehensive penetration testing framework designed for security professionals, red teamers, and ethical hackers. It provides a unified interface for reconnaissance, vulnerability assessment, exploitation, and post-exploitation activities.
+KNDYS is a comprehensive penetration testing framework designed for security professionals, red teamers, and ethical hackers. It provides a unified interface for reconnaissance, vulnerability assessment, exploitation, and post-exploitation activities through 53 integrated modules.
 
-## Key Features
-
-### Reconnaissance & Intelligence
-- Advanced web crawling and content discovery
-- DNS enumeration and subdomain discovery
-- Port scanning and service detection
-- Network mapping and OS fingerprinting
-
-### Vulnerability Assessment
-- SQL injection testing (error-based, blind, time-based)
-- XSS detection (reflected, stored, DOM-based)
-- CSRF vulnerability scanning
-- Directory traversal and LFI/RFI testing
-- Command injection and XXE detection
-
-### Exploitation
-- Web application exploitation
-- Network-level attacks (ARP spoofing, DNS hijacking)
-- Wireless security testing
-- Social engineering campaigns
-
-### Post-Exploitation
-- Credential harvesting and dumping
-- Persistence mechanisms
-- Privilege escalation techniques
-- Network pivoting and lateral movement
+### 53 Integrated Modules
+- **Reconnaissance:** Port scanning, subdomain discovery, network mapping, OS detection, web crawling
+- **Vulnerability Assessment:** SQL injection, XSS, CSRF, SSL/TLS, directory traversal, command injection
+- **Web Exploitation:** SQL injection exploitation, XSS attacks, file upload bypass, XXE injection
+- **Network Attacks:** ARP spoofing, DNS spoofing, packet sniffing, SSL stripping, DHCP attacks
+- **Wireless Security:** WiFi scanning, cracking, rogue AP, network mapping
+- **Social Engineering:** Phishing, credential harvesting, website cloning, SMS spoofing, pretexting, mass mailing
+- **Post-Exploitation:** Credential dumping, privilege escalation, persistence, pivoting, lateral movement
+- **Utilities:** Hash cracking, brute force, API fuzzing, JWT attacks, QR code generation, reverse shells, reporting
 
 ---
 
@@ -194,13 +177,49 @@ See [DISCLAIMER.md](DISCLAIMER.md) for complete legal information.
 
 ## Documentation
 
-- ** [Complete Module Guide](GUIA_COMPLETA_MODULOS.md)** - **NEW!** Step-by-step guide for ALL 48 modules in simple language
-- **[Getting Started](GETTING_STARTED.md)** - Complete beginner's guide
-- **[Quick Start](QUICKSTART.md)** - Quick reference and examples
+- **[Complete Module Guide](GUIA_COMPLETA_MODULOS.md)** - Step-by-step guide for ALL 53 modules
+- **[Quick Start](INICIO_RAPIDO.md)** - Get started in 5 minutes
+- **[Usage Examples](EJEMPLOS_USO.md)** - Practical examples for all modules
 - **[Installation Help](INSTALL.md)** - Detailed installation guide
-- [Full Documentation](DOCUMENTATION_INDEX.md)
-- [Module Guide](MODULES_GUIDE_v3.1.md)
-- [Changelog](CHANGELOG.md)
+- **[Technical Analysis](ANALISIS_COMPLETO_MODULOS.md)** - In-depth module analysis
+- **[Changelog](CHANGELOG.md)** - Version history
+
+---
+
+## Module Overview
+
+**Reconnaissance (5 modules):**
+Port Scanner, Subdomain Scanner, Web Crawler, Network Mapper, OS Detection
+
+**Vulnerability Assessment (5 modules):**
+SQL Scanner, XSS Scanner, SSL/TLS Scanner, Vulnerability Scanner, CSRF Scanner
+
+**Web Exploitation (5 modules):**
+SQL Injection, XSS Exploit, Command Injection, Directory Traversal, File Upload
+
+**Network Attacks (5 modules):**
+ARP Spoofing, DNS Spoofing, Packet Sniffer, SSL Strip, DHCP Starvation
+
+**Wireless Security (3 modules):**
+WiFi Scanner, WiFi Cracker, Rogue AP
+
+**Social Engineering (6 modules):**
+Phishing, Credential Harvester, Website Cloner, SMS Spoofing, Pretexting, Mass Mailer
+
+**Post-Exploitation (4 modules):**
+Credential Dumper, Privilege Escalation, Persistence, Pivot
+
+**Password Attacks (3 modules):**
+Hash Cracker, Brute Force, Spray Attack
+
+**Advanced Testing (7 modules):**
+JWT Cracker, API Fuzzer, CORS Scanner, NoSQL Injection, GraphQL Introspection, Buffer Overflow, Credential Stuffing
+
+**Utilities (5 modules):**
+QR Generator, USB Payload, Fake Update, Report Generator, Evidence Collector
+
+**System Tools (3 modules):**
+Shell, File Explorer, Multi-Handler
 
 ---
 
@@ -226,28 +245,6 @@ Built for the security community. Thanks to all contributors and the open-source
 
 **Use Responsibly • Test Ethically • Secure The Future**
 
-Made with ️ for security professionals
+Made with care for security professionals
 
-</div> 
- cryptography
- paramiko
- python-nmap
- scapy
- beautifulsoup4
- sqlite3 (built-in)
-
-## Solución de Problemas
-
-### "Permission Denied"
-```bash
-chmod +x tt
-```
-
-### Scapy requiere root
-```bash
-sudo python3 tt
-```
-
-## Versión
-
-KNDYS Framework v3.0
+</div>

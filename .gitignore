@@ -1,19 +1,12 @@
-# Wordlists (too large for GitHub)
-wordlists/rockyou.txt
-wordlists/kndys-passwords-master.txt
-wordlists/kndys-usernames-master.txt
-wordlists/xato-net-10-million-usernames.txt
-
-# Large wordlists (>50MB)
-wordlists/*.txt
-wordlists/*.lst
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+env/
+venv/
+ENV/
 build/
 develop-eggs/
 dist/
@@ -29,13 +22,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
-
-# Virtual environments
-venv/
-ENV/
-env/
-.venv
 
 # IDE
 .vscode/
@@ -43,86 +29,25 @@ env/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-Thumbs.db
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
-# Session files
-kndys_session_*.json
-credentials_*.txt
-
-# Test files
-test_*.txt
-test_*.json
-test_*.csv
-
-# Reports
-*_report.txt
-*_report.json
-*_report.html
-crawler_*.txt
-crawler_*.json
-csrf_scan_*.txt
-csrf_scan_*.json
-dir_traversal_*.txt
-dir_traversal_*.json
-exercise_*.txt
-exercise_*.json
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Logs
 *.log
 logs/
 
-# Temporary files
-*.tmp
-*.temp
+# Cache
 .cache/
+*.cache
 
-# Test files
-test_*.py
-
-# Session logs and results
-*.log
-kndys_session_*.json
-
-# Scan/exercise results
-*_report.txt
-*_report.json
-crawler_*.json
-portscan_*.json
-ssl_scan_*.json
-subdomains_*.json
-vuln_scan_*.txt
-network_map_*.json
-os_detect_*.json
-xss_scan_*.json
-csrf_scan_*.json
-dir_traversal_*.json
-pivot_plan_*.json
-credentials_*.txt
-
-# Temporary directories
+# Temporary
+temp/
 tmp/
-run/
-set/
-use/
-ui/
-tt/
-tests/
-docs/
-handler_sessions/
-phish_site/
+*.tmp
 
-# Evidence and audit logs
-evidence.zip
-*_audit.log
-
-# Scripts
-test_modules.sh
-install.sh
+# Session files (framework specific)
+# kndys_session_*.json is automatically ignored below
